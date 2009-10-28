@@ -29,23 +29,24 @@ fi
 name="$1"; shift
 ipaddr="$1"; shift
 
-cat << msgend | /usr/sbin/sendmail -f nico.schottelius@inf.ethz.ch nico.schottelius@inf.ethz.ch asteven@inf.ethz.ch
-From: Nico Schottelius <nico.schottelius@inf.ethz.ch>
-To: Technische Hilfe <helpdesk@id.ethz.ch>
-CC: pseudo-cc@nowhere, asteven
+# From config
+from_name="Nico Schottelius"
+from_mail="nico.schottelius@inf.ethz.ch"
+to_mail="nico.schottelius@inf.ethz.ch"
+to_name="Technische Hilfe (ID)"
+
+# Send with BCC to us
+cat << msgend | /usr/sbin/sendmail -f "$from_mail" "$from_mail" "$to_mail" 
+From: "$from_name" <$from_mail>
+To: "$to_name" <$to_mail>
 X-Sexy: totally!
 Subject: DNS-Aenderung
 
-## sollte in ein header
 Hallo!
 
 Könnt ihr bitte folgende Anpassung im DNS vornehmen:
 
-## sollte in ein header (ENDE)
-
 - Den A-Eintrag "${name}.inf.ethz.ch" auf "${ipaddr}" einrichten
-
-## sollte in einen footer / konfiguration
 
 Beste Grüße,
 

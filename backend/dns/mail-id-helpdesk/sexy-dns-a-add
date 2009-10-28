@@ -32,7 +32,7 @@ ipaddr="$1"; shift
 # From config
 from_name="Nico Schottelius"
 from_mail="nico.schottelius@inf.ethz.ch"
-to_mail="nico.schottelius@inf.ethz.ch"
+to_mail="helpdesk@id.ethz.ch"
 to_name="Technische Hilfe (ID)"
 
 # Send with BCC to us

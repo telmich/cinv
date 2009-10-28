@@ -33,6 +33,7 @@ cat << msgend | /usr/sbin/sendmail -f nico.schottelius@inf.ethz.ch nico.schottel
 From: Nico Schottelius <nico.schottelius@inf.ethz.ch>
 To: Technische Hilfe <helpdesk@id.ethz.ch>
 CC: pseudo-cc@nowhere, asteven
+X-Sexy: totally!
 Subject: DNS-Aenderung
 
 ## sollte in ein header

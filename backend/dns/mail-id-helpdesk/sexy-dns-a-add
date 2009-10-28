@@ -18,6 +18,36 @@
 # along with sexy. If not, see <http://www.gnu.org/licenses/>.
 #
 #
-# Description here
+# Add an DNS A entry
 #
 
+if [ $# -ne 2 ]; then
+   echo "Usage: $0 <name> <ipv4addr>"
+   exit 1
+fi
+
+name="$1"; shift
+ipaddr="$1"; shift
+
+cat << msgend | /usr/sbin/sendmail -f nico.schottelius@inf.ethz.ch nico.schottelius@inf.ethz.ch asteven@inf.ethz.ch
+From: Nico Schottelius <nico.schottelius@inf.ethz.ch>
+To: Technische Hilfe <helpdesk@id.ethz.ch>
+CC: pseudo-cc@nowhere, asteven
+Subject: DNS-Aenderung
+
+## sollte in ein header
+Hallo!
+
+Könnt ihr bitte folgende Anpassung im DNS vornehmen:
+
+## sollte in ein header (ENDE)
+
+- Den A-Eintrag "${name}.inf.ethz.ch" auf "${ipaddr}" einrichten
+
+## sollte in einen footer / konfiguration
+
+Beste Grüße,
+
+Nico Schottelius
+
+msgend

@@ -45,6 +45,22 @@ $db/networks/<ipa>/
 $db/tags/<name>/
    description
 
+$db/config/backends/<type>/
+   get                  # symlink to get dir of selected backend implementation
+   set                  # symlink to set dir of selected backend implementation
+
+
+            dns            eth-id-ws
+            dns            generic-unix-nametools(with dig and co)
+libexec/<backend-type>/<backend-implementation>/
+   get/
+      get-subtype       # get-a-entry, get-cname, get....
+   set/
+      set-subtype       # get-a-entry, get-cname, get....
+   
+libexec/<backend-type>/<backend-implementation>/
+
+
 Naming / wording
 -----------------
 Host = ressource
@@ -106,7 +122,7 @@ sexy host add $name $tag1
 
 
 --------------------------------------------------------------------------------
-sexy host add $name $mac $ipv4a
+sexy host add $name $mac $ipv4a        AR=Nico
 
 results in
    host/$name/
@@ -119,6 +135,9 @@ sexy sync-to-backends(?)
    most likely == git push
 
 Backend part:
+
+   ???sexy-backend-FOO???: 
+
    gets changes: for ressource=$name, attributes=mac,ipv4a
    get current state for ressource=$name, attributes=mac,ipv4a
 

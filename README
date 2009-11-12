@@ -33,38 +33,123 @@ Where and how to store the information?
 $db/hosts/<name>/
    inventory-id         # 2150-XXXXXX
    mac                  # 00:de:ad:ba:be:00
-   ipa                  # 192.168.42.42
-   location             # freeform, one line
-   tags                 # foo, bar, ... (\n seperated)
-   type                 # freeform, one line
+   ipv4a                # 192.168.42.42
+   aliases              # fqdn, fdqn, ... (\n seperated)
+   tags                 # foo, bar, ..., can also be tag=value, "location=cab" (\n seperated)
 
-networks/<ipa>/
-   description
-   mask
-   vlan
+$db/networks/<ipa>/
+   description          # freeform, one line
+   mask                 # Bits: like 16, 25, ...
+   vlan                 # 
 
-# Optional
-tags/<name>/
+$db/tags/<name>/
    description
 
-
-Other tools I need
-------------------
-- host remove
-- host rename
-- host alias add
-- host change mac addr
-- host change ip addr
-
-Random thoughts
----------------
-- host alias add: create new inventory item, linked to the original one?
+Naming / wording
+-----------------
+Host = ressource
+Host has attributes
 
 
-Managing hosts
-~~~~~~~~~~~~~~
 
-Add host (sexy-add-host):
+How to realise the stored configuration?
+-----------------------------------------
+Via backends, which are independent of the frontend.
+
+General
+~~~~~~~
+The frontend defines the target state, while the backend
+analyses the target state, compares it to the
+present situation and applies the needed changes to get
+to the target state.
+
+
+Backend triggering
+~~~~~~~~~~~~~~~~~~
+
+- frontend generated data -> backend-process transfer
+- backend triggered by
+   - change: check after changes occured
+      - data collector: retrieve present situation for changed ressources
+   - time: check that configuration is still valid
+      - data collector: retrieve present situation for all ressources (contiously)
+
+Backend realisation
+~~~~~~~~~~~~~~~~~~~
+$backend <if ressources-> only ressources>
+   no args = all ressources (-> cron)
+
+
+DHCP
+~~~~
+
+Communication
+-------------
+
+Via Unix standard methods:
+
+- command line parameters ($@, ARGV, **argv, as you like)
+- stdin/stdout
+- environment variables
+
+Programming language
+~~~~~~~~~~~~~~~~~~~~
+Independent of the used language. Use the right tool for the right job!
+
+
+
+Detailled description of hosts management
+-----------------------------------------
+
+sexy host add $name $tag1
+   -> needs at least one tag.?????????
+
+
+--------------------------------------------------------------------------------
+sexy host add $name $mac $ipv4a
+
+results in
+   host/$name/
+      mac=$mac
+      ipv4a=$ipv4a
+[frontend done]
+
+sexy sync-to-backends(?)
+   transfers data to backend
+   most likely == git push
+
+Backend part:
+   gets changes: for ressource=$name, attributes=mac,ipv4a
+   get current state for ressource=$name, attributes=mac,ipv4a
+
+   apply needed changes for dns-entry and dhcp-entry
+
+dns-entry: host<->ipv4a
+   exists a-entry host?
+      yes: is it $ipv4a?
+         yes: done
+         no:
+            change to $ipv4
+      no:
+         add a-entry with value $ipv4
+
+dhcp-entry: host: mac<->ipv4a
+   exists dhcp-entry for $host?
+      yes: are mac and ipv4 correct?
+         yes: done
+         no:
+            change what needed
+      no:
+         add dhcp-entry with values $ipv4, $mac
+
+   
+
+--------------------------------------------------------------------------------
+
+
+Host add
+~~~~~~~~
+
 - hostname
 - type
 - location
@@ -78,3 +163,16 @@ Managing networks
 Add network?
 
 Add host to network
+
+Other tools I need
+------------------
+- host remove
+- host rename
+- host alias add
+- host change mac addr
+- host change ip addr
+
+Random thoughts
+---------------
+- host alias add: create new inventory item, linked to the original one?
+

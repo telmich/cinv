@@ -1,6 +1,7 @@
 #!/bin/sh
 
 set -e
+set -x
 
 name="$1"; shift
 type="$1"; shift
@@ -16,7 +17,7 @@ network_dir="${network_base}/${network}"
 
 
 if [ ! -d "${network_dir}" ]; then
-   echo No network configuration available for ${network}"
+   echo "No network configuration found for ${network}"
    exit 1
 fi
 

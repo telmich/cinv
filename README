@@ -1,0 +1,48 @@
+Sexy - the make-the-sysadmin-happy-tool
+========================================
+
+
+Preamble
+--------
+To be able to use the sexy suite, you have to agree to the following
+principle:
+
+
+- Do not care how something is done (realised with 'backends').
+- One aim is to minimise the time spend doing a job (realised with 'frontends').
+
+If you care about how things are done, sexy is suitable for you.
+
+
+Utilisation (= What I want to do)
+---------------------------------
+
+I want to add a new host ($name $mac $network $location $remarks)
+and after some time everything is working.
+
+What is everything?
+-------------------
+- Add host to my inventory
+- Add host to DHCP (I don't care which address it has)
+- Add host to DNS
+
+Random thoughts
+
+
+Managing hosts
+~~~~~~~~~~~~~~
+
+Add host (sexy-add-host):
+- hostname
+- type
+- location
+- mac-address (optional)
+- remarks
+
+
+Managing networks
+~~~~~~~~~~~~~~~~~
+
+Add network?
+
+Add host to network

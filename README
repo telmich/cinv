@@ -67,13 +67,31 @@ What needs to be implemented for backend X
 Backend dns
 ~~~~~~~~~~~
 
+dns/../get/a ->
+
 get
 ^^^
-   a
+   a:
+      input:
+         argv1 = $hostname
+      output:
+         stdout = ip or empty (not existing)
+         return code: ip = 0, not existing = 1
+
    cname-existing???????
 
 set
 ^^^^
+   a:
+      input:
+         argv1 = $hostname
+         argv2 = $ip
+      output:
+         ok: 
+            return code: 0
+         error:
+            return code: 1
+            stderr: <message>
 
 
 Naming / wording
@@ -181,8 +199,10 @@ dhcp-entry: host: mac<->ipv4a
 Concrete realisation plan (!!!!!!!!!!)
 --------------------------------------
 - Nico: sexy frontend for host add with name, mac, ipv4a
+- Steven: Define DNS-Backend specification (methods and ways for dns-backends: args, communication?)
 - Steven: utilise webservice for dns via command line (= dns/eth-id-ws implementation)
-- : utilise webservice for dns via command line (= dns/eth-id-ws implementation)
+- Create "generic-backend" that accepts changes and calls specific implementations (=backend-runner, give-me-a-name)
+- :Get current dns state (unix-generic)
 
 
 Host add

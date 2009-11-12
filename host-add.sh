@@ -25,12 +25,13 @@ set -e
 set -x
 
 name="$1"; shift
+mac="$1"; shift
 type="$1"; shift
 location="$1"; shift
+ipa="$1"; shift
 
 # optional?
-network="$1"; shift
-address="..."
+#address="..."
 
 # FIXME
 basedir="./"

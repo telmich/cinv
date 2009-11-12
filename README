@@ -19,13 +19,34 @@ Utilisation (= What I want to do)
 I want to add a new host ($name $mac $network $location $remarks)
 and after some time everything is working. I do not want to spend
 any time on waiting, but want to be notified, when everything is
-working.
+working or if after a time out stuff is *not* working.
 
 What is everything?
 -------------------
 - Add host to my inventory
 - Add host to DHCP (I don't care which address it has)
 - Add host to DNS
+
+
+Where and how to store the information?
+---------------------------------------
+$db/hosts/<name>/
+   inventory-id         # 2150-XXXXXX
+   mac                  # 00:de:ad:ba:be:00
+   ipa                  # 192.168.42.42
+   location             # freeform, one line
+   tags                 # foo, bar, ... (\n seperated)
+   type                 # freeform, one line
+
+networks/<ipa>/
+   description
+   mask
+   vlan
+
+# Optional
+tags/<name>/
+   description
+
 
 Other tools I need
 ------------------

@@ -16,9 +16,10 @@ If you care about how things are done, sexy is suitable for you.
 
 Utilisation (= What I want to do)
 ---------------------------------
-
 I want to add a new host ($name $mac $network $location $remarks)
-and after some time everything is working.
+and after some time everything is working. I do not want to spend
+any time on waiting, but want to be notified, when everything is
+working.
 
 What is everything?
 -------------------
@@ -26,7 +27,17 @@ What is everything?
 - Add host to DHCP (I don't care which address it has)
 - Add host to DNS
 
+Other tools I need
+------------------
+- host remove
+- host rename
+- host alias add
+- host change mac addr
+- host change ip addr
+
 Random thoughts
+---------------
+- host alias add: create new inventory item, linked to the original one?
 
 
 Managing hosts

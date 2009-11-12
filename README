@@ -230,7 +230,36 @@ Other tools I need
 - host change mac addr
 - host change ip addr
 
+
+Database ideas
+--------------
+Trusted DB without modifications from unstrusted people!
+
+
+DHCP
+----
+
+host {
+   # var=value
+   # var=value
+   # var=value
+   # var=value
+}
+
+--> untrusted  source!
+
+
+cconfig
+-------
+- Easy to use!
+- Easily version controlled
+
+
+
+
 Random thoughts
 ---------------
 - host alias add: create new inventory item, linked to the original one?
+
+
 

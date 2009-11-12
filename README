@@ -21,6 +21,7 @@ and after some time everything is working. I do not want to spend
 any time on waiting, but want to be notified, when everything is
 working or if after a time out stuff is *not* working.
 
+
 What is everything?
 -------------------
 - Add host to my inventory
@@ -40,7 +41,7 @@ $db/hosts/<name>/
 $db/networks/<ipa>/
    description          # freeform, one line
    mask                 # Bits: like 16, 25, ...
-   vlan                 # 
+   vlan                 # ????????
 
 $db/tags/<name>/
    description
@@ -59,6 +60,20 @@ libexec/<backend-type>/<backend-implementation>/
       set-subtype       # get-a-entry, get-cname, get....
    
 libexec/<backend-type>/<backend-implementation>/
+
+What needs to be implemented for backend X
+------------------------------------------
+
+Backend dns
+~~~~~~~~~~~
+
+get
+^^^
+   a
+   cname-existing???????
+
+set
+^^^^
 
 
 Naming / wording
@@ -161,9 +176,13 @@ dhcp-entry: host: mac<->ipv4a
       no:
          add dhcp-entry with values $ipv4, $mac
 
-   
-
 --------------------------------------------------------------------------------
+
+Concrete realisation plan (!!!!!!!!!!)
+--------------------------------------
+- Nico: sexy frontend for host add with name, mac, ipv4a
+- Steven: utilise webservice for dns via command line (= dns/eth-id-ws implementation)
+- : utilise webservice for dns via command line (= dns/eth-id-ws implementation)
 
 
 Host add

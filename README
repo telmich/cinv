@@ -39,9 +39,8 @@ $db/hosts/<name>/
    tags                 # foo, bar, ..., can also be tag=value, "location=cab" (\n seperated)
 
 $db/networks/<ipa>/
-   description          # freeform, one line
    mask                 # Bits: like 16, 25, ...
-   vlan                 # ????????
+   tags                 # v790, server-network,..., can also be tag=value, "location=cab" (\n seperated)
 
 $db/tags/<name>/
    description
@@ -205,14 +204,17 @@ Concrete realisation plan (!!!!!!!!!!)
 - :Get current dns state (unix-generic)
 
 
-Host add
-~~~~~~~~
+Sexy commands
+-------------
 
-- hostname
-- type
-- location
-- mac-address (optional)
-- remarks
+host -<c|d> -h <hostname> -t <tag> -m <mac-address> -4 <ipv4-address>
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+-c: create or change host (creates it, if non existing)
+-d: delete host
+
+network -<c|d> -h <hostname> -t <tag> -m <mac-address> -4 <ipv4-address>
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 
 Managing networks
@@ -222,13 +224,12 @@ Add network?
 
 Add host to network
 
-Other tools I need
-------------------
 - host remove
 - host rename
 - host alias add
 - host change mac addr
 - host change ip addr
+
 
 
 Database ideas

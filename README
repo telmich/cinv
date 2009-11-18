@@ -36,11 +36,11 @@ $db/hosts/<name>/
    mac                  # 00:de:ad:ba:be:00
    ipv4a                # 192.168.42.42
    aliases              # fqdn, fdqn, ... (\n seperated)
-   tags                 # foo, bar, ..., can also be tag=value, "location=cab" (\n seperated)
+   tags                 # foo, bar, ..., (\n seperated)
 
 $db/networks/<ipa>/
    mask                 # Bits: like 16, 25, ...
-   tags                 # v790, server-network,..., can also be tag=value, "location=cab" (\n seperated)
+   tags                 # v790, server-network,..., (\n seperated)
 
 $db/tags/<name>/
    description

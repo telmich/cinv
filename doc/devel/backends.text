@@ -1,0 +1,266 @@
+Sexy - the make-the-sysadmin-happy-tool
+========================================
+sexy-0.1 - give sysadmins time to play nethack
+
+Preamble
+--------
+To be able to use the sexy suite, you have to agree to the following
+principle:
+
+
+- Do not care how something is done (realised with 'backends').
+- One aim is to minimise the time spend doing a job (realised with 'frontends').
+
+If you care about how things are done, sexy is suitable for you.
+
+
+Utilisation (= What I want to do)
+---------------------------------
+I want to add a new host ($name $mac $network $location $remarks)
+and after some time everything is working. I do not want to spend
+any time on waiting, but want to be notified, when everything is
+working or if after a time out stuff is *not* working.
+
+
+What is everything?
+-------------------
+- Add host to my inventory
+- Add host to DHCP (I don't care which address it has)
+- Add host to DNS
+
+
+Where and how to store the information?
+---------------------------------------
+$db/hosts/<fqdn>/
+   inventory-id         # 2150-XXXXXX
+   mac                  # 00:de:ad:ba:be:00
+   ipv4a                # 192.168.42.42
+   aliases              # fqdn, fdqn, ... (\n seperated)
+   tags                 # foo, bar, ..., (\n seperated)
+
+$db/networks/<ipa>/
+   mask                 # Bits: like 16, 25, ...
+   tags                 # v790, server-network,..., (\n seperated)
+
+$db/tags/<name>/
+   description
+
+$db/config/backends/<type>/
+   get                  # symlink to get dir of selected backend implementation
+   set                  # symlink to set dir of selected backend implementation
+
+
+            dns            eth-id-ws
+            dns            generic-unix-nametools(with dig and co)
+libexec/<backend-type>/<backend-implementation>/
+   get/
+      get-subtype       # get-a-entry, get-cname, get....
+   set/
+      set-subtype       # get-a-entry, get-cname, get....
+   
+libexec/<backend-type>/<backend-implementation>/
+
+What needs to be implemented for backend X
+------------------------------------------
+
+Backend dns
+~~~~~~~~~~~
+
+dns/../get/a ->
+
+get
+^^^
+   a:
+      input:
+         argv1 = $hostname
+      output:
+         stdout = ip or empty (not existing)
+         return code: ip = 0, not existing = 1
+
+   cname-existing???????
+
+set
+^^^^
+   a:
+      input:
+         argv1 = $hostname
+         argv2 = $ip
+      output:
+         ok: 
+            return code: 0
+         error:
+            return code: 1
+            stderr: <message>
+
+
+Naming / wording
+-----------------
+Host = ressource
+Host has attributes
+
+
+
+How to realise the stored configuration?
+-----------------------------------------
+Via backends, which are independent of the frontend.
+
+General
+~~~~~~~
+The frontend defines the target state, while the backend
+analyses the target state, compares it to the
+present situation and applies the needed changes to get
+to the target state.
+
+
+Backend triggering
+~~~~~~~~~~~~~~~~~~
+
+- frontend generated data -> backend-process transfer
+- backend triggered by
+   - change: check after changes occured
+      - data collector: retrieve present situation for changed ressources
+   - time: check that configuration is still valid
+      - data collector: retrieve present situation for all ressources (contiously)
+
+Backend realisation
+~~~~~~~~~~~~~~~~~~~
+$backend <if ressources-> only ressources>
+   no args = all ressources (-> cron)
+
+
+DHCP
+~~~~
+
+Communication
+-------------
+
+Via Unix standard methods:
+
+- command line parameters ($@, ARGV, **argv, as you like)
+- stdin/stdout
+- environment variables
+
+Programming language
+~~~~~~~~~~~~~~~~~~~~
+Independent of the used language. Use the right tool for the right job!
+
+
+
+Detailled description of hosts management
+-----------------------------------------
+
+sexy host add $name $tag1
+   -> needs at least one tag.?????????
+
+
+--------------------------------------------------------------------------------
+sexy host add $name $mac $ipv4a        AR=Nico
+
+results in
+   host/$name/
+      mac=$mac
+      ipv4a=$ipv4a
+[frontend done]
+
+sexy sync-to-backends(?)
+   transfers data to backend
+   most likely == git push
+
+Backend part:
+
+   ???sexy-backend-FOO???: 
+
+   gets changes: for ressource=$name, attributes=mac,ipv4a
+   get current state for ressource=$name, attributes=mac,ipv4a
+
+   apply needed changes for dns-entry and dhcp-entry
+
+dns-entry: host<->ipv4a
+   exists a-entry host?
+      yes: is it $ipv4a?
+         yes: done
+         no:
+            change to $ipv4
+      no:
+         add a-entry with value $ipv4
+
+dhcp-entry: host: mac<->ipv4a
+   exists dhcp-entry for $host?
+      yes: are mac and ipv4 correct?
+         yes: done
+         no:
+            change what needed
+      no:
+         add dhcp-entry with values $ipv4, $mac
+
+--------------------------------------------------------------------------------
+
+Concrete realisation plan (!!!!!!!!!!)
+--------------------------------------
+- Nico: sexy frontend for host add with name, mac, ipv4a
+- Steven: Define DNS-Backend specification (methods and ways for dns-backends: args, communication?)
+- Steven: utilise webservice for dns via command line (= dns/eth-id-ws implementation)
+- Create "generic-backend" that accepts changes and calls specific implementations (=backend-runner, give-me-a-name)
+- :Get current dns state (unix-generic)
+
+
+Sexy commands
+-------------
+
+host -<c|d> -h <hostname> -t <tag> -m <mac-address> -4 <ipv4-address>
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+-c: create or change host (creates it, if non existing)
+-d: delete host
+
+network -<c|d> -n <network> -t <tag> -m <mac-address> -4 <ipv4-address>
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+
+Missing / unimplemented commands
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+- host rename
+- host alias add
+- host change mac addr
+- host change ip addr
+
+
+Examples
+~~~~~~~~
+sexy host add
+
+
+Database ideas
+--------------
+Trusted DB without modifications from unstrusted people!
+
+
+DHCP
+----
+
+host {
+   # var=value
+   # var=value
+   # var=value
+   # var=value
+}
+
+--> untrusted  source!
+
+
+cconfig
+-------
+- Easy to use!
+- Easily version controlled
+
+
+
+
+Random thoughts
+---------------
+- host alias add: create new inventory item, linked to the original one?
+
+
+

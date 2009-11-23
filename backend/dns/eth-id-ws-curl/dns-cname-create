@@ -1,0 +1,21 @@
+#!/bin/sh
+
+set -x
+
+[ $# -eq 2 ] || exit 1
+
+domain="ethz.ch"
+
+hostname="$1";shift
+cname="$1";shift
+
+#cat << eof | curl  --insecure --basic --request POST --header "Content-Type: text/xml" --netrc https://www.komcenter.ethz.ch/ip/rest/nameToIP
+cat << eof | curl --verbose --basic --netrc --insecure --request POST --header "Content-Type: text/xml" --data - https://www.komcenter.ethz.ch/ip/rest/alias
+<insert>
+  <alias>
+    <fqName>${cname}.${domain}</fqName>
+    <hostName>${hostname}.${domain}</hostName>
+    <ttl>600</ttl>
+  </alias>
+</insert>
+eof

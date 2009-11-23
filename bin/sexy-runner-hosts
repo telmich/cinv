@@ -45,8 +45,8 @@ for host in *; do
    
    # check name assignments (dns):
    # 
-   # - check a-entry 
-   # - check ptr-entry 
+   # - check a-entry
+   # - check ptr-entry
    # - check all cnames
    # 
    # 

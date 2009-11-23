@@ -1,0 +1,47 @@
+#!/bin/sh
+# 
+# 2009      Nico Schottelius (nico-sexy at schottelius.org)
+# 
+# This file is part of sexy.
+#
+# sexy is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+# 
+# sexy is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+# 
+# You should have received a copy of the GNU General Public License
+# along with sexy. If not, see <http://www.gnu.org/licenses/>.
+#
+#
+# This is the main sexy part
+#
+#
+# ( (Run over the config, compare with reality) OR
+#   (Get some changes to apply) ) AND
+# (Apply needed changes to infrastructure)
+#
+
+set -e
+
+################################################################################
+# standard vars stolen from cconf
+__pwd="$(pwd -P)"
+__mydir="${0%/*}"; __abs_mydir="$(cd "$__mydir" && pwd -P)"
+__myname=${0##*/}; __abs_myname="$__abs_mydir/$__myname"
+
+. "${__mydir}/sexy-config-load"
+
+
+# if something was supplied, we take stdin as the changes, otherwise we compare the
+# db with reality. FIXME: patch has not yet been implemented.
+[ $# -gt 0 ] && patch="-p"
+
+# Go through all interesting object types and compare them
+for interest in ${sexy_runner_known}; do
+   sexy-runner-${interest} ${patch}
+done

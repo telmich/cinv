@@ -213,23 +213,23 @@ host -<c|d> -h <hostname> -t <tag> -m <mac-address> -4 <ipv4-address>
 -c: create or change host (creates it, if non existing)
 -d: delete host
 
-network -<c|d> -h <hostname> -t <tag> -m <mac-address> -4 <ipv4-address>
+network -<c|d> -n <network> -t <tag> -m <mac-address> -4 <ipv4-address>
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 
-Managing networks
-~~~~~~~~~~~~~~~~~
 
-Add network?
+Missing / unimplemented commands
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Add host to network
-
-- host remove
 - host rename
 - host alias add
 - host change mac addr
 - host change ip addr
 
+
+Examples
+~~~~~~~~
+sexy host add
 
 
 Database ideas

@@ -18,7 +18,12 @@
 # along with sexy. If not, see <http://www.gnu.org/licenses/>.
 #
 #
-# Add a tag to an object
+# This is the main sexy part
+#
+#
+# ( (Run over the config, compare with reality) OR
+#   (Get some changes to apply) ) AND
+# (Apply needed changes to infrastructure)
 #
 
 set -e
@@ -31,24 +36,12 @@ __myname=${0##*/}; __abs_myname="$__abs_mydir/$__myname"
 
 . "${__mydir}/sexy-config-load"
 
-object="$1"; shift
 
-while [ $# -gt 0 ]; do
-   newtag="$1"; shift
+# if something was supplied, we take stdin as the changes, otherwise we compare the
+# db with reality. FIXME: patch has not yet been implemented.
+[ $# -gt 0 ] && patch="-p"
 
-   # go through all possible types
-   for type in $sexy_object_types; do
-      # path to object
-      to="${type}/${object}"
-      pto="${sexy_db}/${to}"
-
-      # existing object?
-      if [ -d "${pto}" ]; then
-         # path to type object tags
-         ptot="${pto}/${sexy_path_tags}"
-         echo "${newtag}" >> "${ptot}"
-      fi
-   done
+# Go through all interesting object types and compare them
+for interest in ${sexy_runner_known}; do
+   sexy-runner-${interest} ${patch}
 done
-
-exit 0

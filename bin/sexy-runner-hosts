@@ -18,12 +18,8 @@
 # along with sexy. If not, see <http://www.gnu.org/licenses/>.
 #
 #
-# This is the main sexy part
+# Make sure all hosts exists in the external databases, as we like it!
 #
-#
-# ( (Run over the config, compare with reality) OR
-#   (Get some changes to apply) ) AND
-# (Apply needed changes to infrastructure)
 #
 
 set -e
@@ -41,7 +37,25 @@ __myname=${0##*/}; __abs_myname="$__abs_mydir/$__myname"
 # db with reality. FIXME: patch has not yet been implemented.
 [ $# -gt 0 ] && patch="-p"
 
-# Go through all interesting object types and compare them
-for interest in ${sexy_runner_known}; do
-   sexy-runner-${interest} ${patch}
+# no hosts base? nothing to do!
+cd "${sexy_db_hosts}" || exit 0
+
+for host in *; do
+   # check ip-address assignment (dhcp/static)
+   
+   # check name assignments (dns):
+   # 
+   # - check a-entry 
+   # - check ptr-entry 
+   # - check all cnames
+   # 
+   # 
+   # 
+   # 
+   # 
+   # 
+   # 
+   # 
+   # 
+
 done

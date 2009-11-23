@@ -44,6 +44,7 @@ for host in *; do
    # check ip-address assignment (dhcp/static)
    
    # check name assignments (dns):
+   # - select correct backend
    # 
    # - check a-entry
    # - check ptr-entry

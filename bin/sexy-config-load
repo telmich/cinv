@@ -24,11 +24,15 @@
 # where our database can be found
 sexy_db="${sexy_db:-$HOME/.sexy}"
 
-# what we care about
-sexy_object_types="hosts networks"
-
 # pathnames for objects
-sexy_path_tags="tags"
+: ${sexy_path_tags:="tags"}
+: ${sexy_path_hosts:="hosts"}
+: ${sexy_path_networks="networks"}
+
+# what who cares about
+sexy_object_types="${sexy_path_hosts} ${sexy_path_networks}"
+
+sexy_runner_known="${sexy_path_hosts}"
 
 usage()
 {

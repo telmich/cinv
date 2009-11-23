@@ -60,39 +60,6 @@ libexec/<backend-type>/<backend-implementation>/
    
 libexec/<backend-type>/<backend-implementation>/
 
-What needs to be implemented for backend X
-------------------------------------------
-
-Backend dns
-~~~~~~~~~~~
-
-dns/../get/a ->
-
-get
-^^^
-   a:
-      input:
-         argv1 = $hostname
-      output:
-         stdout = ip or empty (not existing)
-         return code: ip = 0, not existing = 1
-
-   cname-existing???????
-
-set
-^^^^
-   a:
-      input:
-         argv1 = $hostname
-         argv2 = $ip
-      output:
-         ok: 
-            return code: 0
-         error:
-            return code: 1
-            stderr: <message>
-
-
 Naming / wording
 -----------------
 Host = ressource

@@ -21,6 +21,18 @@
 # Load the configuration - this script should be sourced
 #
 
+# where our database can be found
 sexy_db="${sexy_db:-$HOME/.sexy}"
 
+# what we care about
+sexy_object_types="hosts networks"
+
+# pathnames for objects
+sexy_path_tags="tags"
+
+usage()
+{
+   echo "${__myname}: $@"
+   exit 0
+}
 

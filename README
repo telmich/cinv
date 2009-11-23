@@ -31,7 +31,7 @@ What is everything?
 
 Where and how to store the information?
 ---------------------------------------
-$db/hosts/<name>/
+$db/hosts/<fqdn>/
    inventory-id         # 2150-XXXXXX
    mac                  # 00:de:ad:ba:be:00
    ipv4a                # 192.168.42.42

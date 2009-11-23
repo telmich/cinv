@@ -1,0 +1,62 @@
+#!/bin/sh
+# 
+# 2009      Nico Schottelius (nico-sexy at schottelius.org)
+# 
+# This file is part of sexy.
+#
+# sexy is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+# 
+# sexy is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+# 
+# You should have received a copy of the GNU General Public License
+# along with sexy. If not, see <http://www.gnu.org/licenses/>.
+#
+#
+# Add a host (and do all the stuff depending on it)
+#
+
+################################################################################
+# standard vars stolen from cconf
+__pwd="$(pwd -P)"
+__mydir="${0%/*}"; __abs_mydir="$(cd "$__mydir" && pwd -P)"
+__myname=${0##*/}; __abs_myname="$__abs_mydir/$__myname"
+
+set -e
+
+usage()
+{
+   echo "${__myname}: <hostname> <mac> <network|address>"
+   exit 1
+}
+
+[ $# -eq 3 ] || usage
+
+name="$1"; shift
+mac="$1"; shift
+ipv4a="$1"; shift
+
+#type="$1"; shift
+#location="$1"; shift
+dhcp="eth-bd-svn"
+dns="eth-id-ws"
+
+echo "sexy: Warning: Running in dummy mode"
+echo "----------------------------------------------------------------------" 
+echo "Creating database entry for \"$name\" ... OK"
+echo "DHCP: Adding host \"$name\" with mac \"$mac\" ... OK" 
+echo "DHCP: Selected bachend \"$dhcp\" ... OK"
+echo "DB: Selecting next free IP address ... OK"
+echo "DHCP<$dhcp>: Adding $name ($ipv4a, $mac) ... OK"
+echo "DNS: Adding host $name with address $ipv4a ... OK" 
+echo "DNS: Selected bachend \"$dns\" ... OK"
+echo "DB: Selecting address for $name ... OK"
+echo "DNS<$dns>: Adding forward and reverse DNS for $name <-> $ipv4a ... FAILED"
+echo "DNS<$dns>: Backend not reachable."
+echo "----------------------------------------------------------------------" 
+

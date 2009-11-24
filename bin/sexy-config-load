@@ -24,19 +24,25 @@
 # where our database can be found
 sexy_db="${sexy_db:-$HOME/.sexy}"
 
-# pathnames for objects
-: ${sexy_path_tags:="tags"}
-: ${sexy_path_hosts:="hosts"}
-: ${sexy_path_networks="networks"}
+sexy_objects="backends hosts networks tags"
 
-sexy_db="${sexy_db:-$HOME/.sexy}"
-# If there are more types, create an eval loop to create db entries
-sexy_db_hosts="${sexy_db}/${sexy_path_hosts}"
-sexy_db_networks="${sexy_db}/${sexy_path_networks}"
+for sexy_object in $sexy_objects; do
+   # This is the same as
+   # : ${sexy_path_backends:="backends"}
+   # just for variable names
+   eval \: \${sexy_path_${sexy_object}:="$sexy_object"}
 
-# what who cares about
+   #
+   # Create full path in db, like
+   # sexy_db_backends="${sexy_db}/${sexy_path_networks}"
+   #
+   eval sexy_db_${sexy_object}=\"${sexy_db}/\${sexy_path_${sexy_object}}\"
+   eval echo "\${sexy_db_${sexy_object}}"
+done
+sexy_object=""
+
+# What cares about what
 sexy_object_types="${sexy_path_hosts} ${sexy_path_networks}"
-
 sexy_runner_known="${sexy_path_hosts}"
 
 usage()

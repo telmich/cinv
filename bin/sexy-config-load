@@ -36,8 +36,10 @@ for sexy_object in $sexy_objects; do
    # Create full path in db, like
    # sexy_db_backends="${sexy_db}/${sexy_path_networks}"
    #
-   eval sexy_db_${sexy_object}=\"${sexy_db}/\${sexy_path_${sexy_object}}\"
-   eval echo "\${sexy_db_${sexy_object}}"
+   eval sexy_db_${sexy_object}="\"${sexy_db}/\${sexy_path_${sexy_object}}\""
+
+   # Debug output
+   # eval echo "\${sexy_db_${sexy_object}}"
 done
 sexy_object=""
 

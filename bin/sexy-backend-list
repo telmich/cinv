@@ -18,7 +18,7 @@
 # along with sexy. If not, see <http://www.gnu.org/licenses/>.
 #
 #
-# Add a host (and do all the stuff depending on it)
+# List possible backends for chosen types
 #
 
 set -e
@@ -32,10 +32,15 @@ __myname=${0##*/}; __abs_myname="$__abs_mydir/$__myname"
 . "${__mydir}/sexy-config-load"
 
 while [ $# -gt 0 ]; do
-   object="$1"; shift
+   backend_type="$1"; shift
+
+   backend_dir="${sexy_db_backend}/${backend_type}"
+   if [ -d "${backend_dir}" ]; then
+
+   fi
 
    # go through all possible types
-   for type in $sexy_object_types; do
+   for implementation in $sexy_object_types; do
       # path to object
       to="${type}/${object}"
       pto="${sexy_db}/${to}"

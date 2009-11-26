@@ -25,8 +25,10 @@ set -e
 
 . "$(which sexy-config-load)"
 
-host="$1"; shift
+type="$1"; shift
+object="$1"; shift
+attribute="$1"; shift
 
-cat "${sexy_db_hosts}/${host}/ipv4a"
-
-exit 0
+eval path=\""\${sexy_db_${type}}/${object}/${attribute}"\"
+echo $path
+cat "${path}"

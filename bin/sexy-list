@@ -26,9 +26,7 @@ set -e
 . "$(which sexy-config-load)"
 
 type="$1"; shift
-object="$1"; shift
-attribute="$1"; shift
 
-eval path=\""\${sexy_db_${type}}/${object}/${attribute}"\"
-echo $path
-cat "${path}"
+eval basedir=\""\${sexy_db_${type}}"\"
+
+cd "${basedir}" && ls -1

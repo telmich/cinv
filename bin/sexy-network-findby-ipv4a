@@ -25,10 +25,8 @@ set -e
 
 . "$(which sexy-config-load)"
 
-type="$1"; shift
-object="$1"; shift
-attribute="$1"; shift
+ipv4a="$1"; shift
 
-eval path=\""\${sexy_db_${type}}/${object}/${attribute}"\"
-echo $path
-cat "${path}"
+for network in $(sexy-network-list); do
+   sexy-network-ipv4a-inside ${network} ${ipv4a}
+done

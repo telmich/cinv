@@ -21,8 +21,22 @@
 # Load the configuration - this script should be sourced
 #
 
+################################################################################
+# standard vars stolen from cconf, renamed for sexy
+__sexy_pwd="$(pwd -P)"
+__sexy_mydir="${0%/*}"; __sexy_abs_mydir="$(cd "$__sexy_mydir" && pwd -P)"
+__sexy_myname=${0##*/}; __sexy_abs_myname="$__sexy_abs_mydir/$__sexy_myname"
+
+
 # where our database can be found
 sexy_db="${sexy_db:-$HOME/.sexy}"
+sexy_db_abs="$( cd "${sexy_db}" && pwd -P)"
+
+#
+# Determine the current configuration directory
+# A very mysterious, powerfull expression:
+# Use the sexy db base + config + # Remove the database path, add the sexy db base + config +  
+sexy_my_config="${sexy_db_abs}/config${__sexy_abs_mydir##$sexy_db_abs}"
 
 sexy_objects="backends hosts networks tags"
 

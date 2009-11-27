@@ -93,3 +93,21 @@ Output:
 - Return code 0 on sucsses
 - Other return code + error on stderr
 
+
+Backend ipa
+-----------
+The ipa backend handles ip address assignments. It is up to the
+implementation whether this is a static or dynamic (dhcp)
+configuration.
+
+get-mac
+~~~~~~~
+Input:
+
+- $fqdn
+
+Output:
+- stdout = mac address (\n terminated) or empty (not existing)
+- return code: ok = 0, error = 1
+
+

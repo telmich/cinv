@@ -111,3 +111,14 @@ Output:
 - return code: ok = 0, error = 1
 
 
+get-ipv4a
+~~~~~~~~~
+Input:
+
+- $fqdn
+
+Output:
+- stdout = ipv4 address (\n terminated) or empty (not existing)
+- return code: ok = 0, error = 1
+
+

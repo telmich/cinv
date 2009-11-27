@@ -1,0 +1,66 @@
+Sexy backends
+=============
+
+
+Introduction
+------------
+This document describes how sexy backends look like.
+
+
+General
+-------
+Each backend must implement `get` methods, which return
+the current status and `set` methods, which change the status.
+
+
+Backend dns
+-----------
+
+list-a
+~~~~~~~
+
+Input:
+- argv1 = $fqdn
+
+Output:
+- stdout = ipv4a or empty (not existing)
+- return code: ok = 0, error = 1
+
+list-cname
+~~~~~~~~~~
+
+Input:
+- argv1 = $fqdn
+
+Output:
+- stdout = cnames (\n seperated) or empty (not existing)
+- return code: ok = 0, error = 1
+
+set
+^^^^
+
+add-a
+~~~~~~
+Add an A-entry ($fqdn) for an address ($ipv4a).
+
+Input:
+
+- $fqdn
+- $ipv4a
+
+Output:
+- Return code 0 on sucsses
+- Other return code + error on stderr
+
+add-cname
+~~~~~~~~~
+Input:
+
+- $fqdn
+- $cname
+
+Output:
+- Return code 0 on sucsses
+- Other return code + error on stderr
+
+

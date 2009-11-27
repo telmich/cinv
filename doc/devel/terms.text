@@ -1,66 +1,40 @@
-Sexy backends
-=============
+Sexy terms
+==========
 
 
 Introduction
 ------------
-This document describes how sexy backends look like.
+This document describes the sexy terms.
 
 
-General
--------
-Each backend must implement `get` methods, which return
-the current status and `set` methods, which change the status.
+Commands
+--------
 
-
-Backend dns
------------
-
-list-a
-~~~~~~~
-
-Input:
-- argv1 = $fqdn
-
-Output:
-- stdout = ipv4a or empty (not existing)
-- return code: ok = 0, error = 1
-
-list-cname
-~~~~~~~~~~
-
-Input:
-- argv1 = $fqdn
-
-Output:
-- stdout = cnames (\n seperated) or empty (not existing)
-- return code: ok = 0, error = 1
-
-set
-^^^^
-
-add-a
+get-*
 ~~~~~~
-Add an A-entry ($fqdn) for an address ($ipv4a).
+A command that begins with `get-` returns one record.
+The output is terminated by a newline (\n).
 
-Input:
 
-- $fqdn
-- $ipv4a
+list-*
+~~~~~~
+A command that begins with `list-` returns a list of records.
+The records are seperated by newlines (\n).
 
-Output:
-- Return code 0 on sucsses
-- Other return code + error on stderr
 
-add-cname
-~~~~~~~~~
-Input:
+set-*
+~~~~~
+A command that begins with `set-` sets a value for an attribute.
+If the attribute had already a value, it is overwritten.
 
-- $fqdn
-- $cname
 
-Output:
-- Return code 0 on sucsses
-- Other return code + error on stderr
+add-*
+~~~~~
+A command that begins with `add-` adds a value to an attribute.
+Existing values will not be overwritten.
 
+
+del-*
+~~~~~
+A command that begins with `del-` deletes the specified object.
 

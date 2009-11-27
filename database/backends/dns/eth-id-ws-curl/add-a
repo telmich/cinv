@@ -33,7 +33,7 @@ cat << eof | curl --verbose --basic --netrc --insecure --request POST \
     <ip>${ipv4a}</ip>
     <fqName>${fqdn}</fqName>
     <forward>Y</forward>
-    <reverse>Y</reverse>
+    <reverse>N</reverse>
     <ttl>600</ttl>
     <isgGroup>inf-pc</isgGroup>
   </nameToIP>

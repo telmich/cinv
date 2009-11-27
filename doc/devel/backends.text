@@ -47,6 +47,16 @@ Output:
 - stdout = cnames (\n seperated) or empty (not existing)
 - return code: ok = 0, error = 1
 
+list-ptr
+~~~~~~~~
+
+Input:
+- argv1 = $ipv4a
+
+Output:
+- stdout = ptrs (\n seperated) or empty (not existing)
+- return code: ok = 0, error = 1
+
 add-a
 ~~~~~~
 Add an A-entry ($fqdn) for an address ($ipv4a).

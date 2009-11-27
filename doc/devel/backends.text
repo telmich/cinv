@@ -1,5 +1,7 @@
 Sexy backends
 =============
+Nico Schottelius <nico-sexy__@__schottelius.org>
+0.1, Initial version: 2009-11-27
 
 
 Introduction
@@ -9,30 +11,41 @@ This document describes how sexy backends look like.
 
 General
 -------
-Each backend must implement `get` methods, which return
-the current status and `set` methods, which change the status.
+Each backend must implement the described methods.
+A backend *may* contain other commands, like helpers.
+
+
+Helpers
+~~~~~~~
+If a backend implements more than the required set of
+commands, it is recommended to name the other commands
+"helper-`name`", to keep a clean structure in each
+backend.
 
 
 Backend dns
 -----------
 
-get
-~~~
+list-a
+~~~~~~~
 
-a
-^
-- input: argv1 = $fqdn
-- output: stdout = ipv4a or empty (not existing)
-- return code: ip = 0, not existing = 1
+Input:
+- argv1 = $fqdn
 
-cname
-^^^^^
-- input: argv1 = $fqdn
-- output: stdout = cnames (\n seperated) or empty (not existing)
-- return code: ip = 0, not existing = 1
+Output:
+- stdout = ipv4a or empty (not existing)
+- return code: ok = 0, error = 1
 
-set
-^^^^
+
+list-cname
+~~~~~~~~~~
+
+Input:
+- argv1 = $fqdn
+
+Output:
+- stdout = cnames (\n seperated) or empty (not existing)
+- return code: ok = 0, error = 1
 
 add-a
 ~~~~~~

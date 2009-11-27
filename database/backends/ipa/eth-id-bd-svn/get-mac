@@ -23,6 +23,7 @@
 
 . "$(which sexy-config-load)"
 
+host="$1"; shift
 path="$(cat "${sexy_my_config}/path")"
 
 echo $path

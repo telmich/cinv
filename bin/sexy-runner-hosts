@@ -40,7 +40,17 @@ __myname=${0##*/}; __abs_myname="$__abs_mydir/$__myname"
 # no hosts base? nothing to do!
 cd "${sexy_db_hosts}" || exit 0
 
+set -x
+
 for host in *; do
+   # check that there is a network for the configured ip-address is available
+   ipv4a="$(sexy-get hosts ${host} ipv4a)"
+
+
+#   network=$(sexy-network-find $(sexy-host-get-ipv4a))
+
+   # check that ip-address and mac are configured for the host
+
    # check ip-address assignment (dhcp/static)
    
    # check name assignments (dns):

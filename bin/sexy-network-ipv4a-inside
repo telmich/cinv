@@ -25,8 +25,11 @@ set -e
 
 . "$(which sexy-config-load)"
 
+set -x
+network="$1"; shift
 ipv4a="$1"; shift
+mask="$(sexy-get networks "$network" mask)"
 
-for network in $(sexy-list networks); do
-   sexy-network-ipv4a-inside ${network} ${ipv4a}
-done
+subnet="$(sexy-ipv4a-get-subnet "${ipv4a}")"
+
+

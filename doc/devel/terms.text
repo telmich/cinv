@@ -32,8 +32,14 @@ If the attribute had already a value, it is overwritten.
 
 add-*
 ~~~~~
-A command that begins with `add-` adds a value to an attribute.
+A command that begins with `add-` adds one or more
+values to an attribute. It must accept more than one value.
 Existing values will not be overwritten.
+
+Example for the dns backend:
+--------------------------------------------------------------------------------
+add-a 192.168.1.42 first-fqdn.example.org not-first-fqdn.example.org
+--------------------------------------------------------------------------------
 
 
 del-*

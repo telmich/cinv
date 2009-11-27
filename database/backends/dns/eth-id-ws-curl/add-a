@@ -23,11 +23,19 @@
 
 [ $# -eq 2 ] || exit 1
 
+set -e
+
+. "$(which "sexy-config-load")"
+. "${__sexy_abs_mydir}/helper-config-load"
+
 fqdn="$1";shift
 ipv4a="$1";shift
 
-cat << eof | curl --verbose --basic --netrc --insecure --request POST \
---header "Content-Type: text/xml" --data @- https://www.komcenter.ethz.ch/ip/rest/nameToIP
+set -x
+
+#curl --header "Content-Type: text/xml" --data @- https://www.komcenter.ethz.ch/ip/rest/nameToIP
+
+curl --request POST $curl_stdin "${komcenter_url_base}/nameToIP" << eof
 <insert>
   <nameToIP>
     <ip>${ipv4a}</ip>

@@ -27,6 +27,6 @@ set -e
 
 ipv4a="$1"; shift
 
-for network in $(sexy-network-list); do
+for network in $(sexy-list networks); do
    sexy-network-ipv4a-inside ${network} ${ipv4a}
 done

@@ -36,6 +36,7 @@ sexy_db_abs="$( cd "${sexy_db}" && pwd -P)"
 # Determine the current configuration directory
 # A very mysterious, powerfull expression:
 # Use the sexy db base + config + # Remove the database path, add the sexy db base + config +  
+#
 sexy_my_config="${sexy_db_abs}/config${__sexy_abs_mydir##$sexy_db_abs}"
 
 sexy_objects="backends hosts networks tags"

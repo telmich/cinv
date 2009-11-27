@@ -33,14 +33,29 @@ cname
 
 set
 ^^^^
-   a:
-      input:
-         argv1 = $hostname
-         argv2 = $ip
-      output:
-         ok: 
-            return code: 0
-         error:
-            return code: 1
-            stderr: <message>
+
+add-a
+~~~~~~
+Add an A-entry ($fqdn) for an address ($ipv4a).
+
+Input:
+
+- $fqdn
+- $ipv4a
+
+Output:
+- Return code 0 on sucsses
+- Other return code + error on stderr
+
+add-cname
+~~~~~~~~~
+Input:
+
+- $fqdn
+- $cname
+
+Output:
+- Return code 0 on sucsses
+- Other return code + error on stderr
+
 

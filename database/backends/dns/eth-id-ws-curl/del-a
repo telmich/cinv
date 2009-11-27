@@ -21,6 +21,8 @@
 # Delete an IPN ETH ID Webservice
 #
 
+echo "I am not sure, what this thingy really deletes"
+
 [ $# -eq 1 ] || exit 1
 
 set -e

@@ -32,8 +32,8 @@ cat << eof | curl --verbose --basic --netrc --insecure --request POST \
   <nameToIP>
     <ip>${ipv4a}</ip>
     <fqName>${fqdn}</fqName>
-    <forward>Y</forward>
-    <reverse>N</reverse>
+    <forward>N</forward>
+    <reverse>Y</reverse>
     <ttl>600</ttl>
     <isgGroup>inf-pc</isgGroup>
   </nameToIP>

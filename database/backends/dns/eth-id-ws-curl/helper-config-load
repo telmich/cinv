@@ -21,4 +21,12 @@
 # curl command line that is always used
 #
 
-curl --verbose --basic --netrc --insecure "$@"
+# 
+alias curl="curl --basic --netrc --insecure --header \"Content-Type: text/xml\""
+#curl_xmlheader="--header \"Content-Type: text/xml\""
+curl_xmlheader="--header \"Content-Type: text/xml\""
+curl_stdin="--data @-"
+
+komcenter_url_base="https://www.komcenter.ethz.ch/ip/rest"
+
+

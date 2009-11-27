@@ -1,7 +1,7 @@
 Sexy backends
 =============
 Nico Schottelius <nico-sexy__@__schottelius.org>
-0.1, Initial version: 2009-11-27
+0.1-pre1, Initial version: 2009-11-27
 
 
 Introduction
@@ -59,12 +59,12 @@ Output:
 
 add-a
 ~~~~~~
-Add an A-entry ($fqdn) for an address ($ipv4a).
+Add one or more a-entries ($fqdn) for an address ($ipv4a).
 
 Input:
 
-- $fqdn
 - $ipv4a
+- $fqdn ...
 
 Output:
 - Return code 0 on sucsses
@@ -75,10 +75,21 @@ add-cname
 Input:
 
 - $fqdn
-- $cname
+- $cname ...
 
 Output:
 - Return code 0 on sucsses
 - Other return code + error on stderr
 
+
+add-ptr
+~~~~~~~
+Input:
+
+- $ipv4a
+- $ptr ...
+
+Output:
+- Return code 0 on sucsses
+- Other return code + error on stderr
 

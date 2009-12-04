@@ -29,7 +29,7 @@ set -x
 fqdn="$1";shift
 cname="$1";shift
 
-cat << eof | curl --verbose --basic --netrc --insecure --request POST --header "Content-Type: text/xml" --data @- https://www.komcenter.ethz.ch/ip/rest/alias
+cat << eof | curl --basic --netrc --insecure --request POST --header "Content-Type: text/xml" --data @- https://www.komcenter.ethz.ch/ip/rest/alias
 <insert>
   <alias>
     <fqName>${cname}</fqName>

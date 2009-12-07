@@ -67,8 +67,9 @@ sexy_object=""
 sexy_object_types="${sexy_path_hosts} ${sexy_path_networks}"
 sexy_runner_known="${sexy_path_hosts}"
 
-usage()
+sexy_usage()
 {
+   
    echo "${__myname}: $@"
    exit 0
 }

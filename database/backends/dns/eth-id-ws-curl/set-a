@@ -37,9 +37,9 @@ set -x
 curl --request PUT $curl_stdin "${komcenter_url_base}/nameToIP" << eof
 <modify>
    <nameToIP>
-      <toMutade>
+      <toMutate>
          <ip>${ipv4a}</ip>
-      </toMutade>                                              
+      </toMutate>                                              
       <fqName>${newfqdn}</fqName>
    </nameToIP>
 </modify>

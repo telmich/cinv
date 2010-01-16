@@ -41,7 +41,7 @@ curl --request POST $curl_stdin "${komcenter_url_base}/nameToIP" << eof
     <ip>${ipv4a}</ip>
     <fqName>${fqdn}</fqName>
     <forward>Y</forward>
-    <reverse>N</reverse>
+    <reverse>Y</reverse>
     <ttl>600</ttl>
     <isgGroup>inf-pc</isgGroup>
   </nameToIP>

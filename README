@@ -28,6 +28,12 @@ What is everything?
 - Add host to DHCP (I don't care which address it has)
 - Add host to DNS
 
+Examples
+--------
+[23:26] ikn:bin% sexy-list hosts
+ikdesk22.ethz.ch
+ikn-sexy.ethz.ch
+
 
 Where and how to store the information?
 ---------------------------------------

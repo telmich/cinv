@@ -72,7 +72,20 @@ sexy_usage()
    echo "${__sexy_myname}: $@"
    exit 1
 }
-   
+
+# argument(s) should not be empty
+sexy_notempty()
+{
+   errormsg="$1"; shift
+
+   while [ "$#" -gt 0 ]; do
+      if [ "$1" ]; then
+         shift
+      else
+         sexy_usage "$errormsg"
+      fi
+   done
+}
 
 sexy_args()
 {

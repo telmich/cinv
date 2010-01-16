@@ -30,7 +30,7 @@ __sexy_myname=${0##*/}; __sexy_abs_myname="$__sexy_abs_mydir/$__sexy_myname"
 
 # where our database can be found
 sexy_db="${sexy_db:-$HOME/.sexy}"
-sexy_db_abs="$( cd "${sexy_db}" && pwd -P)"
+sexy_db_abs="$(cd "${sexy_db}" && pwd -P)"
 
 #
 # Determine the current configuration directory
@@ -69,8 +69,35 @@ sexy_runner_known="${sexy_path_hosts}"
 
 sexy_usage()
 {
-   
-   echo "${__myname}: $@"
-   exit 0
+   echo "${__sexy_myname}: $@"
+   exit 1
 }
+   
 
+sexy_args()
+{
+
+   count=0
+   arglist=""
+
+   # get argument list
+   while [ "$1" != "--" ]; do
+      eval arg_$count=\"$1\"
+      arglist="$arglist $1"
+      shift
+      count=$(($count+1))
+   done
+   shift; # skip --
+
+   if [ "$#" -ne "$count" ]; then
+      sexy_usage "${arglist}"
+   fi
+
+   # assign values
+   count=0
+   while [ "$#" -gt 0 ]; do
+      eval export \$arg_$count=\"$1\"
+      shift
+      count=$(($count+1))
+   done
+}

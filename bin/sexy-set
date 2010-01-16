@@ -25,9 +25,9 @@ set -e
 
 . "$(which sexy-config-load)"
 
-sexy_args type object attribute -- "$@"
+sexy_args type object attribute value -- "$@"
 
 eval basedir=\"\${sexy_db_${type}}\"
 attributpath="${basedir}/${object}/${attribute}"
 sexy_notempty "Unknown type: $type" "${path}"
-cat "${attributpath}"
+echo "${value}" > "${attributpath}"

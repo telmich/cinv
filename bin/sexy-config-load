@@ -72,17 +72,25 @@ sexy_runner_known="${sexy_path_hosts}"
 # Convert netmask from bitmask to decimal
 sexy_network_decimal_netmask()
 {
-   sexy_binary_mask="$1"; shift
+   sexy_mask_rest="$1"; shift
    sexy_decimal_mask="";
    sexy_i="0"
 
    while [ $sexy_i -lt 4 ]; do
-      sexy_current_binary_mask=$((32*($sexy_binary_mask-(8*$sexy_i))-1))
-      if [ $sexy_current_binary_mask -gt 0 ]; then
-         sexy_decimal_mask="${sexy_decimal_mask}$((255 & $sexy_current_binary_mask))"
+      if [ "$(($sexy_mask_rest / 8))" -gt 1 ]; then
+         byte=255
+         sexy_mask_rest="$(($sexy_mask_rest-8))"
       else
-         sexy_decimal_mask="${sexy_decimal_mask}0"
-      fi
+         byte=1
+         while [ $sexy_mask_rest -gt 0 -a $byte -lt 256 ]; do
+            byte=$(($byte *2))
+            sexy_mask_rest=$(($sexy_mask_rest-1))
+         done
+         byte=$(($byte-1))
+      fi  
+
+      sexy_decimal_mask="${sexy_decimal_mask}${byte}"
+
       sexy_i=$(($sexy_i + 1))
 
       [ $sexy_i -lt 4 ] && sexy_decimal_mask="${sexy_decimal_mask}."
@@ -111,7 +119,6 @@ sexy_network_decimal_broadcast()
          done
          byte=$(($byte-1))
       fi  
-      sexy_mask_rest="$(($sexy_mask_rest-1))"
  
       sexy_current_field="$(echo $sexy_network | cut -d. -f$(($sexy_i+1)))"
       sexy_current_broadcast="$(($sexy_current_field | ($byte ^ 255)))"

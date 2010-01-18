@@ -78,6 +78,36 @@ sexy_ipv4_get_byte()
    echo $sexy_ipv4_addr | cut -d. -f${sexy_byte_num}
 }
 
+# Increment given ipv4 address by one
+sexy_ipv4_addr_increment()
+{
+   sexy_ipv4_addr="$1"; shift
+
+   sexy_i="4"
+   sexy_ipv4_added="0"
+   sexy_ipv4_addr_new=""
+
+   echo $sexy_ipv4_addr
+   while [ $sexy_i -ge 1 ]; do
+      sexy_ipv4_byte=$(sexy_ipv4_get_byte $sexy_ipv4_addr ${sexy_i})
+
+      if [ $sexy_ipv4_added -eq 0 ]; then
+         if [ $((${sexy_ipv4_byte} + 1)) -gt 255 ]; then
+            sexy_ipv4_byte="0"
+         else
+            sexy_ipv4_byte=$((${sexy_ipv4_byte} + 1))
+            sexy_ipv4_added="1"
+         fi
+      fi
+
+      sexy_ipv4_addr_new="${sexy_ipv4_byte}${sexy_ipv4_addr_new}"
+      [ $sexy_i -gt 1 ] && sexy_ipv4_addr_new=".${sexy_ipv4_addr_new}"
+
+      echo $sexy_ipv4_byte - $sexy_ipv4_addr_new
+      sexy_i=$(($sexy_i - 1))
+   done
+}
+
 # Convert netmask from bitmask to decimal
 sexy_network_decimal_netmask()
 {

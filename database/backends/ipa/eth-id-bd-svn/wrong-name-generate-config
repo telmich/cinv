@@ -18,12 +18,35 @@
 # along with sexy. If not, see <http://www.gnu.org/licenses/>.
 #
 #
-# Get the mac-address from a given hostname
+# Generate header for subnet.conf
 #
 
 . "$(which sexy-config-load)"
 
-host="$1"; shift
-path="$(cat "${sexy_my_config}/path")"
+sexy_args network -- "$@" 
 
-echo $path
+tmp="$(sexy_shared_temp)"
+
+# check that the network exists
+npath="${sexy_db_networks}/${network}"
+if [ ! -d "${npath}" ]; then
+   sexy_errormsg "Network $network does not exist"
+fi
+
+mask=$(sexy_file_read "${npath}/mask")
+decimal_mask=$(sexy_network_decimal_netmask "${mask}")
+decimal_broadcast=$(sexy_network_decimal_broadcast "$network" "$mask")
+router=$(sexy_ipv4_addr_increment "$network")
+
+cat << eof > "$tmp"
+# WARNING: sexy generate file, do *not* edit directly.
+# vim users: use 'zn' if you do not know about folds!
+subnet $network netmask $decimal_mask {
+       option broadcast-address $decimal_broadcast;
+       option routers $router;
+       option subnet-mask $decimal_mask;
+
+eof
+
+# Debug
+#cat "${tmp}"

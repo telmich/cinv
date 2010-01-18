@@ -69,6 +69,15 @@ sexy_object_types="${sexy_path_hosts} ${sexy_path_networks}"
 sexy_runner_known="${sexy_path_hosts}"
 
 ################################################################################
+# Return one byte of an ipv4 address
+sexy_ipv4_get_byte()
+{
+   sexy_ipv4_addr="$1"; shift
+   sexy_byte_num="$1"; shift
+
+   echo $sexy_ipv4_addr | cut -d. -f${sexy_byte_num}
+}
+
 # Convert netmask from bitmask to decimal
 sexy_network_decimal_netmask()
 {
@@ -109,19 +118,19 @@ sexy_network_decimal_broadcast()
 
    while [ "${sexy_i}" -lt 4 ]; do
       if [ "$(($sexy_mask_rest / 8))" -gt 1 ]; then
-         byte=255
+         sexy_netmask_byte=255
          sexy_mask_rest="$(($sexy_mask_rest-8))"
       else
-         byte=1
-         while [ $sexy_mask_rest -gt 0 -a $byte -lt 256 ]; do
-            byte=$(($byte *2))
+         sexy_netmask_byte=1
+         while [ $sexy_mask_rest -gt 0 -a $sexy_netmask_byte -lt 256 ]; do
+            sexy_netmask_byte=$(($sexy_netmask_byte *2))
             sexy_mask_rest=$(($sexy_mask_rest-1))
          done
-         byte=$(($byte-1))
+         sexy_netmask_byte=$(($sexy_netmask_byte-1))
       fi  
  
-      sexy_current_field="$(echo $sexy_network | cut -d. -f$(($sexy_i+1)))"
-      sexy_current_broadcast="$(($sexy_current_field | ($byte ^ 255)))"
+      sexy_current_field="$(sexy_ipv4_get_byte $sexy_network $(($sexy_i+1)))"
+      sexy_current_broadcast="$(($sexy_current_field | ($sexy_netmask_byte ^ 255)))"
 
       sexy_decimal_broadcast="${sexy_decimal_broadcast}${sexy_current_broadcast}"
 
@@ -132,7 +141,6 @@ sexy_network_decimal_broadcast()
 
    echo $sexy_decimal_broadcast
 }
-
 # We assume ${sexy_my_tmp} is safe and return the same string for the same backend, so IPC is possible
 sexy_shared_temp()
 {

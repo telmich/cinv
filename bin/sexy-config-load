@@ -72,7 +72,6 @@ sexy_runner_known="${sexy_path_hosts}"
 # Convert netmask from bitmask to decimal
 sexy_network_decimal_netmask()
 {
-#   sexy_network="$1"
    sexy_binary_mask="$1"; shift
    sexy_decimal_mask="";
    sexy_i="0"
@@ -92,6 +91,40 @@ sexy_network_decimal_netmask()
    echo $sexy_decimal_mask
 }
 
+# Calculate broadcast for subnet
+sexy_network_decimal_broadcast()
+{
+   sexy_network="$1"; shift
+   sexy_mask_rest="$1"; shift
+   sexy_decimal_broadcast="";
+   sexy_i="0"
+
+   while [ "${sexy_i}" -lt 4 ]; do
+      if [ "$(($sexy_mask_rest / 8))" -gt 1 ]; then
+         byte=255
+         sexy_mask_rest="$(($sexy_mask_rest-8))"
+      else
+         byte=1
+         while [ $sexy_mask_rest -gt 0 -a $byte -lt 256 ]; do
+            byte=$(($byte *2))
+            sexy_mask_rest=$(($sexy_mask_rest-1))
+         done
+         byte=$(($byte-1))
+      fi  
+      sexy_mask_rest="$(($sexy_mask_rest-1))"
+ 
+      sexy_current_field="$(echo $sexy_network | cut -d. -f$(($sexy_i+1)))"
+      sexy_current_broadcast="$(($sexy_current_field | ($byte ^ 255)))"
+
+      sexy_decimal_broadcast="${sexy_decimal_broadcast}${sexy_current_broadcast}"
+
+      sexy_i=$(($sexy_i + 1))
+
+      [ $sexy_i -lt 4 ] && sexy_decimal_broadcast="${sexy_decimal_broadcast}."
+   done
+
+   echo $sexy_decimal_broadcast
+}
 
 # We assume ${sexy_my_tmp} is safe and return the same string for the same backend, so IPC is possible
 sexy_shared_temp()
@@ -111,9 +144,14 @@ sexy_mktemp()
    mktemp "${sexy_my_tmp}/tempfile.XXXXXXXXXXXXXXX"
 }
 
-sexy_usage()
+sexy_msg()
 {
    echo "${__sexy_myname}: $@"
+}
+
+sexy_errormsg()
+{
+   sexy_msg "$@"
    exit 1
 }
 
@@ -126,10 +164,20 @@ sexy_notempty()
       if [ "$1" ]; then
          shift
       else
-         sexy_usage "$errormsg"
+         sexy_errormsg "$errormsg"
       fi
    done
 }
+
+# read a file with error handling
+sexy_file_read()
+{
+   sexy_file="$1"; shift
+
+   cat "${sexy_file}" || sexy_errormsg "Cannot read file ${sexy_file}"
+
+}
+
 
 sexy_args()
 {
@@ -147,7 +195,7 @@ sexy_args()
    shift; # skip --
 
    if [ "$#" -ne "$count" ]; then
-      sexy_usage "${arglist}"
+      sexy_errormsg "${arglist}"
    fi
 
    # assign values

@@ -38,6 +38,7 @@ sexy_db_abs="$(cd "${sexy_db}" && pwd -P)"
 # Use the sexy db base + config + # Remove the database path, add the sexy db base + config +  
 #
 sexy_my_config="${sexy_db_abs}/config${__sexy_abs_mydir##$sexy_db_abs}"
+sexy_my_tmp="${sexy_db_abs}/tmp${__sexy_abs_mydir##$sexy_db_abs}"
 
 sexy_objects="backends hosts networks tags"
 
@@ -66,6 +67,49 @@ sexy_object=""
 # What cares about what
 sexy_object_types="${sexy_path_hosts} ${sexy_path_networks}"
 sexy_runner_known="${sexy_path_hosts}"
+
+################################################################################
+# Convert netmask from bitmask to decimal
+sexy_network_decimal_netmask()
+{
+#   sexy_network="$1"
+   sexy_binary_mask="$1"; shift
+   sexy_decimal_mask="";
+   sexy_i="0"
+
+   while [ $sexy_i -lt 4 ]; do
+      sexy_current_binary_mask=$((32*($sexy_binary_mask-(8*$sexy_i))-1))
+      if [ $sexy_current_binary_mask -gt 0 ]; then
+         sexy_decimal_mask="${sexy_decimal_mask}$((255 & $sexy_current_binary_mask))"
+      else
+         sexy_decimal_mask="${sexy_decimal_mask}0"
+      fi
+      sexy_i=$(($sexy_i + 1))
+
+      [ $sexy_i -lt 4 ] && sexy_decimal_mask="${sexy_decimal_mask}."
+   done
+
+   echo $sexy_decimal_mask
+}
+
+
+# We assume ${sexy_my_tmp} is safe and return the same string for the same backend, so IPC is possible
+sexy_shared_temp()
+{
+   set -e
+   tempfile="${sexy_my_tmp}/tempfile"
+   mkdir -p "${sexy_my_tmp}"
+   touch "${tempfile}"
+   echo "${tempfile}"
+}
+
+# the secure variant
+sexy_mktemp()
+{
+   set -e
+   mkdir -p "${sexy_my_tmp}"
+   mktemp "${sexy_my_tmp}/tempfile.XXXXXXXXXXXXXXX"
+}
 
 sexy_usage()
 {

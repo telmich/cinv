@@ -69,6 +69,34 @@ sexy_object_types="${sexy_path_hosts} ${sexy_path_networks}"
 sexy_runner_known="${sexy_path_hosts}"
 
 ################################################################################
+# Return if object exists or not
+sexy_type_path()
+{
+   type="$1"; shift
+
+   eval echo \${sexy_db_${type}}
+}
+
+sexy_object_path()
+{
+   type="$1"; shift
+   object="$1"; shift
+
+   echo "$(sexy_type_path "${type}")/${object}"
+}
+
+sexy_object_exists()
+{
+   type="$1"; shift
+   object="$1"; shift
+
+   if [ -d "$(sexy_object_path "${type}" "${object}")" ]; then
+      return 0
+   else
+      return 1
+   fi
+}
+
 # Return one byte of an ipv4 address
 sexy_ipv4_get_byte()
 {
@@ -222,7 +250,6 @@ sexy_file_read()
    cat "${sexy_file}" || sexy_errormsg "Cannot read file ${sexy_file}"
 
 }
-
 
 sexy_args()
 {

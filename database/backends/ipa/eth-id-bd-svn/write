@@ -34,6 +34,6 @@ if ! sexy_object_exists hosts ${host}; then sexy_errormsg "Host $host does not e
 ipv4a="$(sexy-get hosts ${host} ipv4a)"
 mac="$(sexy-get hosts ${host} mac)"
 
-echo "   host ${host} { hardware-ethernet $mac; fixed address $ipv4a; }" >> "${tmp}"
+echo "   host ${host} { hardware ethernet $mac; fixed-address $ipv4a; }" >> "${tmp}"
 
 cat "${tmp}"

@@ -27,29 +27,13 @@ sexy_args network host -- "$@"
 
 tmp="$(sexy_shared_temp)"
 
-# check that the network exists
-npath="${sexy_db_networks}/${network}"
-hpath="${sexy_db_hosts}/${host}"
-if [ ! -d "${npath}" ]; then
-   sexy_errormsg "Network $network or host $host does not exist"
-fi
+# check that the objects exist
+if ! sexy_object_exists networks ${network}; then sexy_errormsg "Network $network does not exist"; fi
+if ! sexy_object_exists hosts ${host}; then sexy_errormsg "Host $host does not exist"; fi
+
+ipv4a="$(sexy-get hosts ${host} ipv4a)"
+mac="$(sexy-get hosts ${host} mac)"
+
+echo "   host ${host} { hardware-ethernet $mac; fixed address $ipv4a; }" >> "${tmp}"
 
 cat "${tmp}"
-exit 1
-mask=$(sexy_file_read "${npath}/mask")
-decimal_mask=$(sexy_network_decimal_netmask "${mask}")
-decimal_broadcast=$(sexy_network_decimal_broadcast "$network" "$mask")
-router=$(sexy_ipv4_addr_increment "$network")
-
-cat << eof > "$tmp"
-# WARNING: sexy generate file, do *not* edit directly.
-# vim users: use 'zn' if you do not know about folds!
-subnet $network netmask $decimal_mask {
-       option broadcast-address $decimal_broadcast;
-       option routers $router;
-       option subnet-mask $decimal_mask;
-
-eof
-
-# Debug
-#cat "${tmp}"

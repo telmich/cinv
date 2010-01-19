@@ -1,6 +1,8 @@
-Sexy - the make-the-sysadmin-happy-tool
-========================================
+Sexy - the make-the-sysadmin-happy-tool (host management)
+=========================================================
 sexy-0.1 - give sysadmins time to play nethack
+
+You define a state - sexy takes care of what needs to be done.
 
 Preamble
 --------
@@ -12,6 +14,10 @@ principle:
 - One aim is to minimise the time spend doing a job (realised with 'frontends').
 
 If you care about how things are done, sexy is suitable for you.
+
+You can change the job and continue to use sexy.
+Your job can change the backends needed, you can continue to use
+sexy. Sexy, isn't it?
 
 
 Utilisation (= What I want to do)
@@ -33,6 +39,14 @@ Examples
 [23:26] ikn:bin% sexy-list hosts
 ikdesk22.ethz.ch
 ikn-sexy.ethz.ch
+[23:49] ikn:bin% sexy-set hosts ikn-sexy.ethz.ch mac 00:1f:16:09:46:11
+[23:49] ikn:bin% sexy-get hosts ikn-sexy.ethz.ch mac                  
+00:1f:16:09:46:11
+[23:50] ikn:bin% sexy-add hosts ikn-sexy.ethz.ch tags notebook 
+[23:51] ikn:bin% sexy-add hosts ikn-sexy.ethz.ch tags cab     
+[23:51] ikn:bin% sexy-get hosts ikn-sexy.ethz.ch tags         
+notebook
+cab
 
 
 Where and how to store the information?
@@ -65,6 +79,12 @@ libexec/<backend-type>/<backend-implementation>/
       set-subtype       # get-a-entry, get-cname, get....
    
 libexec/<backend-type>/<backend-implementation>/
+
+.../README:
+   for every object, optional
+
+.../default_backend:
+   per type
 
 Naming / wording
 -----------------

@@ -69,7 +69,15 @@ sexy_object_types="${sexy_path_hosts} ${sexy_path_networks}"
 sexy_runner_known="${sexy_path_hosts}"
 
 ################################################################################
-# Return if object exists or not
+# Return config path
+sexy_config_path()
+{
+   config="$1"; shift
+
+   eval echo \${sexy_db_config_${type}}
+}
+
+# Return type path
 sexy_type_path()
 {
    type="$1"; shift
@@ -77,6 +85,7 @@ sexy_type_path()
    eval echo \${sexy_db_${type}}
 }
 
+# Return object path
 sexy_object_path()
 {
    type="$1"; shift
@@ -85,6 +94,7 @@ sexy_object_path()
    echo "$(sexy_type_path "${type}")/${object}"
 }
 
+# Return if object exists or not
 sexy_object_exists()
 {
    type="$1"; shift

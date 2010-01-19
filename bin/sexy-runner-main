@@ -42,6 +42,14 @@ __myname=${0##*/}; __abs_myname="$__abs_mydir/$__myname"
 [ $# -gt 0 ] && patch="-p"
 
 # Go through all interesting object types and compare them
-for interest in ${sexy_runner_known}; do
-   sexy-runner-${interest} ${patch}
+#for interest in ${sexy_runner_known}; do
+#   sexy-runner-${interest} ${patch}
+#done
+
+# do it ugly for now.
+
+#networks="$(echo $(sexy-list networks))
+for network in $(sexy-list networks)
+   name="sed s/\./_/g
+   sexy_network
 done

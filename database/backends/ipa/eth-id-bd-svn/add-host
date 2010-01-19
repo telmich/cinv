@@ -25,7 +25,7 @@
 
 sexy_args network host -- "$@" 
 
-tmp="$(sexy_shared_temp)"
+tmp="$(sexy_shared_temp)-${network}"
 
 # check that the objects exist
 if ! sexy_object_exists networks ${network}; then sexy_errormsg "Network $network does not exist"; fi

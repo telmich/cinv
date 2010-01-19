@@ -25,7 +25,7 @@
 
 sexy_args network -- "$@" 
 
-tmp="$(sexy_shared_temp)"
+tmp="$(sexy_shared_temp)-${network}"
 
 # check that the network exists
 npath="${sexy_db_networks}/${network}"

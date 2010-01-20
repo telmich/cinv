@@ -46,10 +46,15 @@ __myname=${0##*/}; __abs_myname="$__abs_mydir/$__myname"
 #   sexy-runner-${interest} ${patch}
 #done
 
-# do it ugly for now.
 
 #networks="$(echo $(sexy-list networks))
-for network in $(sexy-list networks)
-   name="sed s/\./_/g
-   sexy_network
+for network in $(sexy-list networks); do
+
 done
+
+# do it ugly for now.
+#[15:39] ikn:eth-id-bd-svn% ./open 129.132.102.0 
+#[15:42] ikn:hosts% for host in *; do /home/users/nico/ethz/vcs/sexy/database/backends/ipa/eth-id-bd-svn/write 129.132.102.0 $host; done
+#[15:39] ikn:eth-id-bd-svn% ./close 129.132.102.0 
+#[15:39] ikn:eth-id-bd-svn% ./commit 129.132.102.0 
+

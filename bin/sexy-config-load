@@ -28,9 +28,10 @@ __sexy_mydir="${0%/*}"; __sexy_abs_mydir="$(cd "$__sexy_mydir" && pwd -P)"
 __sexy_myname=${0##*/}; __sexy_abs_myname="$__sexy_abs_mydir/$__sexy_myname"
 
 
-# where our database can be found
+# where our database / components can be found
 sexy_db="${sexy_db:-$HOME/.sexy}"
 sexy_db_abs="$(cd "${sexy_db}" && pwd -P)"
+sexy_default_config="${sexy_db_abs}/${sexy_config_path}"
 
 #
 # Determine the current configuration directory
@@ -40,7 +41,8 @@ sexy_db_abs="$(cd "${sexy_db}" && pwd -P)"
 sexy_my_config="${sexy_db_abs}/config${__sexy_abs_mydir##$sexy_db_abs}"
 sexy_my_tmp="${sexy_db_abs}/tmp${__sexy_abs_mydir##$sexy_db_abs}"
 
-sexy_objects="backends hosts networks tags"
+
+sexy_objects="backends config hosts networks tags"
 
 for sexy_object in $sexy_objects; do
    # This is the same as
@@ -73,7 +75,18 @@ sexy_runner_known="${sexy_path_networks}"
 # Return config path: either default or individual (if existing)
 sexy_config_path()
 {
-   eval echo \${sexy_db_config_${type}}
+   type="$1"; shift
+   object="$1"; shift
+   attribute="$1"; shift
+
+   # check object specific first
+   sexy_attribute_path="$(sexy_object_path $type $object)/${sexy_path_config}/${attribute}"
+
+   if [ -f "${sexy_attribute_path}" ]; then
+      echo "${sexy_attribute_path}"
+   else
+      echo "${sexy_db_config}/${attribute}"
+   fi
 }
 
 # Return type path

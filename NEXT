@@ -39,7 +39,7 @@ Hosts are parts of a network!
 --------------------------------------------------------------------------------
 THIS IS THE WAY TO GO
 db/
-   defaults/
+   config/
       {ipa,dns}/
          backend        # one liner, contains default backend
          <id>/

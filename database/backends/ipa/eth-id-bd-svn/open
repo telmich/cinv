@@ -25,6 +25,7 @@
 
 sexy_args network -- "$@" 
 
+# FIXME: add $network as arg to temp
 tmp="$(sexy_shared_temp)-${network}"
 
 # check that the network exists

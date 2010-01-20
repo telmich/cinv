@@ -38,14 +38,25 @@ Hosts are parts of a network!
 
 --------------------------------------------------------------------------------
 db/
-   defaults/
-      ipa_backend
-      dns_backend
+   config/
+      backends/{ipa,dns}/
+         default        # one liner, contains default backend
+         <id>/
+            # backend specific
+
    networks/<id>
       config/
-         ipa_unusable
+         backends/{ipa,dns}/ # same as above
+         ipa_unusable   # optional, unsexy ip addresses (unusable for sexy)
+
       hosts/<id>/
          mac
          ipa
+
+   backends/{ipa,dns}/<id>/
+      open
+      write
+      close
+      commit
 
 --------------------------------------------------------------------------------

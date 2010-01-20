@@ -58,6 +58,7 @@ for sexy_object in $sexy_objects; do
    # The path to the configuration (if available) for an object.
    #
    eval sexy_db_config_${sexy_object}="\"${sexy_db}/config/\${sexy_path_${sexy_object}}\""
+   eval sexy_db_config_${sexy_object}="\"${sexy_db}/config/\${sexy_path_${sexy_object}}\""
 
    # Debug output
    # eval echo "\${sexy_db_${sexy_object}}"
@@ -69,11 +70,9 @@ sexy_object_types="${sexy_path_hosts} ${sexy_path_networks}"
 sexy_runner_known="${sexy_path_networks}"
 
 ################################################################################
-# Return config path
+# Return config path: either default or individual (if existing)
 sexy_config_path()
 {
-   config="$1"; shift
-
    eval echo \${sexy_db_config_${type}}
 }
 

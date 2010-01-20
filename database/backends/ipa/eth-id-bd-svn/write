@@ -23,16 +23,17 @@
 
 . "$(which sexy-config-load)"
 
-sexy_args network host -- "$@" 
+sexy_args network fqdn -- "$@" 
 
 tmp="$(sexy_shared_temp)-${network}"
 
 # check that the objects exist
 if ! sexy_object_exists networks ${network}; then sexy_errormsg "Network $network does not exist"; fi
-if ! sexy_object_exists hosts ${host}; then sexy_errormsg "Host $host does not exist"; fi
+if ! sexy_object_exists hosts ${fqdn}; then sexy_errormsg "Host $fqdn does not exist"; fi
 
-ipv4a="$(sexy-get hosts ${host} ipv4a)"
-mac="$(sexy-get hosts ${host} mac)"
+ipv4a="$(sexy-get hosts ${fqdn} ipv4a)"
+mac="$(sexy-get hosts ${fqdn} mac)"
+host="$(echo ${fqdn} | sed 's/\..*//')"
 
 echo "   host ${host} { hardware ethernet $mac; fixed-address $ipv4a; }" >> "${tmp}"
 

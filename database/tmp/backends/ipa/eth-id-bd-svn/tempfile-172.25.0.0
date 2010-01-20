@@ -1,0 +1,11 @@
+# WARNING: sexy generated file, do *not* edit directly.
+# vim users: use 'zn' if you do not know about folds!
+subnet 172.25.0.0 netmask 255.255.0.0 { # {{{
+       option broadcast-address 172.25.255.255;
+       option routers 172.25.0.1;
+       option subnet-mask 255.255.0.0;
+
+   host lp-8119 { hardware ethernet 00:17:08:8e:1f:b5; fixed-address 172.25.3.0; }
+
+} # }}}
+# vim: foldmethod=marker expandtab autoindent tabstop=3 shiftwidth=3 softtabstop=3

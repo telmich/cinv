@@ -1,0 +1,21 @@
+# WARNING: sexy generated file, do *not* edit directly.
+# vim users: use 'zn' if you do not know about folds!
+subnet 129.132.102.0 netmask 255.255.255.0 { # {{{
+       option broadcast-address 129.132.102.255;
+       option routers 129.132.102.1;
+       option subnet-mask 255.255.255.0;
+
+   host cello { hardware ethernet 00:19:d1:a8:48:db; fixed-address 129.132.102.3; }
+   host gattaca { hardware ethernet 00:15:58:30:A8:A5; fixed-address 129.132.102.4; }
+   host harp { hardware ethernet 00:1A:6B:35:BE:07; fixed-address 129.132.102.5; }
+   host ikdesk20 { hardware ethernet 00:1E:C9:74:DB:63; fixed-address 129.132.102.6; }
+   host melodica { hardware ethernet 00:21:86:98:cf:a9; fixed-address 129.132.102.7; }
+   host piano { hardware ethernet 00:19:d1:12:b5:4c; fixed-address 129.132.102.8; }
+   host sgd-gx620-01 { hardware ethernet 00:12:3F:97:42:FA; fixed-address 129.132.102.9; }
+   host sgn-mac-02 { hardware ethernet 00:23:df:9e:e0:8e; fixed-address 129.132.102.10; }
+   host sgn-sloesing-01 { hardware ethernet 00:1f:5b:eb:8f:b6; fixed-address 129.132.102.11; }
+   host sgn-t400-08 { hardware ethernet 00:24:7e:6f:68:7f; fixed-address 129.132.102.12; }
+   host sgn-x200-01 { hardware ethernet 00:1f:16:09:46:11; fixed-address 129.132.102.2; }
+
+} # }}}
+# vim: foldmethod=marker expandtab autoindent tabstop=3 shiftwidth=3 softtabstop=3

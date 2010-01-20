@@ -46,8 +46,6 @@ __myname=${0##*/}; __abs_myname="$__abs_mydir/$__myname"
 #   sexy-runner-${interest} ${patch}
 #done
 
-
-#networks="$(echo $(sexy-list networks))
 for network in $(sexy-list networks); do
 
 done

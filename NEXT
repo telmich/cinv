@@ -39,49 +39,21 @@ Hosts are parts of a network!
 --------------------------------------------------------------------------------
 THIS IS THE WAY TO GO
 db/
-   config/
-      backends/{ipa,dns}/
-         default        # one liner, contains default backend
-         <id>/
-            # backend specific
-
-   networks/<id>
-      config/
-         backends/{ipa,dns}/ # optional, same as above, can overwrite
-         ipa_unusable   # optional, unsexy ip addresses (unusable for sexy)
-         mask
-
-      hosts/<id>/
-         mac
-         ipa
-
-   backends/{ipa,dns}/<id>/
-      open
-      write
-      close
-      commit
-
---------------------------------------------------------------------------------
-TO ABSTRACT.
-"Each class contains all its objects."
-"An object is an instance of a class"
-
-db/
    defaults/
       {ipa,dns}/
          backend        # one liner, contains default backend
          <id>/
             # backend specific
-      network/
-         ipa
-         dns
-         ipa_unusable   # optional, unsexy ip addresses (unusable for sexy)
-         mask
-         <network-id>/
-            # can overwrite previous values
+      ipa_unusable   # optional, unsexy ip addresses (unusable for sexy)
+      netmask
 
-   networks/<id>/
-      <hostname>/
+   networks/<id>
+      config/
+         backends/{ipa,dns}/ # optional, same as above, can overwrite
+         ipa_unusable   # optional, unsexy ip addresses (unusable for sexy)
+         netmask
+
+      hosts/<id>/
          mac
          ipa
 
@@ -90,5 +62,3 @@ db/
       write
       close
       commit
-
-

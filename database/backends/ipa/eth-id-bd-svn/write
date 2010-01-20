@@ -37,4 +37,5 @@ host="$(echo ${fqdn} | sed 's/\..*//')"
 
 echo "   host ${host} { hardware ethernet $mac; fixed-address $ipv4a; }" >> "${tmp}"
 
-cat "${tmp}"
+# debug
+#cat "${tmp}"

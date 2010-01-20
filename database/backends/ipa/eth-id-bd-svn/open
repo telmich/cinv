@@ -29,8 +29,7 @@ sexy_args network -- "$@"
 tmp="$(sexy_shared_temp)-${network}"
 
 # check that the network exists
-npath="${sexy_db_networks}/${network}"
-if [ ! -d "${npath}" ]; then
+if ! sexy-object-exists networks "${network}"; then
    sexy_errormsg "Network $network does not exist"
 fi
 

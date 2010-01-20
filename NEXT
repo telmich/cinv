@@ -27,8 +27,25 @@ have multiple ipv4a entries, ...
    second entry in a different network.
    That's not sexy, but complex. We don't do that.
 
---------------------------------------------------------------------------------
 
+Iterate over hosts?
+   Save the network in the host?
+
+   IRGS. no.
+
+Hosts are parts of a network!
+
+
+--------------------------------------------------------------------------------
 db/
-   backends/
-   networks/
+   defaults/
+      ipa_backend
+      dns_backend
+   networks/<id>
+      config/
+         ipa_unusable
+      hosts/<id>/
+         mac
+         ipa
+
+--------------------------------------------------------------------------------

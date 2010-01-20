@@ -28,13 +28,7 @@
 
 set -e
 
-################################################################################
-# standard vars stolen from cconf
-__pwd="$(pwd -P)"
-__mydir="${0%/*}"; __abs_mydir="$(cd "$__mydir" && pwd -P)"
-__myname=${0##*/}; __abs_myname="$__abs_mydir/$__myname"
-
-. "${__mydir}/sexy-config-load"
+. "$(which sexy-config-load)"
 
 
 # if something was supplied, we take stdin as the changes, otherwise we compare the
@@ -45,20 +39,3 @@ __myname=${0##*/}; __abs_myname="$__abs_mydir/$__myname"
 for interest in ${sexy_runner_known}; do
    echo sexy-runner-${interest} ${patch}
 done
-
-exit 1
-
-for network in $(sexy-list networks); do
-   ./open 129.132.102.0 
-#[15:42] ikn:hosts% for host in *; do /home/users/nico/ethz/vcs/sexy/database/backends/ipa/eth-id-bd-svn/write 129.132.102.0 $host; done
-#[15:39] ikn:eth-id-bd-svn% ./close 129.132.102.0 
-#[15:39] ikn:eth-id-bd-svn% ./commit 129.132.102.0 
-
-done
-
-# do it ugly for now.
-#[15:39] ikn:eth-id-bd-svn% ./open 129.132.102.0 
-#[15:42] ikn:hosts% for host in *; do /home/users/nico/ethz/vcs/sexy/database/backends/ipa/eth-id-bd-svn/write 129.132.102.0 $host; done
-#[15:39] ikn:eth-id-bd-svn% ./close 129.132.102.0 
-#[15:39] ikn:eth-id-bd-svn% ./commit 129.132.102.0 
-

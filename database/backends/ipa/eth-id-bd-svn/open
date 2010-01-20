@@ -41,7 +41,7 @@ router=$(sexy_ipv4_addr_increment "$network")
 cat << eof > "$tmp"
 # WARNING: sexy generated file, do *not* edit directly.
 # vim users: use 'zn' if you do not know about folds!
-subnet $network netmask $decimal_mask {
+subnet $network netmask $decimal_mask { # {{{
        option broadcast-address $decimal_broadcast;
        option routers $router;
        option subnet-mask $decimal_mask;

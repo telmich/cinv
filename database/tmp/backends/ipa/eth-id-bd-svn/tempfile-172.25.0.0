@@ -1,7 +1,0 @@
-# WARNING: sexy generated file, do *not* edit directly.
-# vim users: use 'zn' if you do not know about folds!
-subnet 172.25.0.0 netmask  { # {{{
-       option broadcast-address ;
-       option routers 172.25.0.1;
-       option subnet-mask ;
-

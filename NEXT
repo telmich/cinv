@@ -34,31 +34,3 @@ Iterate over hosts?
    IRGS. no.
 
 Hosts are parts of a network!
-
-
---------------------------------------------------------------------------------
-THIS IS THE WAY TO GO
-db/
-   config/
-      {ipa,dns}/
-         backend        # one liner, contains default backend
-         <id>/
-            # backend specific
-      ipa_unusable   # optional, unsexy ip addresses (unusable for sexy)
-      netmask
-
-   networks/<id>
-      config/
-         backends/{ipa,dns}/ # optional, same as above, can overwrite
-         ipa_unusable   # optional, unsexy ip addresses (unusable for sexy)
-         netmask
-
-      hosts/<id>/
-         mac
-         ipa
-
-   {ipa,dns}/<id>/
-      open
-      write
-      close
-      commit

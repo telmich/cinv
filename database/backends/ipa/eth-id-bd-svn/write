@@ -29,10 +29,10 @@ tmp="$(sexy_shared_temp)-${network}"
 
 # check that the objects exist
 if ! sexy_object_exists networks ${network}; then sexy_errormsg "Network $network does not exist"; fi
-if ! sexy_object_exists hosts ${fqdn}; then sexy_errormsg "Host $fqdn does not exist"; fi
+if ! sexy_host_exists ${network} ${fqdn}; then sexy_errormsg "Host $fqdn does not exist"; fi
 
-ipv4a="$(sexy-get hosts ${fqdn} ipv4a)"
-mac="$(sexy-get hosts ${fqdn} mac)"
+ipv4a="$(sexy-get-attribute networks "${network}" hosts/${fqdn}/ipv4a)"
+mac="$(sexy-get-attribute networks "${network}" hosts/${fqdn}/mac)"
 host="$(echo ${fqdn} | sed 's/\..*//')"
 
 echo "   host ${host} { hardware ethernet $mac; fixed-address $ipv4a; }" >> "${tmp}"

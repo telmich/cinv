@@ -25,9 +25,15 @@
 
 sexy_args network -- "$@" 
 
+echo ${sexy_my_config}
+
 tmp="$(sexy_shared_temp)-${network}"
 dst="$(sexy_file_read "${sexy_my_config}/path")/${network}/"
 dstfile="${dst}/subnet.conf"
+
+echo $dst
+sexy_config_path networks ${network} ipa/backend
+exit 1
 
 set -e
 cp "${tmp}" "${dstfile}"

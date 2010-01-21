@@ -34,11 +34,11 @@ for sexy_network in 172.25.0.0; do
 
    "${ipa}/open" "$sexy_network"
 
-   for sexy_host in $(sexy_list_hosts "${sexy_network}"); do
+   for sexy_host in $(sexy_list_hosts_fqdn "${sexy_network}"); do
       "${ipa}/write" "$sexy_network" "$sexy_host"
    done
    "${ipa}/close" "$sexy_network"
-#   ${ipa}/commit $sexy_network
+   "${ipa}/commit" $sexy_network
 done
 
 exit 0

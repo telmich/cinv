@@ -72,6 +72,19 @@ sexy_object_types="${sexy_path_hosts} ${sexy_path_networks}"
 sexy_runner_known="${sexy_path_networks}"
 
 ################################################################################
+# Return if a host exists in a network
+sexy_host_exists()
+{
+   sexy_network="$1"; shift
+   sexy_host="$1"; shift
+
+   if [ -d "$(sexy_object_path "${sexy_path_networks}" "${sexy_network}")/hosts/${sexy_host}" ]; then
+      return 0
+   else
+      return 1
+   fi
+}
+
 # Show hosts in network (fully qualified domain name)
 sexy_list_hosts_fqdn()
 {

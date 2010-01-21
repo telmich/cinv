@@ -25,8 +25,12 @@
 
 sexy_args network -- "$@" 
 
-echo ${sexy_my_config}
+sexy_type_attribute backends ipa-default
+#echo ${sexy_my_config}
+#sexy_type_path networks
+#sexy_type_config networks
 
+exit 1
 tmp="$(sexy_shared_temp)-${network}"
 dst="$(sexy_file_read "${sexy_my_config}/path")/${network}/"
 dstfile="${dst}/subnet.conf"

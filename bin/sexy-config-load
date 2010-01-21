@@ -42,7 +42,7 @@ sexy_my_config="${sexy_db_abs}/config${__sexy_abs_mydir##$sexy_db_abs}"
 sexy_my_tmp="${sexy_db_abs}/tmp${__sexy_abs_mydir##$sexy_db_abs}"
 
 
-sexy_objects="backends config hosts networks tags"
+sexy_objects="backends hosts networks"
 
 for sexy_object in $sexy_objects; do
    # This is the same as
@@ -71,6 +71,7 @@ sexy_object=""
 sexy_object_types="${sexy_path_hosts} ${sexy_path_networks}"
 sexy_runner_known="${sexy_path_networks}"
 
+################################################################################
 ################################################################################
 # Return if a host exists in a network
 sexy_host_exists()
@@ -102,20 +103,29 @@ sexy_list_hosts()
    sexy_list_hosts_fqdn "${sexy_network}" | sed 's/\..*//'
 }
 
-# Return config path: either default or individual (if existing)
-sexy_config_path()
+# Retrieve configuration for a type
+sexy_type_attribute()
 {
-   type="$1"; shift
-   object="$1"; shift
-   attribute="$1"; shift
+   sexy_type="$1"; shift
+   sexy_attribute="$1"; shift
+
+   cat "$(sexy_type_path "${sexy_type}")/.config/${sexy_attribute}"
+}
+
+# Return attribute: object specific or default if not set
+sexy_object_attribute()
+{
+   sexy_type="$1"; shift
+   sexy_object="$1"; shift
+   sexy_attribute="$1"; shift
 
    # check object specific first
-   sexy_attribute_path="$(sexy_object_path $type $object)/${sexy_path_config}/${attribute}"
+   sexy_attribute_path="$(sexy_object_path $sexy_type $sexy_object)/.config/${sexy_attribute}"
 
    if [ -f "${sexy_attribute_path}" ]; then
-      echo "${sexy_attribute_path}"
+      cat "${sexy_attribute_path}"
    else
-      echo "${sexy_db_config}/${attribute}"
+      sexy_type_attribute "${sexy_type}"
    fi
 }
 

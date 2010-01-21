@@ -72,6 +72,23 @@ sexy_object_types="${sexy_path_hosts} ${sexy_path_networks}"
 sexy_runner_known="${sexy_path_networks}"
 
 ################################################################################
+# Show hosts in network (fully qualified domain name)
+sexy_list_hosts_fqdn()
+{
+   sexy_network="$1"; shift
+   sexy_hosts_path="$(sexy_object_path ${sexy_path_networks} "${sexy_network}")"
+
+   cd "${sexy_hosts_path}/hosts" && ls -1
+}
+
+# Show hosts in network
+sexy_list_hosts()
+{
+   sexy_network="$1"; shift
+
+   sexy_list_hosts_fqdn "${sexy_network}" | sed 's/\..*//'
+}
+
 # Return config path: either default or individual (if existing)
 sexy_config_path()
 {

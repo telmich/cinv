@@ -8,15 +8,12 @@ data/
             specific settings, overwriting general settings
 
    backends/
-      ipa/
-         .config
-            default
+      .config
+         default-ipa
+         default-dns
+      <backend-id>/
          <id>/
-            id specific
-      dns/
-         .config
-            default
-         <id>/
+            .config
             id specific
 
    hosts/
@@ -27,8 +24,4 @@ data/
       <network-id>/
          <host-ids>
             
-backends/
-   (ipa|dns)/
-      <methods>
-
 tmp/

@@ -1,0 +1,34 @@
+data/
+   (backends|hosts|networks|etc)
+      .config/
+            general settings
+      <id>/
+         attribute
+         .config/
+            specific settings, overwriting general settings
+
+   backends/
+      ipa/
+         .config
+            default
+         <id>/
+            id specific
+      dns/
+         .config
+            default
+         <id>/
+            id specific
+
+   hosts/
+      <host-ids>/
+         ipv4a
+            
+   networks/
+      <network-id>/
+         <host-ids>
+            
+backends/
+   (ipa|dns)/
+      <methods>
+
+tmp/

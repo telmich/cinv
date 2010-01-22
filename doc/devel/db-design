@@ -14,7 +14,7 @@ data/
       <backend-id>/
          <id>/
             .config
-            id specific
+            id specific (?) plus needed (open,write,close,commit)
 
    hosts/
       <host-ids>/

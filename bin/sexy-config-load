@@ -38,7 +38,7 @@ sexy_default_config="${sexy_db_abs}/${sexy_config_path}"
 # A very mysterious, powerfull expression:
 # Use the sexy db base + config + # Remove the database path, add the sexy db base + config +  
 #
-sexy_my_config="${sexy_db_abs}/config${__sexy_abs_mydir##$sexy_db_abs}"
+sexy_my_config="${sexy_db_abs}/${__sexy_abs_mydir##$sexy_db_abs}/.config"
 sexy_my_tmp="${sexy_db_abs}/tmp${__sexy_abs_mydir##$sexy_db_abs}"
 
 
@@ -60,7 +60,6 @@ for sexy_object in $sexy_objects; do
    # The path to the configuration (if available) for an object.
    #
    eval sexy_db_config_${sexy_object}="\"${sexy_db}/config/\${sexy_path_${sexy_object}}\""
-   eval sexy_db_config_${sexy_object}="\"${sexy_db}/config/\${sexy_path_${sexy_object}}\""
 
    # Debug output
    # eval echo "\${sexy_db_${sexy_object}}"
@@ -71,7 +70,6 @@ sexy_object=""
 sexy_object_types="${sexy_path_hosts} ${sexy_path_networks}"
 sexy_runner_known="${sexy_path_networks}"
 
-################################################################################
 ################################################################################
 # Return if a host exists in a network
 sexy_host_exists()
@@ -84,23 +82,6 @@ sexy_host_exists()
    else
       return 1
    fi
-}
-
-# Show hosts in network (fully qualified domain name)
-sexy_list_hosts_fqdn()
-{
-   sexy_network="$1"; shift
-   sexy_hosts_path="$(sexy_object_path ${sexy_path_networks} "${sexy_network}")"
-
-   cd "${sexy_hosts_path}/hosts" && ls -1
-}
-
-# Show hosts in network
-sexy_list_hosts()
-{
-   sexy_network="$1"; shift
-
-   sexy_list_hosts_fqdn "${sexy_network}" | sed 's/\..*//'
 }
 
 # Retrieve configuration for a type
@@ -265,10 +246,13 @@ sexy_network_decimal_broadcast()
 sexy_shared_temp()
 {
    set -e
-   tempfile="${sexy_my_tmp}/tempfile"
+   sexy_temp_name="tempfile"
+
+   [ "$1" ]; sexy_temp_name="${sexy_temp_name}-$1"
+   sexy_tempfile="${sexy_my_tmp}/${sexy_temp_name}"
    mkdir -p "${sexy_my_tmp}"
-   touch "${tempfile}"
-   echo "${tempfile}"
+   touch "${sexy_tempfile}"
+   echo "${sexy_tempfile}"
 }
 
 # the secure variant

@@ -30,6 +30,8 @@ set -e
 for sexy_network in 172.25.0.0; do
    #ipa="$(sexy-config-get networks "$network" ipa_backend)
 
+   sexy_type_attribute backends ipa-default
+
    ipa=/home/users/nico/.sexy/backends/ipa/eth-id-bd-svn
 
    "${ipa}/open" "$sexy_network"

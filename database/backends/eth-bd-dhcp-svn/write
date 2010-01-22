@@ -25,11 +25,18 @@
 
 sexy_args network fqdn -- "$@" 
 
-tmp="$(sexy_shared_temp)-${network}"
+tmp="$(sexy_shared_temp "${network}")"
+
+set -x
+sexy_object_attribute_path networks ${network} ${fqdn}
+
 
 # check that the objects exist
 if ! sexy_object_exists networks ${network}; then sexy_errormsg "Network $network does not exist"; fi
-if ! sexy_host_exists ${network} ${fqdn}; then sexy_errormsg "Host $fqdn does not exist"; fi
+# check that the fqdn is part of the network
+if ! sexy_object_attribute_exists networks ${network} ${fqdn}; then
+   sexy_errormsg "Host $fqdn does not exist in $network"
+fi
 
 ipv4a="$(sexy-get-attribute networks "${network}" hosts/${fqdn}/ipv4a)"
 mac="$(sexy-get-attribute networks "${network}" hosts/${fqdn}/mac)"

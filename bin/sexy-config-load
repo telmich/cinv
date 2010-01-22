@@ -113,9 +113,34 @@ sexy_object_attribute()
 # Return type path
 sexy_type_path()
 {
-   type="$1"; shift
+   sexy_type="$1"; shift
 
-   eval echo \${sexy_db_${type}}
+   eval echo \${sexy_db_${sexy_type}}
+}
+
+# Return object path
+sexy_object_attribute_path()
+{
+   sexy_type="$1"; shift
+   sexy_object="$1"; shift
+   sexy_attribute="$1"; shift
+
+   sexy_object_attribute_path="$(sexy_object_path "$sexy_type" "$sexy_object")/${sexy_attribute}"
+   echo "${sexy_object_attribute_path}"
+}
+
+# Return if object exists or not
+sexy_object_attribute_exists()
+{
+   type="$1"; shift
+   object="$1"; shift
+   attribute="$1"; shift
+
+   if [ -d "$(sexy_object_attribute_path "${type}" "${object}" "${attribute}")" ]; then
+      return 0
+   else
+      return 1
+   fi
 }
 
 # Return object path
@@ -146,7 +171,7 @@ sexy_ipv4_get_byte()
    sexy_ipv4_addr="$1"; shift
    sexy_byte_num="$1"; shift
 
-   echo $sexy_ipv4_addr | cut -d. -f${sexy_byte_num}
+   echo "$sexy_ipv4_addr" | cut -d. "-f${sexy_byte_num}"
 }
 
 # Increment given ipv4 address by one
@@ -242,7 +267,8 @@ sexy_network_decimal_broadcast()
 
    echo $sexy_decimal_broadcast
 }
-# We assume ${sexy_my_tmp} is safe and return the same string for the same backend, so IPC is possible
+
+# Share a temp file (within a backend for instance)
 sexy_shared_temp()
 {
    set -e
@@ -263,6 +289,7 @@ sexy_mktemp()
    mktemp "${sexy_my_tmp}/tempfile.XXXXXXXXXXXXXXX"
 }
 
+# Write message, prefixed by scriptname
 sexy_msg()
 {
    echo "${__sexy_myname}: $@"
@@ -297,6 +324,7 @@ sexy_file_read()
 
 }
 
+# Require some command line parameters
 sexy_args()
 {
 

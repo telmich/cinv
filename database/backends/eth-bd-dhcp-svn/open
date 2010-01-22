@@ -26,14 +26,14 @@
 sexy_args network -- "$@" 
 
 # FIXME: add $network as arg to temp
-tmp="$(sexy_shared_temp)-${network}"
+tmp="$(sexy_shared_temp "${network}")"
 
 # check that the network exists
 if ! sexy-object-exists networks "${network}"; then
    sexy_errormsg "Network $network does not exist"
 fi
 
-mask="$(sexy-config-get networks $network mask)"
+mask="$(sexy_object_attribute networks $network mask)"
 decimal_mask=$(sexy_network_decimal_netmask "${mask}")
 decimal_broadcast=$(sexy_network_decimal_broadcast "$network" "$mask")
 router=$(sexy_ipv4_addr_increment "$network")

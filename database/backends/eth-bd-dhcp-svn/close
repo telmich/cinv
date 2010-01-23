@@ -29,7 +29,7 @@ tmp="$(sexy_shared_temp "${network}")"
 
 # check that the network exists
 
-cat << eof >> "$tmp"
+cat << eof >> "${tmp}"
 
 } # }}}
 # vim: foldmethod=marker expandtab autoindent tabstop=3 shiftwidth=3 softtabstop=3

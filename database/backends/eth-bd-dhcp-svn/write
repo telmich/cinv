@@ -27,9 +27,7 @@ sexy_args network fqdn -- "$@"
 
 tmp="$(sexy_shared_temp "${network}")"
 
-set -x
-sexy_object_attribute_path networks ${network} ${fqdn}
-
+sexy_object_attribute_path networks "${network}" "${fqdn}"
 
 # check that the objects exist
 if ! sexy_object_exists networks ${network}; then sexy_errormsg "Network $network does not exist"; fi
@@ -38,9 +36,9 @@ if ! sexy_object_attribute_exists networks ${network} ${fqdn}; then
    sexy_errormsg "Host $fqdn does not exist in $network"
 fi
 
-ipv4a="$(sexy-get-attribute networks "${network}" hosts/${fqdn}/ipv4a)"
-mac="$(sexy-get-attribute networks "${network}" hosts/${fqdn}/mac)"
-host="$(echo ${fqdn} | sed 's/\..*//')"
+ipv4a="$(sexy-get-attribute networks "${network}" "${fqdn}/ipv4a")"
+mac="$(sexy-get-attribute networks "${network}" "${fqdn}/mac")"
+host="$(echo "${fqdn}" | sed 's/\..*//')"
 
 echo "   host ${host} { hardware ethernet $mac; fixed-address $ipv4a; }" >> "${tmp}"
 

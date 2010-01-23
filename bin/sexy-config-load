@@ -71,6 +71,13 @@ sexy_object_types="${sexy_path_hosts} ${sexy_path_networks}"
 sexy_runner_known="${sexy_path_networks}"
 
 ################################################################################
+# Convert fqdn to hostname
+sexy_fqdn_to_hostname()
+{
+   sexy_host="$1"; shift
+}
+
+
 # Return if a host exists in a network
 sexy_host_exists()
 {
@@ -85,29 +92,12 @@ sexy_host_exists()
 }
 
 # Retrieve configuration for a type
-sexy_type_attribute()
+sexy_type_attribute_get()
 {
    sexy_type="$1"; shift
    sexy_attribute="$1"; shift
 
    cat "$(sexy_type_path "${sexy_type}")/.config/${sexy_attribute}"
-}
-
-# Return attribute: object specific or default if not set
-sexy_object_attribute()
-{
-   sexy_type="$1"; shift
-   sexy_object="$1"; shift
-   sexy_attribute="$1"; shift
-
-   # check object specific first
-   sexy_attribute_path="$(sexy_object_path $sexy_type $sexy_object)/.config/${sexy_attribute}"
-
-   if [ -f "${sexy_attribute_path}" ]; then
-      cat "${sexy_attribute_path}"
-   else
-      sexy_type_attribute "${sexy_type}"
-   fi
 }
 
 # Return type path
@@ -117,6 +107,17 @@ sexy_type_path()
 
    eval echo \${sexy_db_${sexy_type}}
 }
+
+# Return attribute: object specific
+sexy_object_attribute_get()
+{
+   sexy_type="$1"; shift
+   sexy_object="$1"; shift
+   sexy_attribute="$1"; shift
+
+   cat "$(sexy_object_attribute_path "${type}" "${object}" "${attribute}")"
+}
+
 
 # Return object path
 sexy_object_attribute_path()

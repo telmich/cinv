@@ -21,8 +21,6 @@
 # Setup an a-entry via curl to ETH ID Webservice
 #
 
-[ $# -eq 2 ] || exit 1
-
 set -e
 
 . "$(which "sexy-config-load")"

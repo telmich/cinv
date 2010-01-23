@@ -342,7 +342,7 @@ sexy_args()
    shift; # skip --
 
    if [ "$#" -ne "$count" ]; then
-      sexy_errormsg "${arglist}"
+      sexy_errormsg ${arglist}
    fi
 
    # assign values

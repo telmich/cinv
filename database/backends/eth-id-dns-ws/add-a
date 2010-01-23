@@ -26,8 +26,11 @@ set -e
 . "${__sexy_abs_mydir}/helper-config-load"
 
 ttl="$(sexy_file_read "${sexy_my_config}/ttl")"
+isg_group="$(sexy_file_read "${sexy_my_config}/isg_group")"
+
 sexy_args fqdn ipv4a -- "$@"
 
+set -x
 curl --request POST $curl_stdin "${komcenter_url_base}/nameToIP" << eof
 <insert>
   <nameToIP>
@@ -36,7 +39,7 @@ curl --request POST $curl_stdin "${komcenter_url_base}/nameToIP" << eof
     <forward>Y</forward>
     <reverse>N</reverse>
     <ttl>${ttl}</ttl>
-    <isgGroup>inf-pc</isgGroup>
+    <isgGroup>${isg_group}</isgGroup>
   </nameToIP>
 </insert>
 eof

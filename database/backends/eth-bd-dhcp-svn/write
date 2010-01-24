@@ -36,8 +36,8 @@ if ! sexy_object_attribute_exists networks ${network} ${fqdn}; then
    sexy_errormsg "Host $fqdn does not exist in $network"
 fi
 
-ipv4a="$(sexy-get-attribute networks "${network}" "${fqdn}/ipv4a")"
-mac="$(sexy-get-attribute networks "${network}" "${fqdn}/mac")"
+ipv4a="$(sexy-attribute-get networks "${network}" "${fqdn}/ipv4a")"
+mac="$(sexy-attribute-get networks "${network}" "${fqdn}/mac")"
 host="$(echo "${fqdn}" | sed 's/\..*//')"
 
 echo "   host ${host} { hardware ethernet $mac; fixed-address $ipv4a; }" >> "${tmp}"

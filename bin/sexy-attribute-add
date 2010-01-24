@@ -27,7 +27,4 @@ set -e
 
 sexy_args type object attribute value -- "$@"
 
-eval basedir=\"\${sexy_db_${type}}\"
-attributpath="${basedir}/${object}/${attribute}"
-sexy_notempty "Unknown type: $type" "${basedir}"
-echo "${value}" >> "${attributpath}"
+echo "${value}" >> "$(sexy_object_attribute_path "${type}" "${object}" "${attribute}")"

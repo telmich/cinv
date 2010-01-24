@@ -35,9 +35,19 @@ for sexy_network in 172.25.0.0; do
    ipa=/home/users/nico/.sexy/backends/ipa/eth-id-bd-svn
 
    "${ipa}/open" "$sexy_network"
+   "${dns}/open" "$sexy_network"
 
    for sexy_host in $(sexy_list_hosts_fqdn "${sexy_network}"); do
       "${ipa}/write" "$sexy_network" "$sexy_host"
+   
+
+      ipv4a="$(sexy-attribute-get networks "$sexy_network" "$sexy_host/ipv4a")"
+      "${dns}/set-a+ptr" "$sexy_host" "$ipv4a"
+
+      aliases=$(sexy-attribute-get networks "$sexy_network" "$sexy_host/aliases")
+      for alias in $aliases; do
+         "${dns}/add-cname" "$sexy_host" $alias
+      done
    done
    "${ipa}/close" "$sexy_network"
    "${ipa}/commit" $sexy_network

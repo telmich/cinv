@@ -19,6 +19,7 @@ data/
    hosts/
       <host-ids>/
          ipv4a
+         aliases
             
    networks/
       <network-id>/

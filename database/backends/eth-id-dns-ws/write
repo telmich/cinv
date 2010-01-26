@@ -31,7 +31,5 @@ sexy_args fqdn ipv4a -- "$@"
 # The one that the host does NOT EXIST.
 # After that, we recreate it, so we have a consistent state
 
-${__sexy_abs_mydir}/del-a "${ipv4a}"
-${__sexy_abs_mydir}/add-a+ptr "${fqdn}" "${ipv4a}"
-
-exit 0
+"${__sexy_abs_mydir}/del-a" "${ipv4a}"
+"${__sexy_abs_mydir}/add-a+ptr" "${fqdn}" "${ipv4a}"

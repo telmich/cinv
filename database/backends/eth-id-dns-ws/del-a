@@ -21,15 +21,10 @@
 # Delete an IPN ETH ID Webservice
 #
 
-echo "I am not sure, what this thingy really deletes"
-
-[ $# -eq 1 ] || exit 1
-
 set -e
-
-. "$(which "sexy-config-load")"
+. "$(which sexy-config-load)"
 . "${__sexy_abs_mydir}/helper-config-load"
 
-ipv4a="$1";shift
+sexy_args ipv4a -- "$@" 
 
 curl --request DELETE "${komcenter_url_base}/nameToIP/${ipv4a}"

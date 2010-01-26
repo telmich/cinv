@@ -3,3 +3,15 @@ Functions from sexy-config-load:
 
 External functions:
    sexy-...
+
+
+== Configuration storage ==
+
+Objects, types and attributes can have configurations.
+They are stored in the directory ".config" of the specified
+"thing" (type|object|attribute):
+
+    type/[object]/[attribute]/.config
+
+== Retrieving the configuration ==
+

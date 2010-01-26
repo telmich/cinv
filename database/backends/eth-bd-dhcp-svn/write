@@ -27,8 +27,6 @@ sexy_args network fqdn -- "$@"
 
 tmp="$(sexy_shared_temp "${network}")"
 
-sexy_object_attribute_path networks "${network}" "${fqdn}"
-
 # check that the objects exist
 if ! sexy_object_exists networks ${network}; then sexy_errormsg "Network $network does not exist"; fi
 # check that the fqdn is part of the network

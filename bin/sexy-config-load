@@ -77,7 +77,6 @@ sexy_fqdn_to_hostname()
    sexy_host="$1"; shift
 }
 
-
 # Return if a host exists in a network
 sexy_host_exists()
 {
@@ -137,6 +136,20 @@ sexy_object_config_get()
    sexy_config="$1"; shift
 
    cat "$(sexy_object_config_path "${sexy_type}" "${sexy_object}" "${sexy_config}")"
+}
+
+# Configure configuration for an object
+sexy_object_config_set()
+{
+   sexy_type="$1"; shift
+   sexy_object="$1"; shift
+   sexy_config="$1"; shift
+   sexy_value="$1"; shift
+
+   set -x
+   mkdir -p "$(sexy_object_config_path "${sexy_type}" "${sexy_object}" "")"
+   echo "${sexy_value}" > "$(sexy_object_config_path "${sexy_type}" "${sexy_object}" "${sexy_config}")"
+   set +x
 }
 
 # Retrieve configuration path for an object

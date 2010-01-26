@@ -27,9 +27,7 @@
 #
 
 set -e
-
 . "$(which sexy-config-load)"
-
 
 # if something was supplied, we take stdin as the changes, otherwise we compare the
 # db with reality. FIXME: patch has not yet been implemented.
@@ -37,5 +35,7 @@ set -e
 
 # Go through all interesting object types and compare them
 for interest in ${sexy_runner_known}; do
-   echo sexy-runner-${interest} ${patch}
+   runner="sexy-runner-${interest}"
+   echo "Starting ${runner} ..."
+   "${runner}" ${patch}
 done

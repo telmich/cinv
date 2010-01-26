@@ -27,8 +27,4 @@ set -e
 
 sexy_args type -- "$@"
 
-eval basedir=\"\${sexy_db_${type}}\"
-
-sexy_notempty "Unknown type: $type" "${basedir}"
-
-cd "${basedir}" && ls -1
+cd "$(sexy_type_path "${type}")" && ls -1

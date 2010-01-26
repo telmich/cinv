@@ -28,5 +28,4 @@ set -e
 sexy_args network mask -- "$@"
 
 basedir="$(sexy_type_path networks)/${network}"
-mkdir -p "${basedir}"
-sexy-attribute-set networks "${network}" mask "${mask}"
+sexy_object_config_set networks "${network}" mask "${mask}"

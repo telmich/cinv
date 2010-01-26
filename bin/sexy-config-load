@@ -91,7 +91,7 @@ sexy_host_exists()
    fi
 }
 
-# Retrieve configuration for a type
+# Retrieve configuration for a type FIXME
 sexy_type_attribute_get()
 {
    sexy_type="$1"; shift
@@ -106,6 +106,26 @@ sexy_type_path()
    sexy_type="$1"; shift
 
    eval echo \${sexy_db_${sexy_type}}
+}
+
+# Retrieve configuration for an object
+sexy_object_config_get()
+{
+   sexy_type="$1"; shift
+   sexy_object="$1"; shift
+   sexy_config="$1"; shift
+
+   cat "$(sexy_object_config_path "${sexy_type}" "${sexy_object}" "${sexy_config}")"
+}
+
+# Retrieve configuration path for an object
+sexy_object_config_path()
+{
+   sexy_type="$1"; shift
+   sexy_object="$1"; shift
+   sexy_config="$1"; shift
+
+   echo "$(sexy_type_path "${sexy_type}")/${sexy_object}/.config/${sexy_config}"
 }
 
 # Return attribute: object specific

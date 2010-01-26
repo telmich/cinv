@@ -36,6 +36,9 @@ dstfile="${dst}/${filename}"
 set -e
 cp "${tmp}" "${dstfile}"
 cd "${dst}"
+
+# FIXME: make sure git-commit does the right thing and
+# use git diff-index --cached to check whether to run git commit
 #git add "${filename}" 
 set +e
 git commit -m "Sexy update for $network" -o -- "${filename}"

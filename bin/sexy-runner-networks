@@ -26,31 +26,28 @@ set -e
 
 . "$(which sexy-config-load)"
 
-#for network in $(sexy-list networks); do
+#for network in $(sexy-list-objects networks); do
 for sexy_network in 172.25.0.0; do
-   #ipa="$(sexy-config-get networks "$network" ipa_backend)
-
-   sexy_type_attribute backends ipa-default
-
-   ipa=/home/users/nico/.sexy/backends/ipa/eth-id-bd-svn
+   ipa_default="$(sexy_type_config_get backends ipa-default)"
+   ipa="$sexy_db_backends/$ipa_default"
 
    "${ipa}/open" "$sexy_network"
-   "${dns}/open" "$sexy_network"
+#   "${dns}/open" "$sexy_network"
 
-   for sexy_host in $(sexy_list_hosts_fqdn "${sexy_network}"); do
+   for sexy_host in $(sexy-attribute list "${sexy_network}"); do
       "${ipa}/write" "$sexy_network" "$sexy_host"
    
 
       ipv4a="$(sexy-attribute-get networks "$sexy_network" "$sexy_host/ipv4a")"
-      "${dns}/set-a+ptr" "$sexy_host" "$ipv4a"
+#      "${dns}/set-a+ptr" "$sexy_host" "$ipv4a"
 
-      aliases=$(sexy-attribute-get networks "$sexy_network" "$sexy_host/aliases")
-      for alias in $aliases; do
-         "${dns}/add-cname" "$sexy_host" $alias
-      done
+#      aliases=$(sexy-attribute-get networks "$sexy_network" "$sexy_host/aliases")
+#      for alias in $aliases; do
+#         "${dns}/add-cname" "$sexy_host" $alias
+#      done
    done
    "${ipa}/close" "$sexy_network"
-   "${ipa}/commit" $sexy_network
+#   "${ipa}/commit" $sexy_network
 done
 
 exit 0

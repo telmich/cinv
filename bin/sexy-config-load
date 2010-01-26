@@ -91,6 +91,16 @@ sexy_host_exists()
    fi
 }
 
+########## TYPES
+# Return type path
+sexy_type_path()
+{
+   sexy_type="$1"; shift
+
+   eval echo \${sexy_db_${sexy_type}}
+}
+
+
 # Retrieve configuration for a type FIXME
 sexy_type_attribute_get()
 {
@@ -100,14 +110,25 @@ sexy_type_attribute_get()
    cat "$(sexy_type_path "${sexy_type}")/.config/${sexy_attribute}"
 }
 
-# Return type path
-sexy_type_path()
+# Retrieve configuration path for a type
+sexy_type_config_path()
 {
    sexy_type="$1"; shift
+   sexy_config="$1"; shift
 
-   eval echo \${sexy_db_${sexy_type}}
+   echo "$(sexy_type_path "${sexy_type}")/.config/${sexy_config}"
 }
 
+# Retrieve configuration for a type
+sexy_type_config_get()
+{
+   sexy_type="$1"; shift
+   sexy_config="$1"; shift
+
+   cat "$(sexy_type_config_path "${sexy_type}" "${sexy_config}")"
+}
+
+########## OBJECTS
 # Retrieve configuration for an object
 sexy_object_config_get()
 {

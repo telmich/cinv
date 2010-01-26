@@ -26,8 +26,8 @@ set -e
 
 . "$(which sexy-config-load)"
 
-#for network in $(sexy-list-objects networks); do
-for sexy_network in 172.25.0.0; do
+for network in $(sexy-list-objects networks); do
+   echo Configuring network $network ...
    ipa_default="$(sexy_type_config_get backends ipa-default)"
    ipa="$sexy_db_backends/$ipa_default"
 

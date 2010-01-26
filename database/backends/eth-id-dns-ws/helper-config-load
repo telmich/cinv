@@ -22,7 +22,7 @@
 #
 
 # 
-alias curl="curl --basic --netrc --insecure --header \"Content-Type: text/xml\""
+alias curl="curl -s -S --basic --netrc --insecure --header \"Content-Type: text/xml\""
 #curl_xmlheader="--header \"Content-Type: text/xml\""
 curl_xmlheader="--header \"Content-Type: text/xml\""
 curl_stdin="--data @-"

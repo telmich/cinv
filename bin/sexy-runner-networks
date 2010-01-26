@@ -26,28 +26,31 @@ set -e
 
 . "$(which sexy-config-load)"
 
-for network in $(sexy-list-objects networks); do
+for network in $(sexy-object-list networks); do
    echo Configuring network $network ...
    ipa_default="$(sexy_type_config_get backends ipa-default)"
    ipa="$sexy_db_backends/$ipa_default"
 
-   "${ipa}/open" "$sexy_network"
-#   "${dns}/open" "$sexy_network"
+   dns_default="$(sexy_type_config_get backends dns-default)"
+   dns="$sexy_db_backends/$dns_default"
 
-   for sexy_host in $(sexy-attribute list "${sexy_network}"); do
-      "${ipa}/write" "$sexy_network" "$sexy_host"
+   "${ipa}/open" "$network"
+   "${dns}/open" "$network"
+
+   for host in $(sexy-attribute-list networks "${network}"); do
+      echo Configuring $host in $network ...
+      "${ipa}/write" "$network" "$host"
    
+      ipv4a="$(sexy-attribute-get networks "$network" "$host/ipv4a")"
+      "${dns}/write" "$host" "$ipv4a"
 
-      ipv4a="$(sexy-attribute-get networks "$sexy_network" "$sexy_host/ipv4a")"
-#      "${dns}/set-a+ptr" "$sexy_host" "$ipv4a"
-
-#      aliases=$(sexy-attribute-get networks "$sexy_network" "$sexy_host/aliases")
+#      aliases=$(sexy-attribute-get networks "$network" "$host/aliases")
 #      for alias in $aliases; do
-#         "${dns}/add-cname" "$sexy_host" $alias
+#         "${dns}/add-cname" "$host" $alias
 #      done
    done
-   "${ipa}/close" "$sexy_network"
-#   "${ipa}/commit" $sexy_network
+   "${ipa}/close" "$network"
+   "${ipa}/commit" $network
 done
 
 exit 0

@@ -1,0 +1,4 @@
+- network 129.132.186.0
+- support for cnames / aliases
+- support for "find next free ip address"
+- use "next free ip address" in sexy-host-add-to-network

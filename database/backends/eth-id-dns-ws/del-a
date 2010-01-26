@@ -32,6 +32,4 @@ set -e
 
 ipv4a="$1";shift
 
-set -x
-
 curl --request DELETE "${komcenter_url_base}/nameToIP/${ipv4a}"

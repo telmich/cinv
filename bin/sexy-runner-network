@@ -26,31 +26,29 @@ set -e
 
 . "$(which sexy-config-load)"
 
-for network in $(sexy-object-list networks); do
-   echo Configuring network $network ...
-   ipa_default="$(sexy_type_config_get backends ipa-default)"
-   ipa="$sexy_db_backends/$ipa_default"
+sexy_args network -- "$@"
 
-   dns_default="$(sexy_type_config_get backends dns-default)"
-   dns="$sexy_db_backends/$dns_default"
+echo Configuring network $network ...
+ipa_default="$(sexy_type_config_get backends ipa-default)"
+ipa="$sexy_db_backends/$ipa_default"
 
-   "${ipa}/open" "$network"
-   "${dns}/open" "$network"
+dns_default="$(sexy_type_config_get backends dns-default)"
+dns="$sexy_db_backends/$dns_default"
 
-   for host in $(sexy-attribute-list networks "${network}"); do
-      echo Configuring $host in $network ...
-      "${ipa}/write" "$network" "$host"
-   
-      ipv4a="$(sexy-attribute-get networks "$network" "$host/ipv4a")"
-      "${dns}/write" "$host" "$ipv4a"
+"${ipa}/open" "$network"
+"${dns}/open" "$network"
+
+for host in $(sexy-attribute-list networks "${network}"); do
+   echo Configuring $host in $network ...
+   "${ipa}/write" "$network" "$host"
+
+   ipv4a="$(sexy-attribute-get networks "$network" "$host/ipv4a")"
+   "${dns}/write" "$host" "$ipv4a"
 
 #      aliases=$(sexy-attribute-get networks "$network" "$host/aliases")
 #      for alias in $aliases; do
 #         "${dns}/add-cname" "$host" $alias
 #      done
-   done
-   "${ipa}/close" "$network"
-   "${ipa}/commit" $network
 done
-
-exit 0
+"${ipa}/close" "$network"
+"${ipa}/commit" $network

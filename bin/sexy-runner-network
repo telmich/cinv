@@ -1,0 +1,56 @@
+#!/bin/sh
+# 
+# 2009      Nico Schottelius (nico-sexy at schottelius.org)
+# 
+# This file is part of sexy.
+#
+# sexy is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+# 
+# sexy is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+# 
+# You should have received a copy of the GNU General Public License
+# along with sexy. If not, see <http://www.gnu.org/licenses/>.
+#
+#
+# Make sure all hosts exists in the external databases, as we like it!
+#
+#
+
+set -e
+
+. "$(which sexy-config-load)"
+
+for network in $(sexy-object-list networks); do
+   echo Configuring network $network ...
+   ipa_default="$(sexy_type_config_get backends ipa-default)"
+   ipa="$sexy_db_backends/$ipa_default"
+
+   dns_default="$(sexy_type_config_get backends dns-default)"
+   dns="$sexy_db_backends/$dns_default"
+
+   "${ipa}/open" "$network"
+   "${dns}/open" "$network"
+
+   for host in $(sexy-attribute-list networks "${network}"); do
+      echo Configuring $host in $network ...
+      "${ipa}/write" "$network" "$host"
+   
+      ipv4a="$(sexy-attribute-get networks "$network" "$host/ipv4a")"
+      "${dns}/write" "$host" "$ipv4a"
+
+#      aliases=$(sexy-attribute-get networks "$network" "$host/aliases")
+#      for alias in $aliases; do
+#         "${dns}/add-cname" "$host" $alias
+#      done
+   done
+   "${ipa}/close" "$network"
+   "${ipa}/commit" $network
+done
+
+exit 0

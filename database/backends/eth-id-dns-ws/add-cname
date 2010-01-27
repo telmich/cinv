@@ -22,14 +22,13 @@
 #
  
 
-[ $# -eq 2 ] || exit 1
+set -e
+. "$(which sexy-config-load)"
+. "${__sexy_abs_mydir}/helper-config-load"
 
-set -x
+sexy_args fqdn cname -- "$@"
 
-fqdn="$1";shift
-cname="$1";shift
-
-cat << eof | curl --basic --netrc --insecure --request POST --header "Content-Type: text/xml" --data @- https://www.komcenter.ethz.ch/ip/rest/alias
+curl --request POST $curl_stdin "${komcenter_url_base}alias" << eof
 <insert>
   <alias>
     <fqName>${cname}</fqName>

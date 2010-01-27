@@ -1,5 +1,5 @@
 x network 129.132.186.0
-- support for cnames / aliases
+x support for cnames / aliases
 - support for "find next free ip address"
    - start at first usable ip address
       - have a list of unusable ip addresses

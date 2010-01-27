@@ -23,9 +23,7 @@
 #
 
 set -e
-
 . "$(which sexy-config-load)"
-
 sexy_args network -- "$@"
 
 echo Configuring network $network ...
@@ -45,10 +43,14 @@ for host in $(sexy-attribute-list networks "${network}"); do
    ipv4a="$(sexy-attribute-get networks "$network" "$host/ipv4a")"
    "${dns}/write" "$host" "$ipv4a"
 
-#      aliases=$(sexy-attribute-get networks "$network" "$host/aliases")
-#      for alias in $aliases; do
-#         "${dns}/add-cname" "$host" $alias
-#      done
+      # FIXME: implement version that allows non-existing attributes
+      set +e
+      aliases=$(sexy-attribute-get networks "$network" "$host/aliases" 2>/dev/null)
+      set -e
+      for alias in $aliases; do
+         echo "Creating alias $alias for host $host ..."
+         "${dns}/add-cname" "$host" "$alias"
+      done
 done
 "${ipa}/close" "$network"
 "${ipa}/commit" $network

@@ -34,4 +34,9 @@ if ! sexy_object_exists hosts "${fqdn}"; then
    sexy_errormsg "Host $fqdn does not exist"
 fi
 
-ln -s "../../hosts/${fqdn} "$(sexy_object_path networks "${network}")/${fqdn}"
+address="$(sexy-network-free-address-get "${network}")"
+
+hostinnetwork="$(sexy_object_path networks "${network}")/${fqdn}"
+ln -s "../../hosts/${fqdn}" "${hostinnetwork}"
+
+echo "${address}" > "${hostinnetwork}/ipv4a"

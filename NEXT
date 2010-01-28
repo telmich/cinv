@@ -11,3 +11,15 @@ x support for cnames / aliases
 - create sexy-host-add-to-network <network> <fqdn> <address>
 - use "next free ip address" in sexy-host-add-to-network
 
+
+--------------------------------------------------------------------------------
+Next free / general
+
+network create script must create
+   - last used (init with network num)
+--------------------------------------------------------------------------------
+Add support for unusable ip addresses
+Add support for ipv6 addresses: just ignore the type, rename ipv4a to address
+   And add type of network to config?
+--------------------------------------------------------------------------------
+

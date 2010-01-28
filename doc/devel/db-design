@@ -24,5 +24,10 @@ data/
    networks/
       <network-id>/
          <host-ids>
+         .config/
+            mask
+            addresses_free             # used, but freed addresses -> reusable
+            addresses_unusable         # like routers or otherwise managed
+            address_last_used          # last used address, next one can be used
             
 tmp/

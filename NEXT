@@ -22,4 +22,4 @@ Add support for unusable ip addresses
 Add support for ipv6 addresses: just ignore the type, rename ipv4a to address
    And add type of network to config?
 --------------------------------------------------------------------------------
-
+Add some documentation, how to use sexy.

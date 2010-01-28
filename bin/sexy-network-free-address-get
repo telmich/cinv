@@ -1,0 +1,59 @@
+#!/bin/sh
+# 
+# 2009      Nico Schottelius (nico-sexy at schottelius.org)
+# 
+# This file is part of sexy.
+#
+# sexy is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+# 
+# sexy is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+# 
+# You should have received a copy of the GNU General Public License
+# along with sexy. If not, see <http://www.gnu.org/licenses/>.
+#
+#
+# Retrieve next usable address and make it unusable
+#
+
+set -e
+. "$(which sexy-config-load)"
+sexy_args network -- "$@"
+
+free_address="$(sexy_object_config_failok_get networks "${network}" address_free)"
+
+# reuse old address
+if [ "${free_addresses}" ]; then
+   address="$(echo $free_address | tail -n1)"
+   address_free_path="$(sexy_object_config_path "networks" "${network}" "address_free")"
+   tmp="$(sexy_mktemp)"
+
+   grep -v "${address}" "${address_free_path}" > "${tmp}" && mv -f "${tmp}" "${address_free_path}"
+else
+   address_last_used="$(sexy_object_config_get "networks" "${network}" "address_last_used")"
+   address="$(sexy_ipv4_addr_increment "${address_last_used}")"
+   mask="$(sexy_object_config_get "networks" "${network}" "mask")"
+   broadcast="$(sexy_network_decimal_broadcast "${network}" "${mask}")"
+
+   if [ "${address}" = "${broadcast}" ]; then
+      # no free address left
+      address=""
+   else
+      echo "${address}" > "$(sexy_object_config_path "networks" "${network}" "address_last_used")"
+   fi
+fi
+
+# FIXME: implement handling of unusable requires grepping throguh the path
+# probably create a library function!
+#unusable="$(sexy_object_config_failok_get networks "${network}" address_free)"
+
+if [ "${address}" ]; then
+   echo ${address}
+else
+   exit 1
+fi

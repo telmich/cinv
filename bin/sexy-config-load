@@ -127,8 +127,27 @@ sexy_type_config_get()
    cat "$(sexy_type_config_path "${sexy_type}" "${sexy_config}")"
 }
 
+# Retrieve configuration for a type, failing is ok
+sexy_type_config_failok_get()
+{
+   sexy_type="$1"; shift
+   sexy_config="$1"; shift
+
+   sexy_type_config_get "${sexy_type}" "${sexy_config}" 2>/dev/null || true
+}
+
+
 ########## OBJECTS
 # Retrieve configuration for an object
+sexy_object_config_failok_get()
+{
+   sexy_type="$1"; shift
+   sexy_object="$1"; shift
+   sexy_config="$1"; shift
+
+   sexy_object_config_get "${sexy_type}" "${sexy_object}" "${sexy_config}" 2>/dev/null || true
+}
+
 sexy_object_config_get()
 {
    sexy_type="$1"; shift

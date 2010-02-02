@@ -398,31 +398,58 @@ sexy_file_read()
 
 }
 
-# Require some command line parameters
+# Require some command line parameters and allow optional parameters
 sexy_args()
 {
-
    count=0
    arglist=""
+   sexy_args_params="possible"
+   sexy_args_exact="unknown"
+
+   # get argument list
+   while [ "$#" -gt 0 ]; do
+      case "$1" in
+         # Only allow exact number of arguments
+         -exact)
+            sexy_args_exact="yes"
+            shift
+         ;;
+         # Also allow other arguments
+         -optional)
+            sexy_args_exact="no"
+            shift
+         ;;
+         -*)
+            sexy_errormsg "Unknown sexy argument"
+            shift
+         ;;
+         *)
+            break
+         ;;
+      esac
+   done
 
    # get argument list
    while [ "$1" != "--" ]; do
-      eval arg_$count=\"$1\"
+      eval arg_${count}=\"$1\"
       arglist="$arglist $1"
       shift
       count=$(($count+1))
    done
-   shift; # skip --
+   shift; # skip the "--"
 
-   if [ "$#" -ne "$count" ]; then
+   if [ "${sexy_args_exact}" = "yes" -a "$#" -ne "$count" ]; then
       sexy_errormsg ${arglist}
    fi
 
    # assign values
-   count=0
-   while [ "$#" -gt 0 ]; do
-      eval export \$arg_$count=\"$1\"
+   set -x
+   export sexy_args_next=0
+   while [ "$sexy_args_next" -lt "${count}" ]; do
+      eval export \$arg_$sexy_args_next=\"$1\"
       shift
-      count=$(($count+1))
+      sexy_args_next=$(($sexy_args_next+1))
    done
+   # increment for further use of optional arguments
+   sexy_args_next=$(($sexy_args_next+1))
 }

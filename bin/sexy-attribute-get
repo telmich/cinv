@@ -22,9 +22,7 @@
 #
 
 set -e
-
 . "$(which sexy-config-load)"
-
 sexy_args type object attribute -- "$@"
 
 eval basedir=\"\${sexy_db_${type}}\"

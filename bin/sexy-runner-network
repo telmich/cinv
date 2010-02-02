@@ -51,6 +51,7 @@ for host in $(sexy-attribute-list networks "${network}"); do
       echo "Creating alias $alias for host $host ..."
       "${dns}/add-cname" "$host" "$alias"
    done
+
 done
 "${ipa}/close" "$network"
 "${dns}/close" "$network"

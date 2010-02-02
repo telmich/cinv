@@ -44,9 +44,7 @@ for host in $(sexy-attribute-list networks "${network}"); do
    "${dns}/write" "$host" "$ipv4a"
 
    # FIXME: implement version that allows non-existing attributes
-   set +e
-   aliases=$(sexy-attribute-get networks "$network" "$host/aliases" 2>/dev/null)
-   set -e
+   aliases="$(sexy-attribute-get networks "$network" "$host/aliases" failok)"
    for alias in $aliases; do
       echo "Creating alias $alias for host $host ..."
       "${dns}/add-cname" "$host" "$alias"

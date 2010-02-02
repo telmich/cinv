@@ -36,9 +36,16 @@ fi
 
 ipv4a="$(sexy-attribute-get networks "${network}" "${fqdn}/ipv4a")"
 mac="$(sexy-attribute-get networks "${network}" "${fqdn}/mac")"
+next_server="$(sexy-attribute-get networks "$network" "${fqdn}/next-server" failok)"
+bootfilename="$(sexy-attribute-get networks "$network" "${fqdn}/bootfilename" failok)"
 host="$(echo "${fqdn}" | sed 's/\..*//')"
 
-echo "   host ${host} { hardware ethernet $mac; fixed-address $ipv4a; }" >> "${tmp}"
+line="   host ${host} { hardware ethernet $mac; fixed-address $ipv4a;"
+[ "${next_server}" ] && line="${line} next-server $next_server;"
+[ "${bootfilename}" ] && line="${line} filename \"${bootfilename}\";"
+line="${line} }"
+
+echo "${line}" >> "${tmp}"
 
 # debug
-#cat "${tmp}"
+cat "${tmp}"

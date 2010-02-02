@@ -18,8 +18,10 @@ data/
 
    hosts/
       <host-ids>/
-         ipv4a
-         aliases
+         ipv4a                         # ipv4 address - should probably renamed to address later
+         aliases                       # cnames for dns
+         next-server                   # for dhcp
+         bootfilename                  # for dhcp
             
    networks/
       <network-id>/

@@ -23,9 +23,17 @@
 
 set -e
 . "$(which sexy-config-load)"
-sexy_args type object attribute -- "$@"
+sexy_args -atleast type object attribute -- "$@"
+sexy_args -skip -optional failok -- "$@"
 
 eval basedir=\"\${sexy_db_${type}}\"
 sexy_notempty "Unknown type: $type" "${basedir}"
 attributpath="${basedir}/${object}/${attribute}"
-cat "${attributpath}"
+
+if [ ! -f "${attributpath}" ]; then
+   if [ -z "${failok}" ]; then
+      sexy_errormsg "${type}/${object}/${attribute} does not exist"
+   fi
+else
+   cat "${attributpath}"
+fi

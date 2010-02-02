@@ -29,4 +29,6 @@ curl_stdin="--data @-"
 
 komcenter_url_base="https://www.komcenter.ethz.ch/ip/rest"
 
+result_filter="grep Done"
+
 

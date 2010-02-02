@@ -48,4 +48,4 @@ line="${line} }"
 echo "${line}" >> "${tmp}"
 
 # debug
-cat "${tmp}"
+#cat "${tmp}"

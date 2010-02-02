@@ -398,25 +398,46 @@ sexy_file_read()
 
 }
 
+# Have a look whether there are optional parameters left
+sexy_args_optional()
+{
+
+   # sexy_args ran before, skip already checked items
+   if [ "${sexy_args_next}" ]; then
+      echo "Skipping $sexy_args_next ..."
+      shift "${sexy_args_next}"
+   fi
+
+
+}
+
 # Require some command line parameters and allow optional parameters
+# -atleast: have at least the given number of arguments, but allow more to be present
+# -exact: have exactly the given number of arguments
+# -optional: allow arguments to be missing
+# -skip: skip previously found arguments
 sexy_args()
 {
    count=0
    arglist=""
-   sexy_args_params="possible"
-   sexy_args_exact="unknown"
+   sexy_args_exact="exact"
+   sexy_args_skip="1"
 
    # get argument list
    while [ "$#" -gt 0 ]; do
       case "$1" in
-         # Only allow exact number of arguments
-         -exact)
-            sexy_args_exact="yes"
+         # Only allow exact number of arguments (normally allow more)
+         -atleast)
+            sexy_args_exact="atleast"
             shift
          ;;
-         # Also allow other arguments
          -optional)
-            sexy_args_exact="no"
+            sexy_args_exact="optional"
+            shift
+         ;;
+         # Skip previously found parameters
+         -skip)
+            sexy_args_skip="$(($sexy_args_skip+$sexy_args_next))"
             shift
          ;;
          -*)
@@ -432,24 +453,29 @@ sexy_args()
    # get argument list
    while [ "$1" != "--" ]; do
       eval arg_${count}=\"$1\"
+      # unset
+      eval $1=""
       arglist="$arglist $1"
       shift
       count=$(($count+1))
    done
-   shift; # skip the "--"
+ 
+   # skip at the "--" or more args if -skip is specified
+   shift $sexy_args_skip
 
-   if [ "${sexy_args_exact}" = "yes" -a "$#" -ne "$count" ]; then
+   # Need the exact number of arguments
+   if [ "${sexy_args_exact}" = "exact" -a "$#" -ne "$count" ]; then
+      sexy_errormsg ${arglist}
+   # Need at least given number of arguments
+   elif [ "${sexy_args_exact}" = "atleast" -a "$#" -lt "$count" ]; then
       sexy_errormsg ${arglist}
    fi
 
    # assign values
-   set -x
    export sexy_args_next=0
-   while [ "$sexy_args_next" -lt "${count}" ]; do
+   while [ "$#" -gt 0 -a "$sexy_args_next" -lt "${count}" ]; do
       eval export \$arg_$sexy_args_next=\"$1\"
       shift
       sexy_args_next=$(($sexy_args_next+1))
    done
-   # increment for further use of optional arguments
-   sexy_args_next=$(($sexy_args_next+1))
 }

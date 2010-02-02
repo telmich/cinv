@@ -1,0 +1,22 @@
+#!/bin/sh
+set -e
+. "$(which sexy-config-load)"
+set +e
+
+# should work
+sexy_args a b c -- a b c
+echo $a $b $c
+
+# should work
+sexy_args -exact a b c -- a b c
+echo $a $b $c
+
+# should not work, start in a subshell to survive
+( sexy_args -exact a b c -- a b c d )
+
+# should work
+set --  a b c d
+sexy_args -optional a b c -- "$@"
+# should echo "d"
+echo $sexy_args_next
+eval echo \$$sexy_args_next

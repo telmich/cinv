@@ -9,9 +9,9 @@ data/
 
    backends/
       .config
-         default-ipa
-         default-dns
-      <backend-id>/
+         default-ipa                   # which backend is responsible for IP address assignments?
+         default-dns                   # which backend is responsible for the DNS entries?
+      <backend-id>/                    # Backends directory
          <id>/
             .config
             id specific (?) plus needed (open,write,close,commit)
@@ -32,4 +32,4 @@ data/
             addresses_unusable         # like routers or otherwise managed
             address_last_used          # last used address, next one can be used
             
-tmp/
+tmp/                                   # temp dir, that contains shared and random tempfiles

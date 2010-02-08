@@ -51,6 +51,7 @@ for host in $(sexy-attribute-list networks "${network}"); do
    done
 
 done
+#exit 0
 "${ipa}/close" "$network"
 "${dns}/close" "$network"
 "${ipa}/commit" $network

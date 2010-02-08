@@ -49,4 +49,4 @@ subnet $network netmask $decimal_mask { # {{{
 eof
 
 # Debug
-#cat "${tmp}"
+cat "${tmp}"

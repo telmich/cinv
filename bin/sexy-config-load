@@ -157,7 +157,19 @@ sexy_object_config_get()
    cat "$(sexy_object_config_path "${sexy_type}" "${sexy_object}" "${sexy_config}")"
 }
 
-# Configure configuration for an object
+# Add CONFIGURATION for an object
+sexy_object_config_add()
+{
+   sexy_type="$1"; shift
+   sexy_object="$1"; shift
+   sexy_config="$1"; shift
+   sexy_value="$1"; shift
+
+   mkdir -p "$(sexy_object_config_path "${sexy_type}" "${sexy_object}" "")"
+   echo "${sexy_value}" >> "$(sexy_object_config_path "${sexy_type}" "${sexy_object}" "${sexy_config}")"
+}
+
+# CONFIGUre configuration for an object
 sexy_object_config_set()
 {
    sexy_type="$1"; shift

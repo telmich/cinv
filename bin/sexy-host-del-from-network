@@ -18,7 +18,7 @@
 # along with sexy. If not, see <http://www.gnu.org/licenses/>.
 #
 #
-# Remove a host from a network
+# Remove a host from a network and record the free address
 #
 
 set -e
@@ -35,7 +35,11 @@ fi
 address="$(sexy-attribute-get networks "${network}" "${fqdn}/ipv4a")"
 hostinnetwork="$(sexy_object_path networks "${network}")/${fqdn}"
 
-echo "${address}" >> 
-rm "${hostinnetwork}"
+# remember unsued ip address
+sexy_object_config_add networks "${network}" addresses_free "${address}" 
 
-echo "${address}" > "${hostinnetwork}/ipv4a"
+# remove address from host
+sexy-attribute-del hosts "${fqdn}" ipv4a
+
+# remove host from network
+sexy-attribute-del networks "${network}" "${fqdn}"

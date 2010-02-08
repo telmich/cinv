@@ -286,16 +286,19 @@ sexy_network_decimal_netmask()
    sexy_i="0"
 
    while [ $sexy_i -lt 4 ]; do
-      if [ "$(($sexy_mask_rest / 8))" -gt 1 ]; then
+      if [ "$(($sexy_mask_rest / 8))" -ge 1 ]; then
          byte=255
          sexy_mask_rest="$(($sexy_mask_rest-8))"
       else
-         byte=1
+         inc=128
+         byte=0
          while [ $sexy_mask_rest -gt 0 -a $byte -lt 256 ]; do
-            byte=$(($byte *2))
+            byte=$(($byte + $inc))
+            inc=$(($inc / 2))
+            #echo $byte
             sexy_mask_rest=$(($sexy_mask_rest-1))
          done
-         byte=$(($byte-1))
+         #byte=$(($byte-1))
       fi  
 
       sexy_decimal_mask="${sexy_decimal_mask}${byte}"

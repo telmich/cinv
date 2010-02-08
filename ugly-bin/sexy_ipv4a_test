@@ -1,0 +1,12 @@
+#!/bin/sh
+set -e
+. "$(which sexy-config-load)"
+set +e
+
+#set -x
+for i in $(seq 8 32); do
+   echo -n $i :
+   sexy_network_decimal_netmask $i
+done
+set +x
+sexy_network_decimal_broadcast 10.110.128.0 17

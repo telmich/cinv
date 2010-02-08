@@ -25,15 +25,15 @@ set -e
 . "$(which sexy-config-load)"
 sexy_args network -- "$@"
 
-free_address="$(sexy_object_config_failok_get networks "${network}" address_free)"
+free_address="$(sexy_object_config_failok_get networks "${network}" address_free | tail -n1)"
 
 # reuse old address
 if [ "${free_addresses}" ]; then
-   address="$(echo $free_address | tail -n1)"
+   address="${free_address}"
    address_free_path="$(sexy_object_config_path "networks" "${network}" "address_free")"
    tmp="$(sexy_mktemp)"
 
-   grep -v "${address}" "${address_free_path}" > "${tmp}" && mv -f "${tmp}" "${address_free_path}"
+   grep -v "^${address}\$" "${address_free_path}" > "${tmp}" && mv -f "${tmp}" "${address_free_path}"
 else
    address_last_used="$(sexy_object_config_get "networks" "${network}" "address_last_used")"
    address="$(sexy_ipv4_addr_increment "${address_last_used}")"

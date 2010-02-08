@@ -1,6 +1,6 @@
 Sexy - the make-the-sysadmin-happy-tool (host management)
 =========================================================
-sexy-0.2 - make sysadmins play nethack
+sexy - make sysadmins think about nethack strategies
 
 You define a state - sexy takes care of what needs to be done.
 
@@ -10,7 +10,7 @@ To be able to use the sexy suite, you have to agree to the following
 principle:
 
 
-- Do not care how something is done (realised with 'backends').
+- I do not care how something is done (realised with 'backends').
 - One aim is to minimise the time spend doing a job (realised with 'frontends').
 
 If you care about how things are done, sexy is suitable for you.
@@ -18,6 +18,24 @@ If you care about how things are done, sexy is suitable for you.
 You can change the job and continue to use sexy.
 Your job can change the backends needed, you can continue to use
 sexy. Sexy, isn't it?
+
+
+How to use sexy
+---------------
+
+Initialise sexy
+~~~~~~~~~~~~~~~~
+
+Type into the shell:
+
+--------------------------------------------------------------------------------
+sexypath=/path/to/sexy
+export PATH=$PATH:$sexypath/bin
+ln -s $sexypath/database ~/.sexy
+--------------------------------------------------------------------------------
+
+That's it, have fun.
+
 
 
 Utilisation (= What I want to do)

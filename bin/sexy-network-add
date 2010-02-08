@@ -22,11 +22,8 @@
 #
 
 set -e
-
 . "$(which sexy-config-load)"
-
 sexy_args network mask address_last_used -- "$@"
 
-basedir="$(sexy_type_path networks)/${network}"
 sexy_object_config_set networks "${network}" mask "${mask}"
 sexy_object_config_set networks "${network}" address_last_used "${address_last_used}"

@@ -165,10 +165,8 @@ sexy_object_config_set()
    sexy_config="$1"; shift
    sexy_value="$1"; shift
 
-   set -x
    mkdir -p "$(sexy_object_config_path "${sexy_type}" "${sexy_object}" "")"
    echo "${sexy_value}" > "$(sexy_object_config_path "${sexy_type}" "${sexy_object}" "${sexy_config}")"
-   set +x
 }
 
 # Retrieve configuration path for an object

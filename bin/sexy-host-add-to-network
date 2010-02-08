@@ -25,7 +25,8 @@ set -e
 
 . "$(which sexy-config-load)"
 
-sexy_args network fqdn -- "$@"
+sexy_args -atleast network fqdn -- "$@"
+sexy_args -skip -optional address -- "$@"
 
 if ! sexy_object_exists networks "${network}"; then
    sexy_errormsg "Network $network does not exist"
@@ -34,7 +35,8 @@ if ! sexy_object_exists hosts "${fqdn}"; then
    sexy_errormsg "Host $fqdn does not exist"
 fi
 
-address="$(sexy-network-free-address-get "${network}")"
+# if address was not specified, use next free one
+[ "${address}" ] || address="$(sexy-network-free-address-get "${network}")"
 
 hostinnetwork="$(sexy_object_path networks "${network}")/${fqdn}"
 ln -s "../../hosts/${fqdn}" "${hostinnetwork}"

@@ -292,13 +292,11 @@ sexy_network_decimal_netmask()
       else
          inc=128
          byte=0
-         while [ $sexy_mask_rest -gt 0 -a $byte -lt 256 ]; do
+         while [ $sexy_mask_rest -gt 0 ]; do
             byte=$(($byte + $inc))
             inc=$(($inc / 2))
-            #echo $byte
             sexy_mask_rest=$(($sexy_mask_rest-1))
          done
-         #byte=$(($byte-1))
       fi  
 
       sexy_decimal_mask="${sexy_decimal_mask}${byte}"
@@ -320,16 +318,17 @@ sexy_network_decimal_broadcast()
    sexy_i="0"
 
    while [ "${sexy_i}" -lt 4 ]; do
-      if [ "$(($sexy_mask_rest / 8))" -gt 1 ]; then
+      if [ "$(($sexy_mask_rest / 8))" -ge 1 ]; then
          sexy_netmask_byte=255
          sexy_mask_rest="$(($sexy_mask_rest-8))"
       else
-         sexy_netmask_byte=1
-         while [ $sexy_mask_rest -gt 0 -a $sexy_netmask_byte -lt 256 ]; do
-            sexy_netmask_byte=$(($sexy_netmask_byte *2))
+         sexy_netmask_byte=0
+         inc=128
+         while [ $sexy_mask_rest -gt 0 ]; do
+            sexy_netmask_byte=$(($sexy_netmask_byte + $inc))
+            inc=$(($inc / 2))
             sexy_mask_rest=$(($sexy_mask_rest-1))
          done
-         sexy_netmask_byte=$(($sexy_netmask_byte-1))
       fi  
  
       sexy_current_field="$(sexy_ipv4_get_byte $sexy_network $(($sexy_i+1)))"

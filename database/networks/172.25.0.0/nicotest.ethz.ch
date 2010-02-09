@@ -1,1 +1,0 @@
-../../hosts/nicotest.ethz.ch

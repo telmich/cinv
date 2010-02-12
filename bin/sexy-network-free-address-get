@@ -25,7 +25,7 @@ set -e
 . "$(which sexy-config-load)"
 sexy_args network -- "$@"
 
-free_address="$(sexy_object_config_failok_get networks "${network}" address_free | tail -n1)"
+free_address="$(sexy_object_config_failok_get networks "${network}" addresses_free | tail -n1)"
 
 # reuse old address
 if [ "${free_addresses}" ]; then

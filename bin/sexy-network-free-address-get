@@ -30,7 +30,7 @@ free_address="$(sexy_object_config_failok_get networks "${network}" addresses_fr
 # reuse old address
 if [ "${free_address}" ]; then
    address="${free_address}"
-   address_free_path="$(sexy_object_config_path "networks" "${network}" "address_free")"
+   address_free_path="$(sexy_object_config_path "networks" "${network}" "addresses_free")"
    tmp="$(sexy_mktemp)"
 
    grep -v "^${address}\$" "${address_free_path}" > "${tmp}" && mv -f "${tmp}" "${address_free_path}"

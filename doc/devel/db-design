@@ -31,5 +31,7 @@ data/
             addresses_free             # used, but freed addresses -> reusable
             addresses_unusable         # like routers or otherwise managed
             address_last_used          # last used address, next one can be used
+            next-server                # for dhcp (default value)
+            bootfilename               # for dhcp (default value)
             
 tmp/                                   # temp dir, that contains shared and random tempfiles

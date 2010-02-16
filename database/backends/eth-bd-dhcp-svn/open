@@ -38,6 +38,9 @@ decimal_mask=$(sexy_network_decimal_netmask "${mask}")
 decimal_broadcast=$(sexy_network_decimal_broadcast "$network" "$mask")
 router=$(sexy_ipv4_addr_increment "$network")
 
+next_server="$(sexy_object_config_failok_get networks "$network" next-server)"
+bootfilename="$(sexy_object_config_failok_get networks "$network" bootfilename)"
+
 cat << eof > "$tmp"
 # WARNING: sexy generated file, do *not* edit directly.
 # vim users: use 'zn' if you do not know about folds!
@@ -45,8 +48,11 @@ subnet $network netmask $decimal_mask { # {{{
        option broadcast-address $decimal_broadcast;
        option routers $router;
        option subnet-mask $decimal_mask;
-
 eof
 
+[ "${next_server}" ]    && echo "       next-server $next_server;"      >> "${tmp}"
+[ "${bootfilename}" ]   && echo "       filename  \"$bootfilename\";"   >> "${tmp}"
+
+echo "" >> "${tmp}"
 # Debug
 cat "${tmp}"

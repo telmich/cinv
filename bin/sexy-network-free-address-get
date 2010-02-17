@@ -22,6 +22,7 @@
 #
 
 set -e
+set -x
 . "$(which sexy-config-load)"
 sexy_args network -- "$@"
 
@@ -33,7 +34,9 @@ if [ "${free_address}" ]; then
    address_free_path="$(sexy_object_config_path "networks" "${network}" "addresses_free")"
    tmp="$(sexy_mktemp)"
 
-   grep -v "^${address}\$" "${address_free_path}" > "${tmp}" && mv -f "${tmp}" "${address_free_path}"
+   # set -e only continues on success; remove now used ip address
+   sed "/^${address}\$/d" "${address_free_path}" > "${tmp}"
+   mv -f "${tmp}" "${address_free_path}"
 else
    address_last_used="$(sexy_object_config_get "networks" "${network}" "address_last_used")"
    address="$(sexy_ipv4_addr_increment "${address_last_used}")"

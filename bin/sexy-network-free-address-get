@@ -22,7 +22,6 @@
 #
 
 set -e
-set -x
 . "$(which sexy-config-load)"
 sexy_args network -- "$@"
 

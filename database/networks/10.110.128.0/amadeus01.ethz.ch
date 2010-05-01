@@ -1,1 +1,0 @@
-../../hosts/amadeus01.ethz.ch

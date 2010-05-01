@@ -1,1 +1,0 @@
-../../hosts/lost.ethz.ch

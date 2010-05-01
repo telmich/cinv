@@ -1,1 +1,0 @@
-../../hosts/buenavista.ethz.ch

@@ -1,1 +1,0 @@
-../../hosts/cinderella.ethz.ch

@@ -1,1 +1,0 @@
-../../hosts/ikdesk6.ethz.ch

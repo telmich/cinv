@@ -1,1 +1,0 @@
-../../hosts/accordion.ethz.ch

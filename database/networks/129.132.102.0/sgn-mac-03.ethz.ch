@@ -1,1 +1,0 @@
-../../hosts/sgn-mac-03.ethz.ch

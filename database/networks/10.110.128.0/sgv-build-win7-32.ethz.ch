@@ -1,1 +1,0 @@
-../../hosts/sgv-build-win7-32.ethz.ch

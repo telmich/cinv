@@ -1,1 +1,0 @@
-../../hosts/eightmile.ethz.ch

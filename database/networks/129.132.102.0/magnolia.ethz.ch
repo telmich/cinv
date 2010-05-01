@@ -1,1 +1,0 @@
-../../hosts/magnolia.ethz.ch

@@ -1,4 +1,0 @@
-This should become the backend to talk to the ID webservice
-(https://www.komcenter.ethz.ch/confluence/display/kc/WS+IP)
-
-Ignore the mess for now, only have a look at get/ and set/.

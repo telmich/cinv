@@ -1,1 +1,0 @@
-../../hosts/sgn-seashell-01.ethz.ch

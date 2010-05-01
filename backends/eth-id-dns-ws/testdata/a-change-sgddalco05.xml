@@ -1,0 +1,15 @@
+<insert>
+  <nameToIP>
+   <toMutade>
+    <ip>129.132.130.55</ip>
+    <fqName>sgddalco05.ethz.ch</fqName>
+   </toMutade>
+    <ip>129.132.75.157</ip>
+    <fqName>sgddalco05</fqName>
+    <subdomainName>ethz.ch</subdomainName>
+    <forward>Y</forward>
+    <reverse>Y</reverse>
+    <ttl>600</ttl>
+    <isgGroup>inf-pc</isgGroup>
+  </nameToIP>
+</insert>

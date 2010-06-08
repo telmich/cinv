@@ -1,0 +1,1 @@
+../../hosts/sgo-webcam-01.ethz.ch

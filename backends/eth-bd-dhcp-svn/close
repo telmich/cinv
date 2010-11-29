@@ -31,6 +31,7 @@ tmp="$(sexy_shared_temp "${network}")"
 
 cat << eof >> "${tmp}"
 
+} # close group
 } # }}}
 # vim: foldmethod=marker expandtab autoindent tabstop=3 shiftwidth=3 softtabstop=3
 eof

@@ -48,6 +48,10 @@ subnet $network netmask $decimal_mask { # {{{
        option broadcast-address $decimal_broadcast;
        option routers $router;
        option subnet-mask $decimal_mask;
+
+# new: Groups required in new dhcpcd environment - 20101129
+group {
+
 eof
 
 [ "${next_server}" ]    && echo "       next-server $next_server;"      >> "${tmp}"

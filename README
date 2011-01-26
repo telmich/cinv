@@ -19,6 +19,16 @@ You can change the job and continue to use sexy.
 Your job can change the backends needed, you can continue to use
 sexy. Sexy, isn't it?
 
+What sexy can do so far
+~~~~~~~~~~~~~~~~~~~~~~~
+
+Sexy can manage dns/dhcp.
+Sexy should be able to do general services.
+Some stateful, some one shot (?)
+
+   - order printer xyz
+   - add host abc to network foobar
+
 
 How to use sexy
 ---------------

@@ -35,12 +35,12 @@ sexy-host-add-to-network $network sexy2-vm1.ethz.ch
 
 # 4.1) install hypervisor
 # FIXME: should be replaced with cdist
-ssh root@dvorak02.ethz.ch "apt-get install qemu-kvm"
+ssh root@$vm_host "apt-get install qemu-kvm"
 
 # 4.2) configure networking
 # TODO: where to store network settings, iow which nic on dvorak02 to use for what
 bridge="vlan.$vlan"
-ssh root@dvorak02.ethz.ch "brctl addbr $bridge && brctl addbr addif $bridge eth2"
+ssh root@$vm_host "brctl addbr $bridge && brctl addbr addif $bridge eth2"
 
 # 4.3) qemu-img
 # FIXME: where do we store images?

@@ -1,5 +1,9 @@
 #!/bin/sh
 
+# TODOs: (i.e. not working)
+# sexy-add ... fails if running second time => fix in sexy?
+# Can't rerun script: device vlan.141 already exists; can't create bridge with the same name
+
 # Exit if any subtasks fails
 set -e
 

@@ -1,5 +1,7 @@
 #!/bin/sh
 
+# Exit if any subtasks fails
+set -e
 
 # 1) VM erzeugen
 # - RAM           | 512M
@@ -35,7 +37,7 @@ sexy-host-add-to-network $network sexy2-vm1.ethz.ch
 
 # 4.1) install hypervisor
 # FIXME: should be replaced with cdist
-ssh root@dvorak02.ethz.ch "apt-get install qemu-kvm"
+ssh root@dvorak02.ethz.ch "apt-get -y install qemu-kvm"
 
 # 4.2) configure networking
 # TODO: where to store network settings, iow which nic on dvorak02 to use for what

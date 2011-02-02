@@ -3,17 +3,27 @@
 
 # 1) VM erzeugen
 # - RAM           | 512M
+ram=512
 # - HD            | 10G
+hd=10
 # - CPU-anzahl    | 1
-# - Netz (1)      | 10.110.8.0/22
+cpu=1
+# - Netz (1)      | 10.110.64.0/18
+network=10.110.64.0
+
 #  - in VLAN      | ?
+vlan=141
+
 # - VM-host       | dvorak02  
+vm_host=dvorak02.ethz.ch
+
 # - Netz/Mac      | 52:54:00:00:00:01
+mac=52:54:00:00:00:01
 # - DHCP          | sexy ...
 #  - VM <-> IP    | 10.110.8.2
 
-# 2) VM starten
-# to be defined
+sexy-host-add sexy2-vm1.ethz.ch 52:54:00:00:01
+sexy-host-add-to-network 10.110.64.0 sexy2-vm1.ethz.ch
 
 # 3) VM-Host
 # - Hypervisor    | kvm -> 4.1)
@@ -24,7 +34,12 @@
 # 3.2) VM image erzeugen -> 4.3
 
 # 4.1) apt-get install kvm
+# FIXME: should be replaced with cdist
+apt-get install qemu-kvm
+
 # 4.2) vconfig; eth1 <-> vlanX <-> brX
 # 4.3) qemu-img
 
 
+# 500) VM starten => DOES NOT BELONG HERE, is a DIFFERENT PrOCEsS
+# to be defined

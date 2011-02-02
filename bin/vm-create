@@ -46,7 +46,7 @@ ssh root@$vm_host "brctl addbr $bridge && brctl addbr addif $bridge eth2"
 
 # 4.3) qemu-img
 # FIXME: where do we store images?
-qemu-img create -f qcow2 -o size=${hd}G disk.img
+ssh root@$vm_host "qemu-img create -f qcow2 -o size=${hd}G disk.img"
 
 
 

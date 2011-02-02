@@ -2,7 +2,6 @@
 
 # TODOs: (i.e. not working)
 # sexy-add ... fails if running second time => fix in sexy?
-# Can't rerun script: device vlan.141 already exists; can't create bridge with the same name
 
 # Exit if any subtasks fails
 set -e
@@ -46,7 +45,11 @@ ssh root@$vm_host "apt-get -y install qemu-kvm"
 # 4.2) configure networking
 # TODO: where to store network settings, iow which nic on dvorak02 to use for what
 bridge="vlan.$vlan"
-ssh root@$vm_host "brctl addbr $bridge && brctl addif $bridge eth2"
+bridge_iface="eth2"
+ssh root@$vm_host << EOF
+brctl show | grep -q $bridge || brctl addbr $bridge
+brctl show | grep $bridge | grep -q $bridge_iface || brctl addif $bridge $bridge_iface
+EOF
 
 # 4.3) qemu-img
 # FIXME: where do we store images?

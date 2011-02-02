@@ -1,0 +1,30 @@
+#!/bin/sh
+
+
+# 1) VM erzeugen
+# - RAM           | 512M
+# - HD            | 10G
+# - CPU-anzahl    | 1
+# - Netz (1)      | 10.110.8.0/22
+#  - in VLAN      | ?
+# - VM-host       | dvorak02  
+# - Netz/Mac      | 52:54:00:00:00:01
+# - DHCP          | sexy ...
+#  - VM <-> IP    | 10.110.8.2
+
+# 2) VM starten
+# to be defined
+
+# 3) VM-Host
+# - Hypervisor    | kvm -> 4.1)
+# - Netz/MM       | eth0
+# - Netz/VM       | eth1 -> 4.2)
+# - VM <-> Netz   | 
+
+# 3.2) VM image erzeugen -> 4.3
+
+# 4.1) apt-get install kvm
+# 4.2) vconfig; eth1 <-> vlanX <-> brX
+# 4.3) qemu-img
+
+

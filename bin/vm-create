@@ -44,9 +44,9 @@ ssh root@$vm_host "apt-get -y install qemu-kvm"
 
 # 4.2) configure networking
 # TODO: where to store network settings, iow which nic on dvorak02 to use for what
-bridge="vlan.$vlan"
+bridge="br.$vlan"
 bridge_iface="eth2"
-ssh root@$vm_host << EOF
+ssh -T root@$vm_host << EOF
 brctl show | grep -q $bridge || brctl addbr $bridge
 brctl show | grep $bridge | grep -q $bridge_iface || brctl addif $bridge $bridge_iface
 EOF

@@ -1,0 +1,39 @@
+#!/bin/sh
+#
+# Sexy generic set.
+#
+#
+
+error() {
+   echo "[ERROR] $@" >&2
+}
+
+die() {
+   error "$@"
+   exit 1
+}
+
+
+id="$1"; shift
+
+# FIXME: find a better definiton of sane (i.e. everything that is a valid filename)
+sanechars='[A-Za-z0-9_]'
+
+pushd "$id" > /dev/null
+
+while [ "$#" -gt "0" ]; do
+   if echo "$1" | grep -q '^--'; then
+      echo "$1" | grep -q "^--${sanechars}*\$" || die "Invalid property name: $1"
+      key=$(echo $1 | sed 's|^--||')
+      touch "$key"
+   else
+      [ -n "$key" ] || die "Unnamed property value"
+      value="$1"
+      echo "$value" > "$key"
+      key=
+   fi
+   shift
+done
+
+popd > /dev/null
+

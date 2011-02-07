@@ -1,0 +1,6 @@
+#!/bin/sh
+
+YOU="${1:-Anonymous}"
+
+echo "Hello, $YOU"
+

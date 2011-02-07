@@ -1,0 +1,51 @@
+#!/bin/sh
+#
+# I'm the sexy command.
+#
+# sexy <context> add|del|get|set|<action> <id> [--property value]
+#
+# I am just a wrapper, I'm only usefull together with my plugins which 
+# extend my functionality like so:
+# ./plugins/<context>/extend/<myname>/<action>
+#
+# Each of my plugins inherits my generic add, del, get and set actions
+# for interacting with my cconfig db.
+#
+# Each of my plugins also inherits my generic help action which presents
+# the help for usage of the plugin in a uniform consistent way.
+#
+# e.g.
+#  $ sexy network get 129.132.186.0
+#  runs: ./libexec/get
+#  $ sexy network whatever
+#  runs: ./plugins/network/extend/sexy/whatever
+#
+
+set -x
+
+MY_NAME="${0##*/}"
+BIN_DIR=$(readlink -n -f "${0%/*}")
+BASE_DIR=$(cd "${BIN_DIR}/../"; pwd)
+PLUGIN_DIR="${BASE_DIR}/plugins"
+DB_DIR="${BASE_DIR}/db"
+
+PLUGIN="$1"; shift
+ACTION="$1"; shift
+
+case $ACTION in
+   add|del|get|set|help)
+      CMD="$BASE_DIR/libexec/$ACTION"
+      ;;
+   *)
+      CMD="$PLUGIN_DIR/$PLUGIN/extend/$MY_NAME/$ACTION"
+      ;;
+esac
+
+mkdir -p "$DB_DIR"
+mkdir -p "$DB_DIR/$PLUGIN"
+pushd "$DB_DIR/$PLUGIN" > /dev/null
+
+$CMD "$@"
+
+popd > /dev/null
+

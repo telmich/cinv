@@ -1,0 +1,65 @@
+#!/bin/sh
+
+# TODOs: (i.e. not working)
+# sexy-add ... fails if running second time => fix in sexy?
+
+# Exit if any subtasks fails
+set -e
+
+# 1) VM erzeugen
+# - RAM           | 512M
+ram=512
+# - HD            | 10G
+hd=10
+# - CPU-anzahl    | 1
+cpu=1
+# - Netz (1)      | 10.110.64.0/18
+network=10.110.64.0
+
+#  - in VLAN      | ?
+vlan=141
+
+# - VM-host       | dvorak02  
+vm_host=dvorak02.ethz.ch
+
+# - Netz/Mac      | 52:54:00:00:00:01
+mac=52:54:00:00:00:01
+# - DHCP          | sexy ...
+#  - VM <-> IP    | 10.110.8.2
+
+sexy-host-add sexy2-vm1.ethz.ch $mac
+sexy-host-add-to-network $network sexy2-vm1.ethz.ch
+
+# 3) VM-Host
+# - Hypervisor    | kvm -> 4.1)
+# - Netz/MM       | eth0
+# - Netz/VM       | eth1 -> 4.2)
+# - VM <-> Netz   | 
+
+# 3.2) VM image erzeugen -> 4.3
+
+# 4.1) install hypervisor
+# FIXME: should be replaced with cdist
+ssh root@$vm_host "apt-get -y install qemu-kvm"
+
+# 4.2) configure networking
+# TODO: where to store network settings, iow which nic on dvorak02 to use for what
+# TODO: create new process "create-vlan on host, bind-vlan-to-bridge-on-host"
+bridge="br.$vlan"
+bridge_iface="eth2"
+ssh -T root@$vm_host << EOF
+brctl show | grep -q $bridge || brctl addbr $bridge
+brctl show | grep $bridge | grep -q $bridge_iface || brctl addif $bridge $bridge_iface
+EOF
+
+# 4.3) qemu-img
+# FIXME: where do we store images?
+ssh root@$vm_host "qemu-img create -f qcow2 -o size=${hd}G disk.img"
+
+
+
+# 499) vlan aware networking => DOES NOT BELONG HERE, is a DIFFERENT PrOCEsS
+# vconfig add eth2 $vlan -> eth2.141
+
+# 500) VM starten => DOES NOT BELONG HERE, is a DIFFERENT PrOCEsS
+# to be defined

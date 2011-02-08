@@ -1,6 +1,6 @@
 #!/bin/sh
 # 
-# 2009      Nico Schottelius (nico-sexy at schottelius.org)
+# 2009-2011 Nico Schottelius (nico-sexy at schottelius.org)
 # 
 # This file is part of sexy.
 #
@@ -18,18 +18,12 @@
 # along with sexy. If not, see <http://www.gnu.org/licenses/>.
 #
 #
-# Setup an a-entry via curl to ETH ID Webservice
+# Delete an IPN ETH ID Webservice
 #
 
-[ $# -eq 1 ] || exit 1
-
 set -e
-
-. "$(which "sexy-config-load")"
+. sexy-config
 . "${__sexy_abs_mydir}/helper-config-load"
 
-fqdn="$1";shift
-
-set -x
-
-curl --request DELETE "${komcenter_url_base}/alias/${fqdn}"
+__sexy_args ipv4a -- "$@" 
+curl --request DELETE "${komcenter_url_base}/nameToIP/${ipv4a}"

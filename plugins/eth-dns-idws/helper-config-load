@@ -1,6 +1,6 @@
 #!/bin/sh
 # 
-# 2009      Nico Schottelius (nico-sexy at schottelius.org)
+# 2009-2011 Nico Schottelius (nico-sexy at schottelius.org)
 # 
 # This file is part of sexy.
 #
@@ -18,29 +18,15 @@
 # along with sexy. If not, see <http://www.gnu.org/licenses/>.
 #
 #
-# Setup an a-entry via curl to ETH ID Webservice
+# Helper for ETH DNS ID WS
 #
 
-[ $# -eq 2 ] || exit 1
+alias curl="curl -s -S --basic --netrc --insecure --header \"Content-Type: text/xml\""
+curl_xmlheader="--header \"Content-Type: text/xml\""
+curl_stdin="--data @-"
 
-set -e
+komcenter_url_base="https://www.komcenter.ethz.ch/ip/rest"
 
-. "$(which "sexy-config-load")"
-. "${__sexy_abs_mydir}/helper-config-load"
+result_filter="grep Done"
 
-ipv4a="$1";shift
-newfqdn="$1";shift
 
-set -x
-
-#############         <fqName>${newfqdn}</fqName>
-curl --request PUT $curl_stdin "${komcenter_url_base}/nameToIP" << eof
-<modify>
-   <nameToIP>
-      <toMutate>
-         <ip>${ipv4a}</ip>
-      </toMutate>                                              
-      <fqName>${newfqdn}</fqName>
-   </nameToIP>
-</modify>
-eof

@@ -18,18 +18,28 @@
 # along with sexy. If not, see <http://www.gnu.org/licenses/>.
 #
 #
-# Generate header for subnet.conf
+# Setup an a-entry via curl to ETH ID Webservice
 #
 
+[ $# -eq 2 ] || exit 1
+
 set -e
-. "$(which sexy-config-load)"
 
-sexy_args fqdn ipv4a -- "$@" 
+. sexy-config
+. "${__sexy_abs_mydir}/helper-config-load"
 
-# We cannot be sure what the current state is without
-# parsing a lot of XML. Thus we CREATE a know state:
-# The one that the host does NOT EXIST.
-# After that, we recreate it, so we have a consistent state
+fqdn="$1";shift
+ipv4a="$1";shift
 
-"${__sexy_abs_mydir}/del-a" "${ipv4a}"
-"${__sexy_abs_mydir}/add-a+ptr" "${fqdn}" "${ipv4a}"
+curl --request POST $curl_stdin "${komcenter_url_base}/nameToIP" << eof
+<insert>
+  <nameToIP>
+    <ip>${ipv4a}</ip>
+    <fqName>${fqdn}</fqName>
+    <forward>Y</forward>
+    <reverse>Y</reverse>
+    <ttl>600</ttl>
+    <isgGroup>inf-sg</isgGroup>
+  </nameToIP>
+</insert>
+eof

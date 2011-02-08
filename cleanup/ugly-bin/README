@@ -1,2 +1,0 @@
-Binaries needed for development, testing, ..., that should *never* find
-their way into your $PATH (besides you are a sexy developer).

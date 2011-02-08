@@ -18,11 +18,14 @@
 # along with sexy. If not, see <http://www.gnu.org/licenses/>.
 #
 #
-# Generate header for subnet.conf
+# Setup an a-entry via curl to ETH ID Webservice
 #
 
-. "$(which sexy-config-load)"
+set -e
 
-#sexy_args network -- "$@" 
+. sexy-config
+. "${__sexy_abs_mydir}/helper-config-load"
 
-exit 0
+__sexy_args fqdn -- "$@"
+
+curl --request DELETE "${komcenter_url_base}/alias/${fqdn}"

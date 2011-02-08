@@ -21,25 +21,26 @@
 # Setup an a-entry via curl to ETH ID Webservice
 #
 
+[ $# -eq 2 ] || exit 1
+
 set -e
-. "$(which "sexy-config-load")"
+
+. sexy-config
 . "${__sexy_abs_mydir}/helper-config-load"
 
-ttl="$(sexy_file_read "${sexy_my_config}/ttl")"
-isg_group="$(sexy_file_read "${sexy_my_config}/isg_group")"
-
-sexy_args fqdn ipv4a -- "$@"
+ipv4a="$1";shift
+newfqdn="$1";shift
 
 set -x
-curl --request POST $curl_stdin "${komcenter_url_base}/nameToIP" << eof
-<insert>
-  <nameToIP>
-    <ip>${ipv4a}</ip>
-    <fqName>${fqdn}</fqName>
-    <forward>Y</forward>
-    <reverse>N</reverse>
-    <ttl>${ttl}</ttl>
-    <isgGroup>${isg_group}</isgGroup>
-  </nameToIP>
-</insert>
+
+#############         <fqName>${newfqdn}</fqName>
+curl --request PUT $curl_stdin "${komcenter_url_base}/nameToIP" << eof
+<modify>
+   <nameToIP>
+      <toMutate>
+         <ip>${ipv4a}</ip>
+      </toMutate>                                              
+      <fqName>${newfqdn}</fqName>
+   </nameToIP>
+</modify>
 eof

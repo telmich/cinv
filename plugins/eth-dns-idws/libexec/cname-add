@@ -18,17 +18,22 @@
 # along with sexy. If not, see <http://www.gnu.org/licenses/>.
 #
 #
-# curl command line that is always used
+# Add a cname-entry via curl to ETH ID Webservice
 #
+ 
 
-# 
-alias curl="curl -s -S --basic --netrc --insecure --header \"Content-Type: text/xml\""
-#curl_xmlheader="--header \"Content-Type: text/xml\""
-curl_xmlheader="--header \"Content-Type: text/xml\""
-curl_stdin="--data @-"
+set -e
+. sexy-config
+. "${__sexy_abs_mydir}/helper-config-load"
 
-komcenter_url_base="https://www.komcenter.ethz.ch/ip/rest"
+__sexy_args fqdn cname -- "$@"
 
-result_filter="grep Done"
-
-
+curl --request POST $curl_stdin "${komcenter_url_base}/alias" << eof
+<insert>
+  <alias>
+    <fqName>${cname}</fqName>
+    <hostName>${fqdn}</hostName>
+    <ttl>600</ttl>
+  </alias>
+</insert>
+eof

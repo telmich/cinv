@@ -21,27 +21,19 @@
 # Setup an a-entry via curl to ETH ID Webservice
 #
 
-[ $# -eq 2 ] || exit 1
+. sexy-config
+__sexy_args fqdn ipv4a -- "$@"
 
-set -e
 
-. "$(which "sexy-config-load")"
-. "${__sexy_abs_mydir}/helper-config-load"
-
-fqdn="$1";shift
-ipv4a="$1";shift
-
-set -x
-
-#curl --header "Content-Type: text/xml" --data @- https://www.komcenter.ethz.ch/ip/rest/nameToIP
-
-curl --request POST $curl_stdin "${komcenter_url_base}/nameToIP" << eof
+# FIXME: adjust / check path, use variable
+cat << eof | curl --verbose --basic --netrc --insecure --request POST \
+--header "Content-Type: text/xml" --data @- https://www.komcenter.ethz.ch/ip/rest/nameToIP
 <insert>
   <nameToIP>
     <ip>${ipv4a}</ip>
     <fqName>${fqdn}</fqName>
-    <forward>Y</forward>
-    <reverse>N</reverse>
+    <forward>N</forward>
+    <reverse>Y</reverse>
     <ttl>600</ttl>
     <isgGroup>inf-pc</isgGroup>
   </nameToIP>

@@ -1,0 +1,12 @@
+Basically define what you want and add dependencies:
+
+
+I want a virtual machine with 512M RAM (other stuff I don't care).
+|- requires: virtual machine host with >= 512M RAM
+  |- requires: virtual machine hypervisor
+   |- requires: operating system
+    |- requires: real machine (hardware)
+
+--------------------------------------------------------------------------------
+
+How to implement this?

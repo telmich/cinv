@@ -17,7 +17,7 @@
 # along with sexy. If not, see <http://www.gnu.org/licenses/>.
 #
 #
-# Description here
+# Set global configuration variables and helper funcions used in all other scripts
 #
 # vim: set filetype=sh
 

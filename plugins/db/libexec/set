@@ -1,19 +1,17 @@
 #!/bin/sh
 #
-# Sexy generic add.
-#
+# Change an existing database entry.
 #
 
 . sexy-config
 . lib/db-config
 
-name="$1"; shift
+. sexy-args -atleast name id -- "$@"
+
 __db_check_id "$name" || __sexy_exit_err "Invalid database name: $name"
 [ -d "$name" ] || __sexy_exit_err "No such database: $name"
 
-id="$1"; shift
 __db_check_id "$id" || __sexy_exit_err "Invalid database id: $id"
-
 
 db_dir="$name/$id"
 [ -d "$db_dir" ] || __sexy_exit_err "No such database entry: $db_dir"

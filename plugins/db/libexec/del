@@ -1,18 +1,14 @@
 #!/bin/sh
 #
-# Sexy generic del.
+# Delete an entry from a sexy database.
 #
-#
-
-set -x
 
 . sexy-config
 . lib/db-config
 
-name="$1"; shift
-__db_check_id "$name" || __sexy_exit_err "Invalid database name: $name"
+. sexy-args -atleast name id -- "$@"
 
-id="$1"; shift
+__db_check_id "$name" || __sexy_exit_err "Invalid database name: $name"
 __db_check_id "$id" || __sexy_exit_err "Invalid or missing database id: $id"
 
 rm -rf "$name/$id"

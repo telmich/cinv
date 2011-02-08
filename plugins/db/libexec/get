@@ -1,20 +1,22 @@
 #!/bin/sh
 #
-# Sexy generic get.
-#
+# Get one or more properties from an existing database entry.
 #
 
 . sexy-config
 . lib/db-config
 
-name="$1"; shift
-__db_check_id "$name" || __sexy_exit_err "Invalid database name: $name"
+. sexy-args -atleast name id -- "$@"
 
-id="$1"; shift
+__db_check_id "$name" || __sexy_exit_err "Invalid database name: $name"
+[ -d "$name" ] || __sexy_exit_err "No such database: $name"
+
 __db_check_id "$id" || __sexy_exit_err "Invalid database id: $id"
 
-# FIXME: test for db and id existence
-cd "$name/$id"
+db_dir="$name/$id"
+[ -d "$db_dir" ] || __sexy_exit_err "No such database entry: $db_dir"
+
+cd "$db_dir"
 
 # TODO: discuss if get should only return a single value per call or multiple,
 #  as the current implementation does

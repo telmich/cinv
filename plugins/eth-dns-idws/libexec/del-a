@@ -25,5 +25,5 @@ set -e
 . sexy-config
 . "${__sexy_abs_mydir}/helper-config-load"
 
-sexy_args ipv4a -- "$@" 
+__sexy_args ipv4a -- "$@" 
 curl --request DELETE "${komcenter_url_base}/nameToIP/${ipv4a}"

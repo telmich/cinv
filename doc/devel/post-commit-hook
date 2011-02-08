@@ -21,8 +21,6 @@
 #       done
 #
 
-exit 0
-
 # The project as known to CIA
 project="sexy"
 

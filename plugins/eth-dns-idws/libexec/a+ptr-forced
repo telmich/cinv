@@ -1,6 +1,6 @@
 #!/bin/sh
 # 
-# 2009      Nico Schottelius (nico-sexy at schottelius.org)
+# 2009-2011 Nico Schottelius (nico-sexy at schottelius.org)
 # 
 # This file is part of sexy.
 #
@@ -18,18 +18,20 @@
 # along with sexy. If not, see <http://www.gnu.org/licenses/>.
 #
 #
-# Generate header for subnet.conf
+# Definitely create a dns ptr+a entry
 #
 
-set -e
-. "$(which sexy-config-load)"
+. sexy-config
 
-sexy_args fqdn ipv4a -- "$@" 
+__sexy_args fqdn ipv4a -- "$@" 
 
 # We cannot be sure what the current state is without
 # parsing a lot of XML. Thus we CREATE a know state:
 # The one that the host does NOT EXIST.
 # After that, we recreate it, so we have a consistent state
+
+# FIXME: also ensure that the a-record does not exist on
+# another ip address!
 
 "${__sexy_abs_mydir}/del-a" "${ipv4a}"
 "${__sexy_abs_mydir}/add-a+ptr" "${fqdn}" "${ipv4a}"

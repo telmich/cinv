@@ -1,0 +1,1 @@
+../../hosts/sans-fai-test.ethz.ch

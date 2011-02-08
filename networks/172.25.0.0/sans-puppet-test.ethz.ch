@@ -1,0 +1,1 @@
+../../hosts/sans-puppet-test.ethz.ch

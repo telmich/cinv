@@ -17,9 +17,12 @@
 # along with sexy. If not, see <http://www.gnu.org/licenses/>.
 #
 #
-# 
+# Generic argument parsing and checking.
 #
-# vim: set filetype=sh
+# Usage:
+#  . sexy-args fqdn ipv4a -- "$@"
+#  echo "${ipv4a}"
+#
 
 # Require some command line parameters and allow optional parameters
 # -atleast: have at least the given number of arguments, but allow more to be present
@@ -99,3 +102,4 @@ set -- "$@"
 # cleanup
 unset count arglist sexy_args_exact sexy_args_skip
 
+# vim: set filetype=sh

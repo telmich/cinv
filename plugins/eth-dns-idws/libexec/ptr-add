@@ -18,11 +18,24 @@
 # along with sexy. If not, see <http://www.gnu.org/licenses/>.
 #
 #
-# Generate header for subnet.conf
+# Setup an a-entry via curl to ETH ID Webservice
 #
 
 . sexy-config
+__sexy_args fqdn ipv4a -- "$@"
 
-#sexy_args network -- "$@" 
 
-exit 0
+# FIXME: adjust / check path, use variable
+cat << eof | curl --verbose --basic --netrc --insecure --request POST \
+--header "Content-Type: text/xml" --data @- https://www.komcenter.ethz.ch/ip/rest/nameToIP
+<insert>
+  <nameToIP>
+    <ip>${ipv4a}</ip>
+    <fqName>${fqdn}</fqName>
+    <forward>N</forward>
+    <reverse>Y</reverse>
+    <ttl>600</ttl>
+    <isgGroup>inf-pc</isgGroup>
+  </nameToIP>
+</insert>
+eof

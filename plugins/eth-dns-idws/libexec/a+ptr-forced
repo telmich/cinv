@@ -33,5 +33,5 @@ __sexy_args fqdn ipv4a -- "$@"
 # FIXME: also ensure that the a-record does not exist on
 # another ip address!
 
-"${__sexy_abs_mydir}/del-a" "${ipv4a}"
-"${__sexy_abs_mydir}/add-a+ptr" "${fqdn}" "${ipv4a}"
+"${__sexy_abs_mydir}/libexec/del-a" "${ipv4a}"
+"${__sexy_abs_mydir}/libexec/add-a+ptr" "${fqdn}" "${ipv4a}"

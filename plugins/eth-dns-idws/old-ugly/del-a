@@ -1,6 +1,6 @@
 #!/bin/sh
 # 
-# 2009      Nico Schottelius (nico-sexy at schottelius.org)
+# 2009-2011 Nico Schottelius (nico-sexy at schottelius.org)
 # 
 # This file is part of sexy.
 #
@@ -22,7 +22,7 @@
 #
 
 set -e
-. "$(which sexy-config-load)"
+. sexy-config
 . "${__sexy_abs_mydir}/helper-config-load"
 
 sexy_args ipv4a -- "$@" 

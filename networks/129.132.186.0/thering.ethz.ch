@@ -1,1 +1,0 @@
-../../hosts/thering.ethz.ch

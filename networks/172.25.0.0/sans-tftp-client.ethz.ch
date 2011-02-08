@@ -1,1 +1,0 @@
-../../hosts/sans-tftp-client.ethz.ch

@@ -1,1 +1,0 @@
-../../hosts/sgn-mac-08.ethz.ch

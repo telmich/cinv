@@ -1,1 +1,0 @@
-../../hosts/sans-rails-01.ethz.ch

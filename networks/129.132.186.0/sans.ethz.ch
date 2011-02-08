@@ -1,1 +1,0 @@
-../../hosts/sans.ethz.ch

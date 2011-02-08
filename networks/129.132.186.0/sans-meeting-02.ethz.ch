@@ -1,1 +1,0 @@
-../../hosts/sans-meeting-02.ethz.ch

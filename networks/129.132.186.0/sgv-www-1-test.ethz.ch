@@ -1,1 +1,0 @@
-../../hosts/sgv-www-1-test.ethz.ch

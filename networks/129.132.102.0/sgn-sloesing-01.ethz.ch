@@ -1,1 +1,0 @@
-../../hosts/sgn-sloesing-01.ethz.ch

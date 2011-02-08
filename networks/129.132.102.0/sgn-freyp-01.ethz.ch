@@ -1,1 +1,0 @@
-../../hosts/sgn-freyp-01.ethz.ch

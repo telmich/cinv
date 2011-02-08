@@ -1,1 +1,0 @@
-../../hosts/sans-tftp-test.ethz.ch

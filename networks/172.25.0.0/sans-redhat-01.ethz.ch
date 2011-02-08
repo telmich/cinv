@@ -1,1 +1,0 @@
-../../hosts/sans-redhat-01.ethz.ch

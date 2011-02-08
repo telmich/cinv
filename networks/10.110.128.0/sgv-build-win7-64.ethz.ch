@@ -1,1 +1,0 @@
-../../hosts/sgv-build-win7-64.ethz.ch

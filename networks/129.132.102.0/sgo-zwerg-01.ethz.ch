@@ -1,1 +1,0 @@
-../../hosts/sgo-zwerg-01.ethz.ch

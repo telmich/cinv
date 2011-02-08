@@ -1,1 +1,0 @@
-../../hosts/sans-install.ethz.ch

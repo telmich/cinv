@@ -1,1 +1,0 @@
-../../hosts/sgn-t60-01.ethz.ch

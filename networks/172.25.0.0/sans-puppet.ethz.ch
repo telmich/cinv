@@ -1,1 +1,0 @@
-../../hosts/sans-puppet.ethz.ch

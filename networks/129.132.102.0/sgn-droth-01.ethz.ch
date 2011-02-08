@@ -1,1 +1,0 @@
-../../hosts/sgn-droth-01.ethz.ch

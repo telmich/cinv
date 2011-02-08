@@ -34,3 +34,9 @@ cd tmp/
 ../libexec/get 129.132.186.0 --gateway --mask
 
 ../libexec/del 129.132.186.0
+
+--------------------------------------------------------------------------------
+
+SEXY_PLUGIN_PATH=/path/to/plugins sexy network get 129.132.186.0 --gateway
+
+

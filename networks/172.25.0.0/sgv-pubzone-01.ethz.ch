@@ -1,1 +1,0 @@
-../../hosts/sgv-pubzone-01.ethz.ch

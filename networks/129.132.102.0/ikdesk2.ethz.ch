@@ -1,1 +1,0 @@
-../../hosts/ikdesk2.ethz.ch

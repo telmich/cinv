@@ -1,1 +1,0 @@
-../../hosts/sgn-amoga-01.ethz.ch

@@ -1,0 +1,19 @@
+# Used for IDs
+__db_sane_regexp='[A-Za-z0-9]*[-A-Za-z0-9_.]*'
+
+__db_check_id() {
+   if [ -z "$1" ]; then
+      return 1
+   elif echo "$1" | grep -q "^${__db_sane_regexp}*\$"; then
+      return 0
+   else
+      return 1
+   fi
+}
+
+# Where to find/store the database
+: ${SEXY_DB_DIR:="$(__sexy_plugin_datadir)/db"}
+plugin_db_dir="$SEXY_DB_DIR/$__sexy_plugin_name"
+mkdir -p "$plugin_db_dir"
+cd "$plugin_db_dir"
+

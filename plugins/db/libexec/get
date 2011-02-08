@@ -1,0 +1,29 @@
+#!/bin/sh
+#
+# Sexy generic get.
+#
+#
+
+. sexy-config
+. lib/db-config
+
+name="$1"; shift
+__db_check_id "$name" || __sexy_exit_err "Invalid database name: $name"
+
+id="$1"; shift
+__db_check_id "$id" || __sexy_exit_err "Invalid database id: $id"
+
+# FIXME: test for db and id existence
+cd "$name/$id"
+
+# TODO: discuss if get should only return a single value per call or multiple,
+#  as the current implementation does
+while [ "$#" -gt "0" ]; do
+   if echo "$1" | grep -q '^--'; then
+      __db_check_id "$1" || __sexy_exit_err "Invalid property name: $1"
+      key=$(echo $1 | sed 's|^--||')
+      echo "$key: $(cat "$key")"
+   fi
+   shift
+done
+

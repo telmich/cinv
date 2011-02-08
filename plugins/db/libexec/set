@@ -1,0 +1,37 @@
+#!/bin/sh
+#
+# Sexy generic add.
+#
+#
+
+. sexy-config
+. lib/db-config
+
+name="$1"; shift
+__db_check_id "$name" || __sexy_exit_err "Invalid database name: $name"
+[ -d "$name" ] || __sexy_exit_err "No such database: $name"
+
+id="$1"; shift
+__db_check_id "$id" || __sexy_exit_err "Invalid database id: $id"
+
+
+db_dir="$name/$id"
+[ -d "$db_dir" ] || __sexy_exit_err "No such database entry: $db_dir"
+
+cd "$db_dir"
+
+# Each longopt argument is a property name
+while [ "$#" -gt "0" ]; do
+   if echo "$1" | grep -q '^--'; then
+      __db_check_id "$1" || __sexy_exit_err "Invalid property name: $1"
+      key=$(echo $1 | sed 's|^--||')
+      touch "$key"
+   else
+      [ -n "$key" ] || __sexy_exit_err "Unnamed property value"
+      value="$1"
+      echo "$value" > "$key"
+      key=
+   fi
+   shift
+done
+

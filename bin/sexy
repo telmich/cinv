@@ -25,10 +25,7 @@
 
 . sexy-config
 
-[ $# -ge 2  ] || __sexy_usage "Wrong number of arguments. Expected at least 2, got $#"
-
-plugin="$1"; shift
-action="$1"; shift
+__sexy_args -atleast plugin action -- "$@"
 
 __sexy_plugin_dir=$(__sexy_find_plugin_dir "$plugin")
 [ -d "$__sexy_plugin_dir" ] || __sexy_exit_err "Plugin not found: $plugin"

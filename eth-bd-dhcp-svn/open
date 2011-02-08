@@ -1,0 +1,62 @@
+#!/bin/sh
+# 
+# 2009      Nico Schottelius (nico-sexy at schottelius.org)
+# 
+# This file is part of sexy.
+#
+# sexy is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+# 
+# sexy is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+# 
+# You should have received a copy of the GNU General Public License
+# along with sexy. If not, see <http://www.gnu.org/licenses/>.
+#
+#
+# Generate header for subnet.conf
+#
+
+. "$(which sexy-config-load)"
+
+sexy_args network -- "$@" 
+
+# FIXME: add $network as arg to temp
+tmp="$(sexy_shared_temp "${network}")"
+
+# check that the network exists
+if ! sexy-object-exists networks "${network}"; then
+   sexy_errormsg "Network $network does not exist"
+fi
+
+mask="$(sexy_object_config_get networks $network mask)"
+decimal_mask=$(sexy_network_decimal_netmask "${mask}")
+decimal_broadcast=$(sexy_network_decimal_broadcast "$network" "$mask")
+router=$(sexy_ipv4_addr_increment "$network")
+
+next_server="$(sexy_object_config_failok_get networks "$network" next-server)"
+bootfilename="$(sexy_object_config_failok_get networks "$network" bootfilename)"
+
+cat << eof > "$tmp"
+# WARNING: sexy generated file, do *not* edit directly.
+# vim users: use 'zn' if you do not know about folds!
+subnet $network netmask $decimal_mask { # {{{
+       option broadcast-address $decimal_broadcast;
+       option routers $router;
+       option subnet-mask $decimal_mask;
+
+# new: Groups required in new dhcpcd environment - 20101129
+group {
+
+eof
+
+[ "${next_server}" ]    && echo "       next-server $next_server;"      >> "${tmp}"
+[ "${bootfilename}" ]   && echo "       filename  \"$bootfilename\";"   >> "${tmp}"
+
+echo "" >> "${tmp}"
+# Debug
+cat "${tmp}"

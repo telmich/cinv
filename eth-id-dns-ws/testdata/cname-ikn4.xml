@@ -1,0 +1,7 @@
+<insert>
+  <alias>
+    <fqName>ikn4.ethz.ch</fqName>
+    <hostName>ikn.ethz.ch</hostName>
+    <ttl>600</ttl>
+  </alias>
+</insert>

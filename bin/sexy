@@ -1,0 +1,83 @@
+#!/bin/dash
+#
+# I'm the sexy command.
+#
+# sexy <context> add|del|get|set|help|<action> <id> [--property value]
+#
+# I am just a wrapper, I'm only usefull together with my plugins which 
+# extend my functionality like so:
+# ./plugins/<context>/extend/<myname>/<action>
+#
+# Each of my plugins inherits my generic add, del, get and set actions
+# for interacting with my cconfig db.
+#
+# Each of my plugins also inherits my generic help action which presents
+# the help for usage of the plugin in a uniform consistent way.
+#
+# e.g.
+#  $ sexy network get 129.132.186.0
+#  runs: ./libexec/get
+#  $ sexy network whatever
+#  runs: ./plugins/network/extend/sexy/whatever
+#
+
+################################################################################
+# standard vars stolen from cconf, renamed for sexy
+__sexy_pwd="$(pwd -P)"
+__sexy_mydir="${0%/*}"; __sexy_abs_mydir="$(cd "$__sexy_mydir" && pwd -P)"
+__sexy_myname=${0##*/}; __sexy_abs_myname="$__sexy_abs_mydir/$__sexy_myname"
+__sexy_base_dir=$(cd "${bin_dir}/../"; pwd)
+export PATH="$__sexy_abs_mydir:$PATH"
+
+
+#set -x
+
+__sexy_exit_err() {
+   echo "[ERROR] $@" >&2
+   exit 1
+}
+
+__sexy_exit_usage() {
+   echo "Usage: $__sexy_myname <plugin> <action> [arg1, argn]" > &2
+   exit 1
+}
+
+: ${SEXY_DB_DIR:="${HOME}/.sexy/db"}
+mkdir -p "$SEXY_DB_DIR"
+
+if [ -n "$SEXY_PLUGIN_PATH" ]; then
+   SEXY_PLUGIN_PATH="$SEXY_PLUGIN_PATH:${base_dir}/plugins"
+else
+   SEXY_PLUGIN_PATH="${base_dir}/plugins"
+fi
+
+
+find_plugin_dir() {
+   local plugin_name="$1"
+   for path in $(echo "$SEXY_PLUGIN_PATH" | sed 's/[^\]:/\n/g'); do
+      [ -d "$path/$plugin_name" ] && echo "$path/$plugin_name"
+   done
+}
+
+[ $# -ge 2  ] || __sexy_exit_usage "Missing arguments"
+
+plugin="$1"; shift
+action="$1"; shift
+
+case $action in
+   help)
+      command="$__sexy_base_dir/libexec/$action"
+      ;;
+   *)
+      plugin_dir=$(find_plugin_dir "$plugin")
+      command="$plugin_dir/libexec/$action"
+      ;;
+esac
+
+# TODO: move to db plugin
+#plugin_db_dir="$SEXY_DB_DIR/$plugin"
+#mkdir -p "$plugin_db_dir"
+#cd "$plugin_db_dir"
+
+$command "$@"
+

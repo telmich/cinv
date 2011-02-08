@@ -1,0 +1,39 @@
+sexy-plugins(7)
+===============
+Steven Armstrong <steven-sexy--@--armstrong.cc>
+
+
+NAME
+----
+sexy-plugins - Anatomy of a sexy plugin
+
+
+DESCRIPTION
+-----------
+Sexy's functionality comes from it's plugins.
+
+A plugin is just a directory layout following the following 
+naming convention
+
+/path/to/<name>   # The name of the plugin
+   libexec/       # folder containing plugin binaries
+
+
+EXAMPLES
+--------
+Assuming a plugin named 'hello' with the following directory layout
+
+plugins/hello
+└── libexec
+    ├── world
+    └── you
+
+Sexy would interact with this plugin as follows:
+
+$ sexy hello world
+# runs: ./plugins/hello/libexec/world
+
+$ sexy hello you frank
+# runs: ./plugins/hello/libexec/you frank
+
+

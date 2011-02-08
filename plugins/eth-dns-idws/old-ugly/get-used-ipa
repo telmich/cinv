@@ -25,7 +25,7 @@
 
 set -e
 
-. "$(which "sexy-config-load")"
+. sexy-config
 . "${__sexy_abs_mydir}/helper-config-load"
 
 fqdn="$1";shift

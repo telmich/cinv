@@ -1,3 +1,13 @@
+sexy db add|del|get|set <dbname> <id> [--property value]
+
+sexy db add network 129.132.186.0 --gateway 129.132.186.1 --mask 25 --broadcast 129.132.186.255
+sexy db add $__sexy_plugin_name 129.132.186.0 --gateway 129.132.186.1 --mask 25 --broadcast 129.132.186.255
+
+
+
+--------------------------------------------------------------------------------
+
+
 sexy <context> add|del|get|set <id> [--property value]
 
 $ sexy network add 129.132.186.0 --gateway 129.132.186.1 --mask 25 --broadcast 129.132.186.255

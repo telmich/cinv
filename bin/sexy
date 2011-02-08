@@ -43,7 +43,7 @@ esac
 [ -e "$command" ] || __sexy_exit_err "Command not found: $command"
 [ -x "$command" ] || __sexy_exit_err "Command not executable: $command"
 
-# Change to plugin dir for further execution
+# Change to plugin dir before executing the plugin action
 cd "$__sexy_plugin_dir"
 $command "$@"
 

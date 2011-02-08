@@ -28,7 +28,7 @@ set -e
 ttl="$(sexy_file_read "${sexy_my_config}/ttl")"
 isg_group="$(sexy_file_read "${sexy_my_config}/isg_group")"
 
-sexy_args fqdn ipv4a -- "$@"
+__sexy_args fqdn ipv4a -- "$@"
 
 set -x
 curl --request POST $curl_stdin "${komcenter_url_base}/nameToIP" << eof

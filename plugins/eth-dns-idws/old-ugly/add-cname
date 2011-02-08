@@ -23,7 +23,7 @@
  
 
 set -e
-. "$(which sexy-config-load)"
+. sexy-config
 . "${__sexy_abs_mydir}/helper-config-load"
 
 __sexy_args fqdn cname -- "$@"

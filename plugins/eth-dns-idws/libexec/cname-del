@@ -21,15 +21,11 @@
 # Setup an a-entry via curl to ETH ID Webservice
 #
 
-[ $# -eq 1 ] || exit 1
-
 set -e
 
 . sexy-config
 . "${__sexy_abs_mydir}/helper-config-load"
 
-fqdn="$1";shift
-
-set -x
+__sexy_args fqdn -- "$@"
 
 curl --request DELETE "${komcenter_url_base}/alias/${fqdn}"

@@ -21,7 +21,7 @@
 # Generate header for subnet.conf
 #
 
-. "$(which sexy-config-load)"
+. sexy-config
 
 #sexy_args network -- "$@" 
 

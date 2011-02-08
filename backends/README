@@ -1,6 +1,0 @@
-This directory contains all the backends to handle DNS management:
-
-   - sexy-dns-a-add <hostname> <ipv4 addr>
-   - sexy-dns-a-del <hostname>
-   - sexy-dns-cname-add <cname> <hostname>
-   - sexy-dns-cname-del <cname>

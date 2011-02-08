@@ -1,0 +1,82 @@
+# 2011      Nico Schottelius (nico-sexy at schottelius.org)
+#           Steven Armstrong (steven-sexy at armstrong.cc)
+# 
+# This file is part of sexy.
+#
+# sexy is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+# 
+# sexy is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+# 
+# You should have received a copy of the GNU General Public License
+# along with sexy. If not, see <http://www.gnu.org/licenses/>.
+#
+#
+# Description here
+#
+# vim: set filetype=sh
+
+################################################################################
+# cconf standard vars prefixed with sexy
+__sexy_pwd="$(pwd -P)"
+__sexy_mydir="${0%/*}"
+__sexy_abs_mydir="$(cd "$__sexy_mydir" && pwd -P)"
+__sexy_myname="${0##*/}"
+__sexy_abs_myname="$__sexy_abs_mydir/$__sexy_myname"
+
+
+################################################################################
+# Global variables
+
+: ${__sexy_config_dir:="$HOME/.sexy"}
+
+# TODO: make this prettier/more portable
+__sexy_base_dir=$(cd "${__sexy_abs_mydir}/../"; pwd)
+if [ -n "$SEXY_PLUGIN_PATH" ]; then
+   SEXY_PLUGIN_PATH="$SEXY_PLUGIN_PATH:${__sexy_base_dir}/plugins"
+else
+   SEXY_PLUGIN_PATH="${__sexy_base_dir}/plugins"
+fi
+
+
+################################################################################
+# Functions
+#
+__sexy_debug_echo()
+{
+   if [ "$__sexy_debug" ]; then
+      echo "Debug: $@"
+   fi
+}
+
+__sexy_exit_err()
+{
+   echo "$@"
+   exit 1
+}
+
+__sexy_usage()
+{
+   __sexy_exit_err "${__sexy_myname}: $@"
+}
+
+__sexy_plugin_datadir()
+{
+   local plugin_datadir="${__sexy_config_dir}/data/${__sexy_plugin_name}"
+   mkdir -p "$plugin_datadir"
+   echo "$plugin_datadir"
+}
+
+__sexy_find_plugin_dir() {
+   local plugin_name="$1"
+   local path
+   for path in $(echo "$SEXY_PLUGIN_PATH" | sed 's/[^\]:/\n/g'); do
+      [ -d "$path/$plugin_name" ] && echo "$path/$plugin_name"
+   done
+}
+

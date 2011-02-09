@@ -70,6 +70,17 @@ __sexy_usage()
    __sexy_exit_err "${__sexy_myname}: $@"
 }
 
+# Search SEXY_PLUGIN_PATH for the given plugin_name
+__sexy_find_plugin_dir() {
+   local plugin_name="$1"
+   local path
+   for path in $(echo "$SEXY_PLUGIN_PATH" | sed 's/[^\]:/\n/g'); do
+      [ -d "$path/$plugin_name" ] && echo "$path/$plugin_name"
+   done
+   # TODO: error out here if plugin not found?
+}
+
+# Requires __sexy_plugin_name to be set
 __sexy_plugin_datadir()
 {
    local plugin_datadir="${__sexy_config_dir}/data/${__sexy_plugin_name}"
@@ -77,12 +88,18 @@ __sexy_plugin_datadir()
    echo "$plugin_datadir"
 }
 
-__sexy_find_plugin_dir() {
-   local plugin_name="$1"
-   local path
-   for path in $(echo "$SEXY_PLUGIN_PATH" | sed 's/[^\]:/\n/g'); do
-      [ -d "$path/$plugin_name" ] && echo "$path/$plugin_name"
-   done
+# Return the absolute path of the given database path
+__sexy_db_dir() {
+   local db_path="$1"
+   echo "${__sexy_db_abs_dir}/${db_path}"
 }
 
+# Return the absolute path to current plugins db
+# Requires __sexy_plugin_name to be set
+__sexy_plugin_db_dir() {
+   local plugin_db_dir=$(__sexy_db_dir "$__sexy_plugin_name")
+   # Ensure directory exists
+   mkdir -p "$plugin_db_dir"
+   echo "$plugin_db_dir"
+}
 

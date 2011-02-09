@@ -29,12 +29,12 @@
 
 __sexy_plugin_dir=$(__sexy_find_plugin_dir "$plugin")
 [ -d "$__sexy_plugin_dir" ] || __sexy_exit_err "Plugin not found: $plugin"
-export __sexy_plugin_dir
 
+export __sexy_plugin_dir
 export __sexy_plugin_name="$plugin"
 export __sexy_plugin_command="$command"
 
-case $command in
+case "$command" in
    help)
       __sexy_command_abs="$__sexy_base_dir/$__sexy_name_libexec/$command"
       ;;
@@ -43,7 +43,7 @@ case $command in
       ;;
 esac
 
-[ -e "$__sexy_command_abs" ] || __sexy_exit_err "Command not found: $__sexy_command_abs"
+[ -e "$__sexy_command_abs" ] || __sexy_exit_err "Command not found: $__sexy_plugin_command"
 [ -x "$__sexy_command_abs" ] || __sexy_exit_err "Command not executable: $__sexy_command_abs"
 
 export __sexy_command_abs

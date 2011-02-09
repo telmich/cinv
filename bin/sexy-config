@@ -114,3 +114,28 @@ __sexy_db_check_id() {
       return 1
    fi
 }
+
+# Usage: __sexy_opts2dir /tmp/foo --param1 value1 --param2 value2 --param3 value3
+__sexy_opts2dir() {
+   local target_dir="$1"; shift
+   mkdir -p "$target_dir"
+   cd "$target_dir"
+
+   # Each longopt argument is a property name
+   local key value
+   while [ "$#" -gt "0" ]; do
+      if echo "$1" | grep -q '^--'; then
+         __sexy_db_check_id "$1" || __sexy_exit_err "Invalid property name: $1"
+         key=$(echo $1 | sed 's|^--||')
+         touch "$key"
+      else
+         [ -n "$key" ] || __sexy_exit_err "Unnamed property value"
+         value="$1"
+         echo "$value" > "$key"
+         key=
+      fi
+      shift
+   done
+}
+
+

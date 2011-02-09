@@ -30,6 +30,7 @@
 __sexy_plugin_dir=$(__sexy_find_plugin_dir "$plugin")
 [ -d "$__sexy_plugin_dir" ] || __sexy_exit_err "Plugin not found: $plugin"
 export __sexy_plugin_dir
+export __sexy_plugin_name="$plugin"
 
 case $action in
    help)

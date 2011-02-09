@@ -4,16 +4,16 @@
 #
 # I'm the sexy command.
 #
-# sexy <context> add|del|get|set|help|<action> <id> [--property value]
+# sexy <context> add|del|get|set|help|<command> <id> [--property value]
 #
 # I am just a wrapper, I'm only usefull together with my plugins which 
 # extend my functionality like so:
-# ./plugins/<context>/extend/<myname>/<action>
+# ./plugins/<context>/extend/<myname>/<command>
 #
-# Each of my plugins inherits my generic add, del, get and set actions
+# Each of my plugins inherits my generic add, del, get and set commands
 # for interacting with my cconfig db.
 #
-# Each of my plugins also inherits my generic help action which presents
+# Each of my plugins also inherits my generic help command which presents
 # the help for usage of the plugin in a uniform consistent way.
 #
 # e.g.
@@ -25,21 +25,21 @@
 
 . sexy-config
 
-. sexy-args -atleast plugin action -- "$@"
+. sexy-args -atleast plugin command -- "$@"
 
 __sexy_plugin_dir=$(__sexy_find_plugin_dir "$plugin")
 [ -d "$__sexy_plugin_dir" ] || __sexy_exit_err "Plugin not found: $plugin"
 export __sexy_plugin_dir
 
 export __sexy_plugin_name="$plugin"
-export __sexy_plugin_action="$action"
+export __sexy_plugin_command="$command"
 
-case $action in
+case $command in
    help)
-      __sexy_command_abs="$__sexy_base_dir/$__sexy_name_libexec/$action"
+      __sexy_command_abs="$__sexy_base_dir/$__sexy_name_libexec/$command"
       ;;
    *)
-      __sexy_command_abs="$__sexy_plugin_dir/$__sexy_name_libexec/$action"
+      __sexy_command_abs="$__sexy_plugin_dir/$__sexy_name_libexec/$command"
       ;;
 esac
 
@@ -48,7 +48,7 @@ esac
 
 export __sexy_command_abs
 
-# Change to plugin dir before executing the plugin action
+# Change to plugin dir before executing the plugin command
 cd "$__sexy_plugin_dir"
 $__sexy_command_abs "$@"
 

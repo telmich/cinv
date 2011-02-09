@@ -1,0 +1,2 @@
+- add plugin: "plugin" which knows methods "list", "list-methods", "show-help"
+   - a plugin that helps the life with plugins ;-)

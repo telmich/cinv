@@ -43,7 +43,11 @@ case "$command" in
       ;;
 esac
 
-[ -e "$__sexy_command_abs" ] || __sexy_exit_err "Command not found: $__sexy_plugin_command"
+if [ ! -e "$__sexy_command_abs" ]; then
+   __sexy_exit_err \
+      "Plugin $__sexy_plugin_name does not have command $__sexy_plugin_command"
+fi
+
 [ -x "$__sexy_command_abs" ] || __sexy_exit_err "Command not executable: $__sexy_command_abs"
 
 export __sexy_command_abs
@@ -51,4 +55,3 @@ export __sexy_command_abs
 # Change to plugin dir before executing the plugin command
 cd "$__sexy_plugin_dir"
 $__sexy_command_abs "$@"
-

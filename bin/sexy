@@ -1,20 +1,29 @@
 #!/bin/sh
+# 
+# 2011      Nico Schottelius (nico-sexy at schottelius.org)
+#           Steven Armstrong (steven-sexy at armstrong.cc)
+# 
+# This file is part of sexy.
 #
-# FIXME: update these docs
+# sexy is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+# 
+# sexy is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+# 
+# You should have received a copy of the GNU General Public License
+# along with sexy. If not, see <http://www.gnu.org/licenses/>.
+#
 #
 # I'm the sexy command.
-#
-# sexy <context> add|del|get|set|help|<command> <id> [--property value]
 #
 # I am just a wrapper, I'm only usefull together with my plugins which 
 # extend my functionality like so:
 # ./plugins/<context>/extend/<myname>/<command>
-#
-# Each of my plugins inherits my generic add, del, get and set commands
-# for interacting with my cconfig db.
-#
-# Each of my plugins also inherits my generic help command which presents
-# the help for usage of the plugin in a uniform consistent way.
 #
 # e.g.
 #  $ sexy network get 129.132.186.0
@@ -24,7 +33,6 @@
 #
 
 . sexy-config
-
 . sexy-args -atleast plugin command -- "$@"
 
 __sexy_plugin_dir=$(__sexy_find_plugin_dir "$plugin")
@@ -33,25 +41,17 @@ __sexy_plugin_dir=$(__sexy_find_plugin_dir "$plugin")
 export __sexy_plugin_dir
 export __sexy_plugin_name="$plugin"
 export __sexy_plugin_command="$command"
-
-case "$command" in
-   help)
-      __sexy_command_abs="$__sexy_base_dir/$__sexy_name_libexec/$command"
-      ;;
-   *)
-      __sexy_command_abs="$__sexy_plugin_dir/$__sexy_name_libexec/$command"
-      ;;
-esac
+export __sexy_plugin_command_abs="$__sexy_plugin_dir/$__sexy_name_libexec/$__sexy_plugin_command"
 
 if [ ! -e "$__sexy_command_abs" ]; then
    __sexy_exit_err \
       "Plugin $__sexy_plugin_name does not have command $__sexy_plugin_command"
 fi
 
-[ -x "$__sexy_command_abs" ] || __sexy_exit_err "Command not executable: $__sexy_command_abs"
-
-export __sexy_command_abs
+if [ ! -x "$__sexy_command_abs" ]; then
+   __sexy_exit_err "Command not executable: $__sexy_plugin_command_abs"
+fi
 
 # Change to plugin dir before executing the plugin command
 cd "$__sexy_plugin_dir"
-$__sexy_command_abs "$@"
+$__sexy_plugin_command_abs "$@"

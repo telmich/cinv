@@ -23,6 +23,8 @@
 #  . sexy-args fqdn ipv4a -- "$@"
 #  echo "${ipv4a}"
 #
+# Warning: arguments to source scripts is just a "valid extension" in posix!
+# See http://pubs.opengroup.org/onlinepubs/009695399/utilities/dot.html
 
 # Require some command line parameters and allow optional parameters
 # -atleast: have at least the given number of arguments, but allow more to be present

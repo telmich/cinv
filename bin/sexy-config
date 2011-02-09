@@ -84,7 +84,7 @@ __sexy_find_plugin_dir()
 }
 
 # Requires __sexy_plugin_name to be set
-__sexy_plugin_datadir()
+__sexy_plugin_data_dir()
 {
    local plugin_datadir="${__sexy_config_dir}/data/${__sexy_plugin_name}"
    mkdir -p "$plugin_datadir"
@@ -92,7 +92,7 @@ __sexy_plugin_datadir()
 }
 
 # Requires _sexy_plugin_dir to be set
-__sexy_plugin_libexecdir()
+__sexy_plugin_libexec_dir()
 {
    echo "$__sexy_plugin_dir/$__sexy_name_libexec"
 }

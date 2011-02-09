@@ -48,6 +48,8 @@ else
    SEXY_PLUGIN_PATH="${__sexy_base_dir}/plugins"
 fi
 
+# Constants
+__sexy_name_libexec="libexec"
 
 ################################################################################
 # Functions
@@ -86,6 +88,12 @@ __sexy_plugin_datadir()
    local plugin_datadir="${__sexy_config_dir}/data/${__sexy_plugin_name}"
    mkdir -p "$plugin_datadir"
    echo "$plugin_datadir"
+}
+
+# Requires _sexy_plugin_dir to be set
+__sexy_plugin_libexecdir()
+{
+   echo "$__sexy_plugin_dir/$__sexy_name_libexec"
 }
 
 # Return the absolute path of the given database path

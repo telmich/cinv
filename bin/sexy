@@ -36,19 +36,19 @@ export __sexy_plugin_action="$action"
 
 case $action in
    help)
-      __sexy_command="$__sexy_base_dir/$__sexy_name_libexec/$action"
+      __sexy_command_abs="$__sexy_base_dir/$__sexy_name_libexec/$action"
       ;;
    *)
-      __sexy_command="$__sexy_plugin_dir/$__sexy_name_libexec/$action"
+      __sexy_command_abs="$__sexy_plugin_dir/$__sexy_name_libexec/$action"
       ;;
 esac
 
-[ -e "$__sexy_command" ] || __sexy_exit_err "Command not found: $__sexy_command"
-[ -x "$__sexy_command" ] || __sexy_exit_err "Command not executable: $__sexy_command"
+[ -e "$__sexy_command_abs" ] || __sexy_exit_err "Command not found: $__sexy_command_abs"
+[ -x "$__sexy_command_abs" ] || __sexy_exit_err "Command not executable: $__sexy_command_abs"
 
-export __sexy_command
+export __sexy_command_abs
 
 # Change to plugin dir before executing the plugin action
 cd "$__sexy_plugin_dir"
-$__sexy_command "$@"
+$__sexy_command_abs "$@"
 

@@ -73,7 +73,8 @@ __sexy_usage()
 }
 
 # Search SEXY_PLUGIN_PATH for the given plugin_name
-__sexy_find_plugin_dir() {
+__sexy_find_plugin_dir()
+{
    local plugin_name="$1"
    local path
    for path in $(echo "$SEXY_PLUGIN_PATH" | sed 's/[^\]:/\n/g'); do
@@ -98,14 +99,16 @@ __sexy_plugin_libexecdir()
 
 # Return the absolute path of the given database path
 # Propose: __sexy_db_dir="${__sexy_db_abs_dir}/${db_path}"
-__sexy_db_dir() {
+__sexy_db_dir()
+{
    local db_path="$1"
    echo "${__sexy_db_abs_dir}/${db_path}"
 }
 
 # Return the absolute path to current plugins db
 # Requires __sexy_plugin_name to be set
-__sexy_plugin_db_dir() {
+__sexy_plugin_db_dir()
+{
    local plugin_db_dir=$(__sexy_db_dir "$__sexy_plugin_name")
    # Ensure directory exists
    mkdir -p "$plugin_db_dir"
@@ -114,7 +117,8 @@ __sexy_plugin_db_dir() {
 
 # Check if the given id is a valid identifier
 __sexy_db_sane_regexp='[A-Za-z0-9]*[-A-Za-z0-9_.]*'
-__sexy_db_check_id() {
+__sexy_db_check_id()
+{
    if [ -z "$1" ]; then
       return 1
    elif echo "$1" | grep -q "^${__sexy_db_sane_regexp}*\$"; then
@@ -125,7 +129,8 @@ __sexy_db_check_id() {
 }
 
 # Usage: __sexy_opts2dir /tmp/foo --param1 value1 --param2 value2 --param3 value3
-__sexy_opts2dir() {
+__sexy_opts2dir()
+{
    local target_dir="$1"; shift
    mkdir -p "$target_dir"
    cd "$target_dir"
@@ -146,5 +151,3 @@ __sexy_opts2dir() {
       shift
    done
 }
-
-

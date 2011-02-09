@@ -29,4 +29,5 @@ name="${__sexy_plugin_action#set-}"
 file="$(__sexy_plugin_datadir)/$name"
 
 [ -e "${file}" ] && __sexy_exit_err "${file} already exists"
+
 echo $mac > "$file"

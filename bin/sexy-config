@@ -89,6 +89,7 @@ __sexy_plugin_datadir()
 }
 
 # Return the absolute path of the given database path
+# Propose: __sexy_db_dir="${__sexy_db_abs_dir}/${db_path}"
 __sexy_db_dir() {
    local db_path="$1"
    echo "${__sexy_db_abs_dir}/${db_path}"

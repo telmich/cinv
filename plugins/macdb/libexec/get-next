@@ -24,6 +24,9 @@
 # set -e
 . sexy-config
 
-echo $(__sexy_plugin_db_dir)
+# any old address free? use that.
 
-echo $(__sexy_plugin_libexecdir)
+# no unused?
+# check whether last used is < lastaddress
+# if yes, new = last used + 1, last_used_new=$addr
+

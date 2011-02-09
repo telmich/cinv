@@ -33,10 +33,10 @@ export __sexy_plugin_dir
 
 case $action in
    help)
-      command="$__sexy_base_dir/libexec/$action"
+      command="$__sexy_base_dir/$__sexy_name_libexec/$action"
       ;;
    *)
-      command="$__sexy_plugin_dir/libexec/$action"
+      command="$__sexy_plugin_dir/$__sexy_name_libexec/$action"
       ;;
 esac
 

@@ -45,12 +45,12 @@ export __sexy_plugin_name="$plugin"
 export __sexy_plugin_command="$command"
 export __sexy_plugin_command_abs="$__sexy_plugin_dir/$__sexy_name_libexec/$__sexy_plugin_command"
 
-if [ ! -e "$__sexy_command_abs" ]; then
+if [ ! -e "$__sexy_plugin_command_abs" ]; then
    __sexy_exit_err \
       "Plugin $__sexy_plugin_name does not have command $__sexy_plugin_command"
 fi
 
-if [ ! -x "$__sexy_command_abs" ]; then
+if [ ! -x "$__sexy_plugin_command_abs" ]; then
    __sexy_exit_err "Command not executable: $__sexy_plugin_command_abs"
 fi
 

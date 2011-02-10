@@ -56,4 +56,4 @@ fi
 
 # Change to plugin dir before executing the plugin command
 cd "$__sexy_plugin_dir"
-$__sexy_plugin_command_abs "$@"
+"$__sexy_plugin_command_abs" "$@"

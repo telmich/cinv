@@ -139,7 +139,6 @@ __sexy_opts2dir()
    local key value
    while [ "$#" -gt "0" ]; do
       if echo "$1" | grep -q '^--'; then
-         __sexy_db_check_id "$1" || __sexy_exit_err "Invalid property name: $1"
          key=$(echo $1 | sed 's|^--||')
          touch "$key"
       else

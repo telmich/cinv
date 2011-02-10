@@ -111,7 +111,7 @@ __sexy_plugin_db_dir()
 {
    local plugin_db_dir=$(__sexy_db_abs_dir "$__sexy_plugin_name")
    # Ensure directory exists
-   mkdir -p "$plugin_db_dir"
+   mkdir -p "$plugin_db_dir" || __sexy_exit_err "Cannot create $plugin_db_dir"
    echo "$plugin_db_dir"
 }
 

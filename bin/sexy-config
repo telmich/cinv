@@ -36,8 +36,8 @@ __sexy_abs_myname="$__sexy_abs_mydir/$__sexy_myname"
 : ${__sexy_config_dir:="$HOME/.sexy"}
 
 # Where to find/store the database
-: ${SEXY_DB_DIR:="${__sexy_config_dir}/db"}
-__sexy_db_abs_dir="$(cd "$SEXY_DB_DIR" && pwd -P)"
+: ${__sexy_db_dir:="${__sexy_config_dir}/db"}
+__sexy_db_abs_dir="$(cd "$__sexy_db_dir" && pwd -P)"
 
 
 # TODO: make this prettier/more portable

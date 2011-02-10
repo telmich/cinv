@@ -33,7 +33,9 @@
 #
 
 . sexy-config
-. sexy-args -atleast plugin command -- "$@"
+. sexy-args -atleast plugin -- "$@"
+. sexy-args -optional command -- "$@"
+: ${command:='default'}
 
 __sexy_plugin_dir=$(__sexy_find_plugin_dir "$plugin")
 [ -d "$__sexy_plugin_dir" ] || __sexy_exit_err "Plugin not found: $plugin"

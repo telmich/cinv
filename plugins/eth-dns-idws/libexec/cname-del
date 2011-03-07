@@ -23,9 +23,9 @@
 
 set -e
 
-. sexy-config
-. "${__sexy_abs_mydir}/helper-config-load"
+#. sexy-config
+. "${__sexy_abs_mydir}/../helper-config-load"
 
-__sexy_args fqdn -- "$@"
+#__sexy_args fqdn -- "$@"
 
 curl --request DELETE "${komcenter_url_base}/alias/${fqdn}"

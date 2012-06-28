@@ -41,7 +41,7 @@ for host in $(sexy-attribute-list networks "${network}"); do
    "${ipa}/write" "$network" "$host"
 
    ipv4a="$(sexy-attribute-get networks "$network" "$host/ipv4a")"
-   "${dns}/write" "$host" "$ipv4a"
+   "${dns}/write" "$network" "$host" "$ipv4a"
 
    # FIXME: implement version that allows non-existing attributes
    aliases="$(sexy-attribute-get networks "$network" "$host/aliases" failok)"

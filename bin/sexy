@@ -52,6 +52,10 @@ def commandline():
         parents=[parser['loglevel']])
     parser['net-ipv4']['sub'] = parser['net-ipv4']['main'].add_subparsers(title="net-ipv4 commands")
 
+    parser['net-ipv4']['add'] = parser['net-ipv4']['sub'].add_parser('add', 
+        parents=[parser['loglevel']])
+    parser['net-ipv4']['add'].add_argument('subnet', help='Subnet to delete')
+
     parser['net-ipv4']['del'] = parser['net-ipv4']['sub'].add_parser('del', 
         parents=[parser['loglevel']])
 
@@ -107,5 +111,4 @@ if __name__ == "__main__":
     #    exit_code = 1
 
     # Determine exit code by return value of function
-
-    sys.exit(exit_code)
+    #sys.exit(exit_code)

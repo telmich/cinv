@@ -62,21 +62,11 @@ def commandline():
     parser['net-ipv4']['del'].add_argument('subnet', help='Subnet to delete')
 
     # host
+    import sexy.host
     parser['host'] = {}
     parser['host']['main'] = parser['mainsub'].add_parser('host', 
         parents=[parser['loglevel']])
-    parser['host']['sub'] = parser['host']['main'].add_subparsers(title="host commands")
-
-    parser['host']['add'] = parser['host']['sub'].add_parser('add', 
-        parents=[parser['loglevel']])
-    parser['host']['add'].add_argument('fqdn', help='Fully Qualified Domain Name')
-    parser['host']['add'].add_argument('-t', '--type', help='Machine Type',
-        choices=["hw","vm"])
-
-    parser['host']['del'] = parser['host']['sub'].add_parser('del', 
-        parents=[parser['loglevel']])
-
-    parser['host']['del'].add_argument('subnet', help='Subnet to delete')
+    sexy.host.Host.commandline_args(parser['host']['main'], [parser['loglevel']])
 
     # vm
     parser['vm'] = {}

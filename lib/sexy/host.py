@@ -28,7 +28,7 @@ class Host(object):
         pass
 
     @classmethod
-    def commandline_handle(cls, args):
+    def commandline_list(cls, args):
         print(args)
         pass
 

@@ -54,44 +54,12 @@ def commandline():
 
     parser['net-ipv4']['add'] = parser['net-ipv4']['sub'].add_parser('add', 
         parents=[parser['loglevel']])
-    parser['net-ipv4']['add'].add_argument('subnet', help='Subnet to add')
+    parser['net-ipv4']['add'].add_argument('subnet', help='Subnet to delete')
 
     parser['net-ipv4']['del'] = parser['net-ipv4']['sub'].add_parser('del', 
         parents=[parser['loglevel']])
 
     parser['net-ipv4']['del'].add_argument('subnet', help='Subnet to delete')
-
-    # host
-    parser['host'] = {}
-    parser['host']['main'] = parser['mainsub'].add_parser('host', 
-        parents=[parser['loglevel']])
-    parser['host']['sub'] = parser['host']['main'].add_subparsers(title="host commands")
-
-    parser['host']['add'] = parser['host']['sub'].add_parser('add', 
-        parents=[parser['loglevel']])
-    parser['host']['add'].add_argument('fqdn', help='Fully Qualified Domain Name')
-    parser['host']['add'].add_argument('-t', '--type', help='Machine Type',
-        choices=["hw","vm"])
-
-    parser['host']['del'] = parser['host']['sub'].add_parser('del', 
-        parents=[parser['loglevel']])
-
-    parser['host']['del'].add_argument('subnet', help='Subnet to delete')
-
-    # vm
-    parser['vm'] = {}
-    parser['vm']['main'] = parser['mainsub'].add_parser('vm', 
-        parents=[parser['loglevel']])
-    parser['vm']['sub'] = parser['vm']['main'].add_subparsers(title="vm commands")
-
-    parser['vm']['add'] = parser['vm']['sub'].add_parser('add', 
-        parents=[parser['loglevel']])
-    parser['vm']['add'].add_argument('subnet', help='Subnet to add')
-
-    parser['vm']['del'] = parser['vm']['sub'].add_parser('del', 
-        parents=[parser['loglevel']])
-
-    parser['vm']['del'].add_argument('subnet', help='Subnet to delete')
 
     args = parser['main'].parse_args(sys.argv[1:])
 

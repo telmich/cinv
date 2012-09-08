@@ -1,3 +1,6 @@
+test:
+	PYTHONPATH=$$PYTHONPATH:$$(pwd -P)/lib python3 -m sexy.test
+
 opub:
 	git push --tags
 	git push --all

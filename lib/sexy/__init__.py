@@ -22,6 +22,12 @@
 
 VERSION="2.0"
 
+import subprocess
+
+class Error(Exception):
+    """Base class for fallback of all exceptions"""
+    pass
+
 def commandline():
     """Parse command line"""
     import argparse

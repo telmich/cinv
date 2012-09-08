@@ -22,10 +22,22 @@
 
 import argparse
 
+import sexy
+
+HOST_TYPES = ["hw", "vm"]
+
+class Error(sexy.Error):
+    pass
+
 class Host(object):
 
-    def __init__(self):
-        pass
+    def __init__(self, fqdn, host_type):
+        self.fqdn = fqdn
+
+        if host_type not in HOST_TYPES:
+            raise Error("Host type must be one of %s" % (" ".join(HOST_TYPES)))
+
+        self.host_type = host_type
 
     @classmethod
     def commandline_list(cls, args):
@@ -37,16 +49,13 @@ class Host(object):
         """Add us to the parent parser and add all parents to our parsers"""
 
         parser = {}
-        #parser['main'] = parent_parser.add_parser('host', parents=parent)
-        #parser['sub'] = parser['main'].add_subparsers(title="Host Commands")
-
         parser['sub'] = parent_parser.add_subparsers(title="Host Commands")
 
         parser['add'] = parser['sub'].add_parser('add', 
             parents=parents)
         parser['add'].add_argument('fqdn', help='Fully Qualified Domain Name')
         parser['add'].add_argument('-t', '--type', help='Machine Type',
-            choices=["hw","vm"])
+            required=True, choices=["hw","vm"])
 
         parser['del'] = parser['sub'].add_parser('del', 
             parents=parents)
@@ -57,5 +66,6 @@ class Host(object):
             parents=parents)
         parser['list'].add_argument('-t', '--type', help='Machine Type',
             choices=["hw","vm"])
-        parser['list'].set_defaults(func=cls.commandline_handle)
+        parser['list'].set_defaults(func=cls.commandline_list)
+
 

@@ -24,6 +24,7 @@ import argparse
 import logging
 import os.path
 import os
+import re
 
 import sexy
 from sexy import fsproperty
@@ -42,7 +43,7 @@ class Mac(object):
 
         self._init_dir()
 
-    prefix  = fsproperty.FileStringProperty(lambda obj: os.path.join(obj.base_dir, "prefix"))
+    _prefix  = fsproperty.FileStringProperty(lambda obj: os.path.join(obj.base_dir, "prefix"))
     last    = fsproperty.FileStringProperty(lambda obj: os.path.join(obj.base_dir, "last"))
     free    = fsproperty.FileListProperty(lambda obj: os.path.join(obj.base_dir, "free"))
 
@@ -57,6 +58,18 @@ class Mac(object):
         if not self.prefix:
             raise Error("Cannot generate address without prefix - use prefix-set")
 
+    @property
+    def prefix(self):
+        return self._prefix
+
+    @prefix.setter
+    def prefix(self, prefix):
+        if not re.match(r'([0-9A-F]{2}[-:]){2}[0-9A-F]{2}$', prefix, re.I):
+            raise Error("Wrong mac address format - use 00:11:22")
+
+        self._prefix = prefix
+
+
 
     @classmethod
     def commandline_generate(cls, args):
@@ -65,7 +78,8 @@ class Mac(object):
 
     @classmethod
     def commandline_prefix_set(cls, args):
-        print(args)
+        mac = Mac()
+        mac.prefix = args.prefix
 
     @classmethod
     def commandline_prefix_get(cls, args):

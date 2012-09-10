@@ -139,7 +139,7 @@ class DirectoryDict(collections.MutableMapping):
                     for v in value:
                         fd.write(str(v) + '\n')
                 else:
-                    fd.write(str(value))
+                    fd.write(str(value) + '\n')
         except EnvironmentError as e:
             raise sexy.Error(str(e))
 

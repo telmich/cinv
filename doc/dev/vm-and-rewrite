@@ -39,14 +39,12 @@ Area consists of:
 --------------------------------------------------------------------------------
 x sexy host add <fqdn> <type>           # hw | vm
 x sexy host disk-add <fqdn> <size>        # size is given
-sexy host nic-add <fqdn> <macaddr>      # nico01 00:00:00....
+x sexy host nic-add <fqdn> <macaddr>      # nico01 00:00:00....
 sexy host nic-del <fqdn> <macaddr>      # nico01 00:00:00.....
 sexy host nic-list <fqdn>
 
 sexy host memory-set <amount>           # allow k,m,g,t, suffices
 sexy host cpu-set <amount >             # amount of cpus / cores
-
-
 sexy host vmhost-set <fqdn> <vmhost> # error if type != vm
 
 sexy host list [--type <hw|vm>]
@@ -65,9 +63,9 @@ sexy net-ipv4 list
 
 --------------------------------------------------------------------------------
 
-sexy mac generate               # stdout = next
-sexy mac free <macaddr>         # write into free database
-sexy mac prefix-set <prefix>     # prefix to use to generate mac addresses
+x sexy mac generate               # stdout = next
+x sexy mac free <macaddr>         # write into free database
+x sexy mac prefix-set <prefix>     # prefix to use to generate mac addresses
 
 --------------------------------------------------------------------------------
 Create VM: <fqdn> => "rails"

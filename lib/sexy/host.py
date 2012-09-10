@@ -43,8 +43,11 @@ class Host(object):
         self.base_dir = self.get_base_dir(fqdn)
         self.fqdn = fqdn
 
-    _host_type = fsproperty.FileStringProperty(lambda obj: os.path.join(obj.base_dir, "host_type"))
-    disks  = fsproperty.DirectoryDictProperty(lambda obj: os.path.join(obj.base_dir, 'disks'))
+    disks       = fsproperty.DirectoryDictProperty(lambda obj: os.path.join(obj.base_dir, 'disks'))
+    _host_type  = fsproperty.FileStringProperty(lambda obj: os.path.join(obj.base_dir, "host_type"))
+    _memory     = fsproperty.FileStringProperty(lambda obj: os.path.join(obj.base_dir, "memory"))
+    nics        = fsproperty.DirectoryDictProperty(lambda obj: os.path.join(obj.base_dir, 'nics'))
+    _vm_host    = fsproperty.FileStringProperty(lambda obj: os.path.join(obj.base_dir, "vm_host"))
 
     def _init_base_dir(self, host_type):
         """Create base directory of host"""
@@ -68,6 +71,17 @@ class Host(object):
     def host_type(self, host_type):
         self.validate_host_type(host_type)
         self._host_type = host_type
+
+    @property
+    def vm_host(self):
+        return self._vmhost
+
+    @vm_host.setter
+    def vm_host(self, vm_host):
+        if not self.host_type == "vm":
+            raise Error("Can only configure vmhost for VMs")
+
+        self._vm_host = vm_host
 
     @staticmethod
     def get_base_dir(fqdn):
@@ -105,13 +119,14 @@ class Host(object):
 
         return bytes
 
-    def get_next_disk_name(self):
+    def get_next_name(self, area):
         """Get next generic disk name"""
 
-        base_name = "disk"
+        base_name = area
+        attribute = getattr(self, "%ss" % area)
 
-        if self.disks:
-            last_name = sorted([key for key in self.disks if key.startswith(base_name)])[-1]
+        if attribute:
+            last_name = sorted([key for key in attribute if key.startswith(base_name)])[-1]
             last_number = last_name.lstrip(base_name)
             next_number = int(last_number) + 1
         else:
@@ -145,14 +160,42 @@ class Host(object):
 
         if args.name:
             if args.name in host.disks:
-                raise Error("Disk %s already existing")
+                raise Error("Disk already existing: %s")
         else:
-            name = host.get_next_disk_name()
+            name = host.get_next_name("disk")
 
         host.disks[name] = size_bytes
 
-        log.info("Adding disk %s (%s Bytes)" % (name, size_bytes))
+        log.info("Added disk %s (%s Bytes)" % (name, size_bytes))
 
+    @classmethod
+    def commandline_nic_add(cls, args):
+
+        if not cls.exists(args.fqdn):
+            raise Error("Host does not exist: %s" % args.fqdn)
+
+        host = cls(fqdn=args.fqdn)
+
+        if args.name:
+            if args.name in host.disks:
+                raise Error("Network interface card already existing: %s")
+        else:
+            name = host.get_next_name("nic")
+
+        host.nics[name] = args.address
+
+        log.info("Added nic %s (%s)" % (name, args.address))
+
+    @classmethod
+    def commandline_vmhost_set(cls, args):
+
+        if not cls.exists(args.fqdn):
+            raise Error("Host does not exist: %s" % args.fqdn)
+
+        host = cls(fqdn=args.fqdn)
+        host.vm_host = args.vm_host
+
+        log.info("VMHost for %s = %s" % (args.fqdn, args.vm_host))
 
     @classmethod
     def commandline_args(cls, parent_parser, parents):
@@ -177,9 +220,22 @@ class Host(object):
         parser['disk-add'].add_argument('-n', '--name', help='Disk name')
         parser['disk-add'].set_defaults(func=cls.commandline_disk_add)
 
+        parser['nic-add'] = parser['sub'].add_parser('nic-add', parents=parents)
+        parser['nic-add'].add_argument('fqdn', help='Host name')
+        parser['nic-add'].add_argument('-a', '--address', help='Mac address',
+            required=True)
+        parser['nic-add'].add_argument('-n', '--name', help='Nic name')
+        parser['nic-add'].set_defaults(func=cls.commandline_nic_add)
+
         parser['list'] = parser['sub'].add_parser('list', parents=parents)
         parser['list'].add_argument('-t', '--type', help='Host Type',
             choices=["hw","vm"])
         parser['list'].set_defaults(func=cls.commandline_list)
+
+        parser['vmhost-set'] = parser['sub'].add_parser('vmhost-set', parents=parents)
+        parser['vmhost-set'].add_argument('fqdn', help='Host name')
+        parser['vmhost-set'].add_argument('--vm-host', help='VM Host (only for VMs)',
+            required=True)
+        parser['vmhost-set'].set_defaults(func=cls.commandline_vmhost_set)
 
 

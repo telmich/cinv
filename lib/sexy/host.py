@@ -60,6 +60,28 @@ class Host(object):
         if self.host_type not in HOST_TYPES:
             raise Error("Host type must be one of %s" % (" ".join(HOST_TYPES)))
 
+    @staticmethod
+    def convert_si_prefixed_size_values(value):
+        """Convert given size of 101 G to bytes"""
+
+        prefix = int(value[:-1])
+        suffix = value[-1]
+
+        if suffix == 'k':
+            bytes = prefix * (1024**1)
+        elif suffix == 'm':
+            bytes = prefix * (1024**2)
+        elif suffix == 'g':
+            bytes = prefix * (1024**3)
+        elif suffix == 't':
+            bytes = prefix * (1024**4)
+        elif suffix == 'p':
+            bytes = prefix * (1024**5)
+        else:
+            raise Error("Unsupported suffix %s" % (suffix))
+
+        return bytes
+            
 
     @classmethod
     def commandline_list(cls, args):

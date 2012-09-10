@@ -92,7 +92,11 @@ def commandline():
         logging.root.setLevel(logging.DEBUG)
 
     log.debug(args)
-    args.func(args)
+
+    try:
+        args.func(args)
+    except sexy.Error as e:
+        log.error(e)
 
 if __name__ == "__main__":
     # Sys is needed for sys.exit()

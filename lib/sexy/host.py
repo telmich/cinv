@@ -23,6 +23,7 @@
 import argparse
 
 import sexy
+from sexy.db import DB
 
 HOST_TYPES = ["hw", "vm"]
 
@@ -31,18 +32,44 @@ class Error(sexy.Error):
 
 class Host(object):
 
-    def __init__(self, fqdn, host_type):
+    def __init__(self, fqdn=None, host_type=None):
         self.fqdn = fqdn
+        self.host_type = host_type
 
-        if host_type not in HOST_TYPES:
+        self.db = DB(prefix="host")
+
+    def to_disk(self, exist_ok=True):
+        """Write entry to disk"""
+
+        self.verify()
+        self.db.entry_add(self.fqdn, exist_ok=exist_ok)
+
+    def verify(self):
+        self.verify_host_type()
+        self.verify_host_fqdn()
+
+    def verify_host_fqdn(self):
+        if not self.fqdn:
+            raise Error("Required FQDN not given")
+
+    def verify_host_type(self):
+        """Verify host type is correct"""
+
+        if self.host_type not in HOST_TYPES:
             raise Error("Host type must be one of %s" % (" ".join(HOST_TYPES)))
 
-        self.host_type = host_type
 
     @classmethod
     def commandline_list(cls, args):
         print(args)
         pass
+
+    @classmethod
+    def commandline_add(cls, args):
+        host = cls(fqdn=args.fqdn, host_type = args.type)
+
+        host.to_disk(exist_ok=False)
+
 
     @classmethod
     def commandline_args(cls, parent_parser, parents):
@@ -51,20 +78,19 @@ class Host(object):
         parser = {}
         parser['sub'] = parent_parser.add_subparsers(title="Host Commands")
 
-        parser['add'] = parser['sub'].add_parser('add', 
-            parents=parents)
+        parser['add'] = parser['sub'].add_parser('add', parents=parents)
         parser['add'].add_argument('fqdn', help='Fully Qualified Domain Name')
         parser['add'].add_argument('-t', '--type', help='Machine Type',
             required=True, choices=["hw","vm"])
+        parser['add'].set_defaults(func=cls.commandline_add)
 
         parser['del'] = parser['sub'].add_parser('del', 
             parents=parents)
 
         parser['del'].add_argument('subnet', help='Subnet to delete')
 
-        parser['list'] = parser['sub'].add_parser('list', 
-            parents=parents)
-        parser['list'].add_argument('-t', '--type', help='Machine Type',
+        parser['list'] = parser['sub'].add_parser('list', parents=parents)
+        parser['list'].add_argument('-t', '--type', help='Host Type',
             choices=["hw","vm"])
         parser['list'].set_defaults(func=cls.commandline_list)
 

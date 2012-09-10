@@ -25,10 +25,12 @@ import unittest
 
 class HostTest(unittest.TestCase):
     def setUp(self):
-        self.host = sexy.host.Host(fqdn = "test.example.org", host_type = "vm")
 
-    def test_host_add(self):
-        pass
+    #    self.host = sexy.host.Host(fqdn = "test.example.org", host_type = "vm")
 
     def test_prevent_wrong_type(self):
         self.assertRaises(sexy.host.Error, sexy.host.Host, "test", "nothw")
+
+    def test_host_add(self):
+        self.host
+

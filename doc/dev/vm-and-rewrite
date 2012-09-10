@@ -38,7 +38,7 @@ Area consists of:
         apply is always defined, but different parameters possible
 --------------------------------------------------------------------------------
 x sexy host add <fqdn> <type>           # hw | vm
-sexy host disk-add <fqdn> <size>        # size is given
+x sexy host disk-add <fqdn> <size>        # size is given
 sexy host nic-add <fqdn> <macaddr>      # nico01 00:00:00....
 sexy host nic-del <fqdn> <macaddr>      # nico01 00:00:00.....
 sexy host nic-list <fqdn>
@@ -65,9 +65,9 @@ sexy net-ipv4 list
 
 --------------------------------------------------------------------------------
 
-sexy mac-generate               # stdout = next
-sexy mac-del <macaddr>          # write into free database
-sexy mac-setprefix <prefix>     # prefix to use to generate mac addresses
+sexy mac generate               # stdout = next
+sexy mac free <macaddr>         # write into free database
+sexy mac prefix-set <prefix>     # prefix to use to generate mac addresses
 
 --------------------------------------------------------------------------------
 Create VM: <fqdn> => "rails"

@@ -37,24 +37,39 @@ class Error(sexy.Error):
 
 class Mac(object):
 
-    def __init__(self, fqdn):
-        self.host_dir = self.get_host_dir(fqdn)
-        self.fqdn = fqdn
+    def __init__(self):
+        self.base_dir = os.path.join(DB.get_default_db_dir(), "mac")
+
         self._init_dir()
 
-    host_type = fsproperty.FileStringProperty(lambda obj: os.path.join(obj.host_dir, "host_type"))
-    disks  = fsproperty.DirectoryDictProperty(lambda obj: os.path.join(obj.host_dir, 'disks'))
+    prefix  = fsproperty.FileStringProperty(lambda obj: os.path.join(obj.base_dir, "prefix"))
+    last    = fsproperty.FileStringProperty(lambda obj: os.path.join(obj.base_dir, "last"))
+    free    = fsproperty.FileListProperty(lambda obj: os.path.join(obj.base_dir, "free"))
 
     def _init_dir(self):
         try:
-            os.makedirs(self.host_dir, exist_ok=True)
+            os.makedirs(self.base_dir, exist_ok=True)
         except OSError as e:
             raise Error(e)
 
+
+    def get_next(self):
+        if not self.prefix:
+            raise Error("Cannot generate address without prefix - use prefix-set")
+
+
     @classmethod
     def commandline_generate(cls, args):
+        mac = Mac()
+        print(mac.get_next())
+
+    @classmethod
+    def commandline_prefix_set(cls, args):
         print(args)
-        pass
+
+    @classmethod
+    def commandline_prefix_get(cls, args):
+        print(args)
 
     @classmethod
     def commandline_add(cls, args):
@@ -69,10 +84,11 @@ class Mac(object):
         parser['sub'] = parent_parser.add_subparsers(title="Mac Commands")
 
         parser['generate'] = parser['sub'].add_parser('generate', parents=parents)
+        parser['generate'].set_defaults(func=cls.commandline_generate)
 
         parser['free'] = parser['sub'].add_parser('free', parents=parents)
         parser['free'].add_argument('address', help='Address to add to free database')
 
         parser['prefix-set'] = parser['sub'].add_parser('prefix-set', parents=parents)
-        parser['prefix-set'].add_argument('prefix', help='Address prefix for generating (3 bytes)')
-        parser['prefix-set'].set_defaults(func=cls.commandline_set_prefix)
+        parser['prefix-set'].add_argument('prefix', help="3 Byte address prefix (f.i. '00:16:3e')")
+        parser['prefix-set'].set_defaults(func=cls.commandline_prefix_set)

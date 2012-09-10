@@ -68,6 +68,13 @@ def commandline():
         parents=[parser['loglevel']])
     sexy.host.Host.commandline_args(parser['host']['main'], [parser['loglevel']])
 
+    # mac
+    import sexy.mac
+    parser['mac'] = {}
+    parser['mac']['main'] = parser['mainsub'].add_parser('mac', 
+        parents=[parser['loglevel']])
+    sexy.mac.Mac.commandline_args(parser['mac']['main'], [parser['loglevel']])
+
     # vm
     parser['vm'] = {}
     parser['vm']['main'] = parser['mainsub'].add_parser('vm', 

@@ -83,7 +83,8 @@ class Mac(object):
 
     @classmethod
     def commandline_prefix_get(cls, args):
-        print(args)
+        mac = Mac()
+        print(mac.prefix)
 
     @classmethod
     def commandline_add(cls, args):
@@ -106,3 +107,6 @@ class Mac(object):
         parser['prefix-set'] = parser['sub'].add_parser('prefix-set', parents=parents)
         parser['prefix-set'].add_argument('prefix', help="3 Byte address prefix (f.i. '00:16:3e')")
         parser['prefix-set'].set_defaults(func=cls.commandline_prefix_set)
+
+        parser['prefix-get'] = parser['sub'].add_parser('prefix-get', parents=parents)
+        parser['prefix-get'].set_defaults(func=cls.commandline_prefix_get)

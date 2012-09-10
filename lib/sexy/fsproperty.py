@@ -20,6 +20,7 @@
 #
 
 import os
+import os.path
 import collections
 
 import sexy

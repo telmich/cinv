@@ -21,8 +21,12 @@
 #
 
 import argparse
+import os.path
+import os
 
 import sexy
+from sexy import fsproperty
+
 from sexy.db import DB
 
 HOST_TYPES = ["hw", "vm"]
@@ -32,11 +36,29 @@ class Error(sexy.Error):
 
 class Host(object):
 
-    def __init__(self, fqdn=None, host_type=None):
+    def __init__(self, fqdn, host_type=None):
         self.fqdn = fqdn
         self.host_type = host_type
 
+        #self.host_dir = os.path.join(DB.get_default_db_dir(), "host", fqdn)
+        self.host_dir = "abc"
+
+    host_type = fsproperty.FileStringProperty(lambda obj: os.path.join(obj.host_dir, "host_type"))
+
+
+    @classmethod
+    def from_disk(cls, fqdn):
+        """Read entry from disk"""
+
+        self.host_dir = os.path.join(DB.get_default_db_dir(), "host", fqdn)
         self.db = DB(prefix="host")
+
+        if not self.db.dir_exist(fqdn):
+            raise Error("Host does not exist: %s" % fqdn)
+
+        cls(fqdn)
+
+        #self.db.oneliner_add(self.fqdn, "host_type", self.host_type)
 
     def to_disk(self, exist_ok=True):
         """Write entry to disk"""
@@ -81,7 +103,6 @@ class Host(object):
             raise Error("Unsupported suffix %s" % (suffix))
 
         return bytes
-            
 
     @classmethod
     def commandline_list(cls, args):
@@ -94,6 +115,10 @@ class Host(object):
 
         host.to_disk(exist_ok=False)
 
+    @classmethod
+    def commandline_disk_add(cls, args):
+        host = cls(fqdn=args.fqdn)
+
 
     @classmethod
     def commandline_args(cls, parent_parser, parents):
@@ -103,15 +128,20 @@ class Host(object):
         parser['sub'] = parent_parser.add_subparsers(title="Host Commands")
 
         parser['add'] = parser['sub'].add_parser('add', parents=parents)
-        parser['add'].add_argument('fqdn', help='Fully Qualified Domain Name')
+        parser['add'].add_argument('fqdn', help='Host name')
         parser['add'].add_argument('-t', '--type', help='Machine Type',
             required=True, choices=["hw","vm"])
         parser['add'].set_defaults(func=cls.commandline_add)
 
-        parser['del'] = parser['sub'].add_parser('del', 
-            parents=parents)
+        parser['del'] = parser['sub'].add_parser('del', parents=parents)
+        parser['add'].add_argument('fqdn', help='Host name')
 
-        parser['del'].add_argument('subnet', help='Subnet to delete')
+        parser['disk-add'] = parser['sub'].add_parser('disk-add', parents=parents)
+        parser['disk-add'].add_argument('fqdn', help='Host name')
+        parser['disk-add'].add_argument('-s', '--size', help='Disk size',
+            required=True)
+        parser['disk-add'].add_argument('-n', '--name', help='Disk name')
+        parser['disk-add'].set_defaults(func=cls.commandline_disk_add)
 
         parser['list'] = parser['sub'].add_parser('list', parents=parents)
         parser['list'].add_argument('-t', '--type', help='Host Type',

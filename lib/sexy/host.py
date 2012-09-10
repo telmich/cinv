@@ -40,7 +40,7 @@ class Error(sexy.Error):
 class Host(object):
 
     def __init__(self, fqdn):
-        self.host_dir = os.path.join(DB.get_default_db_dir(), "host", fqdn)
+        self.host_dir = self.get_host_dir(fqdn)
         self.fqdn = fqdn
         self._init_dir()
 
@@ -52,6 +52,14 @@ class Host(object):
             os.makedirs(self.host_dir, exist_ok=True)
         except OSError as e:
             raise Error(e)
+
+    @staticmethod
+    def get_host_dir(fqdn):
+        return os.path.join(DB.get_default_db_dir(), "host", fqdn)
+
+    @classmethod
+    def exists(cls, fqdn):
+        return os.path.exists(cls.get_host_dir(fqdn))
 
     @staticmethod
     def convert_si_prefixed_size_values(value):
@@ -108,6 +116,10 @@ class Host(object):
 
     @classmethod
     def commandline_disk_add(cls, args):
+
+        if not cls.exists(args.fqdn):
+            raise Error("Host does not exist: %s" % args.fqdn)
+
         host = cls(fqdn=args.fqdn)
         size_bytes = cls.convert_si_prefixed_size_values(args.size)
 
@@ -116,6 +128,8 @@ class Host(object):
                 raise Error("Disk %s already existing")
         else:
             name = host.get_next_disk_name()
+
+        host.disks[name] = size_bytes
 
         log.info("Adding disk %s (%s Bytes)" % (name, size_bytes))
 

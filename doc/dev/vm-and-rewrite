@@ -45,9 +45,9 @@ sexy host nic-list <fqdn>
 
 sexy host memory-set <amount>           # allow k,m,g,t, suffices
 sexy host cpu-set <amount >             # amount of cpus / cores
-sexy host vmhost-set <fqdn> <vmhost> # error if type != vm
+x sexy host vmhost-set <fqdn> <vmhost> # error if type != vm
 
-sexy host list [--type <hw|vm>]
+x sexy host list [--type <hw|vm>]
 sexy host apply <fqdn|all>
 --------------------------------------------------------------------------------
 sexy net-ipv4 add <subnet>/<mask>

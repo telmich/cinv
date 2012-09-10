@@ -88,6 +88,26 @@ class Host(object):
         return os.path.join(DB.get_default_db_dir(), "host", fqdn)
 
     @classmethod
+    def hosts_list(cls, host_type=None):
+        hosts = []
+
+        if host_type:
+            if host_type not in HOST_TYPES:
+                raise Error("Host type must be one of %s" % (" ".join(HOST_TYPES)))
+
+        base_dir = os.path.join(DB.get_default_db_dir(), "host")
+
+        for entry in os.listdir(base_dir):
+            if host_type:
+                host = cls(entry)
+                if host.host_type == host_type:
+                    hosts.append(entry)
+            else:
+                hosts.append(entry)
+
+        return hosts
+
+    @classmethod
     def exists(cls, fqdn):
         return os.path.exists(cls.get_base_dir(fqdn))
 
@@ -136,11 +156,6 @@ class Host(object):
 
 
     @classmethod
-    def commandline_list(cls, args):
-        print(args)
-        pass
-
-    @classmethod
     def commandline_add(cls, args):
         if cls.exists(args.fqdn):
             raise Error("Host already exist: %s" % args.fqdn)
@@ -167,6 +182,11 @@ class Host(object):
         host.disks[name] = size_bytes
 
         log.info("Added disk %s (%s Bytes)" % (name, size_bytes))
+
+    @classmethod
+    def commandline_list(cls, args):
+        for host in cls.hosts_list(args.type):
+            print(host)
 
     @classmethod
     def commandline_nic_add(cls, args):
@@ -229,7 +249,7 @@ class Host(object):
 
         parser['list'] = parser['sub'].add_parser('list', parents=parents)
         parser['list'].add_argument('-t', '--type', help='Host Type',
-            choices=["hw","vm"])
+            choices=["hw","vm"], required=False)
         parser['list'].set_defaults(func=cls.commandline_list)
 
         parser['vmhost-set'] = parser['sub'].add_parser('vmhost-set', parents=parents)

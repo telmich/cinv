@@ -161,9 +161,9 @@ class Mac(object):
         parser['generate'] = parser['sub'].add_parser('generate', parents=parents)
         parser['generate'].set_defaults(func=cls.commandline_generate)
 
+        parser['prefix-get'] = parser['sub'].add_parser('prefix-get', parents=parents)
+        parser['prefix-get'].set_defaults(func=cls.commandline_prefix_get)
+
         parser['prefix-set'] = parser['sub'].add_parser('prefix-set', parents=parents)
         parser['prefix-set'].add_argument('prefix', help="3 Byte address prefix (f.i. '00:16:3e')")
         parser['prefix-set'].set_defaults(func=cls.commandline_prefix_set)
-
-        parser['prefix-get'] = parser['sub'].add_parser('prefix-get', parents=parents)
-        parser['prefix-get'].set_defaults(func=cls.commandline_prefix_get)

@@ -39,20 +39,37 @@ class Error(sexy.Error):
 class Mac(object):
 
     def __init__(self):
-        self.base_dir = os.path.join(DB.get_default_db_dir(), "mac")
+        self.base_dir = self.get_base_dir()
 
-        self._init_dir()
-
-    _prefix  = fsproperty.FileStringProperty(lambda obj: os.path.join(obj.base_dir, "prefix"))
-    _free    = fsproperty.FileListProperty(lambda obj: os.path.join(obj.base_dir, "free"))
+    _prefix = fsproperty.FileStringProperty(lambda obj: os.path.join(obj.base_dir, "prefix"))
+    free   = fsproperty.FileListProperty(lambda obj: os.path.join(obj.base_dir, "free"))
     last    = fsproperty.FileStringProperty(lambda obj: os.path.join(obj.base_dir, "last"))
 
-    def _init_dir(self):
+    def _init_base_dir(self):
         try:
             os.makedirs(self.base_dir, exist_ok=True)
         except OSError as e:
             raise Error(e)
 
+    @staticmethod
+    def validate_mac(mac):
+        if not re.match(r'([0-9A-F]{2}[-:]){5}[0-9A-F]{2}$', mac, re.I):
+            raise Error("Not a valid mac address: %s" % mac)
+
+    def free_append(self, mac):
+        if mac in self.free:
+            raise Error("Mac already in free database: %s" % mac)
+
+        self.free.append(mac)
+
+
+    @staticmethod
+    def get_base_dir():
+        return os.path.join(DB.get_default_db_dir(), "mac")
+
+    @classmethod
+    def exists(cls):
+        return os.path.exists(cls.get_base_dir())
 
     def get_next(self):
         if not self.prefix:
@@ -99,7 +116,14 @@ class Mac(object):
     @classmethod
     def commandline_free_add(cls, args):
         mac = Mac()
-        print(mac.get_next())
+        mac.validate_mac(args.address)
+        mac.free_append(args.address)
+
+    @classmethod
+    def commandline_free_list(cls, args):
+        mac = Mac()
+        for mac in mac.free:
+            print(mac)
 
     @classmethod
     def commandline_prefix_set(cls, args):
@@ -123,9 +147,13 @@ class Mac(object):
         parser = {}
         parser['sub'] = parent_parser.add_subparsers(title="Mac Commands")
 
-        parser['free-add'] = parser['sub'].add_parser('free', parents=parents)
+        parser['free-add'] = parser['sub'].add_parser('free-add', parents=parents)
         parser['free-add'].add_argument('address', help='Address to add to free database')
         parser['free-add'].set_defaults(func=cls.commandline_free_add)
+
+        parser['free-list'] = parser['sub'].add_parser('free-list', parents=parents,
+            help="List free mac addresses")
+        parser['free-list'].set_defaults(func=cls.commandline_free_list)
 
         parser['generate'] = parser['sub'].add_parser('generate', parents=parents)
         parser['generate'].set_defaults(func=cls.commandline_generate)

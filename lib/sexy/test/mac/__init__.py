@@ -28,6 +28,7 @@ import unittest
 class MacTest(unittest.TestCase):
     def setUp(self):
         self.mac = sexy.mac.Mac()
+
         self.temp_dir = tempfile.mkdtemp()
 
         self.mac.base_dir = self.temp_dir

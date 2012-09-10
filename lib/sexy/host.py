@@ -40,16 +40,16 @@ class Error(sexy.Error):
 class Host(object):
 
     def __init__(self, fqdn):
-        self.host_dir = self.get_host_dir(fqdn)
+        self.base_dir = self.get_base_dir(fqdn)
         self.fqdn = fqdn
 
-    _host_type = fsproperty.FileStringProperty(lambda obj: os.path.join(obj.host_dir, "host_type"))
-    disks  = fsproperty.DirectoryDictProperty(lambda obj: os.path.join(obj.host_dir, 'disks'))
+    _host_type = fsproperty.FileStringProperty(lambda obj: os.path.join(obj.base_dir, "host_type"))
+    disks  = fsproperty.DirectoryDictProperty(lambda obj: os.path.join(obj.base_dir, 'disks'))
 
-    def create(self, host_type):
+    def _init_base_dir(self, host_type):
         """Create base directory of host"""
         try:
-            os.makedirs(self.host_dir, exist_ok=True)
+            os.makedirs(self.base_dir, exist_ok=True)
         except OSError as e:
             raise Error(e)
 
@@ -70,12 +70,12 @@ class Host(object):
         self._host_type = host_type
 
     @staticmethod
-    def get_host_dir(fqdn):
+    def get_base_dir(fqdn):
         return os.path.join(DB.get_default_db_dir(), "host", fqdn)
 
     @classmethod
     def exists(cls, fqdn):
-        return os.path.exists(cls.get_host_dir(fqdn))
+        return os.path.exists(cls.get_base_dir(fqdn))
 
     @staticmethod
     def convert_si_prefixed_size_values(value):
@@ -132,7 +132,7 @@ class Host(object):
 
         host = cls(fqdn=args.fqdn)
         host.validate_host_type(args.type)
-        host.create(args.type)
+        host._init_base_dir(args.type)
 
     @classmethod
     def commandline_disk_add(cls, args):

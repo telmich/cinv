@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-# 2010-2011 Steven Armstrong (steven-sexy at armstrong.cc)
+# 2010-2011 Steven Armstrong (steven-cdist at armstrong.cc)
 #
 # This file is part of sexy.
 #

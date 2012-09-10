@@ -1,0 +1,124 @@
+db:
+
+~/.sexy
+    /db/
+        /host/
+            <fqdn>/
+                disk/
+                    <name>/
+                        size # in Bytes
+                nic/
+                    <macaddr>
+                type    # hw or vm
+        /net-ipv4/
+            <subnet>/
+                mask
+                address/
+                    <ipv4addr>:<macaddr>
+
+        /mac/
+            prefix      # to be used for mac address generation
+            last        # last assigned mac address
+            free        # list of freed mac addresses
+            
+    /backend/
+        /host/
+            add
+            disk-add
+            apply
+        /net-ipv4/
+        /mac/
+            set-prefix
+
+--------------------------------------------------------------------------------
+Area consists of:
+    Arguments
+    DB Entry definition
+    Backend definition + "Hooks"
+        apply is always defined, but different parameters possible
+--------------------------------------------------------------------------------
+x sexy host add <fqdn> <type>           # hw | vm
+sexy host disk-add <fqdn> <size>        # size is given
+sexy host nic-add <fqdn> <macaddr>      # nico01 00:00:00....
+sexy host nic-del <fqdn> <macaddr>      # nico01 00:00:00.....
+sexy host nic-list <fqdn>
+
+sexy host memory-set <amount>           # allow k,m,g,t, suffices
+sexy host cpu-set <amount >             # amount of cpus / cores
+
+
+sexy host vmhost-set <fqdn> <vmhost> # error if type != vm
+
+sexy host list [--type <hw|vm>]
+sexy host apply <fqdn|all>
+--------------------------------------------------------------------------------
+sexy net-ipv4 add <subnet>/<mask>
+sexy net-ipv4 del <subnet>
+
+sexy net-ipv4 addr-add <subnet> <macaddr> [ipv4addr]
+sexy net-ipv4 addr-del <subnet> <macaddr>
+sexy net-ipv4 addr-get <subnet> <macaddr> # returns ipv4addr
+
+sexy net-ipv4 apply <subnet|all>
+sexy net-ipv4 check <subnet|all>
+sexy net-ipv4 list
+
+--------------------------------------------------------------------------------
+
+sexy mac-generate               # stdout = next
+sexy mac-del <macaddr>          # write into free database
+sexy mac-setprefix <prefix>     # prefix to use to generate mac addresses
+
+--------------------------------------------------------------------------------
+Create VM: <fqdn> => "rails"
+
+    sexy host add rails-vm-inx01.intra.local.ch --type vm
+    sexy host set-vmhost rails-vm-inx01.intra.local.ch kvm-hw-inx01
+    sexy host disk-add rails-vm-inx01.intra.local.ch 20G
+    newmac1=$(sexy mac-generate)
+    newmac2=$(sexy mac-generate)
+
+    sexy host nic-add rails-vm-inx01.intra.local.ch $newmac1
+    sexy host nic-add rails-vm-inx01.intra.local.ch $newmac2
+
+    sexy net-ipv4 addr-add 10.182.0.0 $newmac1
+    sexy net-ipv4 addr-add 10.182.64.0 $newmac2
+
+    sexy host apply --all 
+    sexy host apply rails-vm-inx01.intra.local.ch
+
+        # disk erzeugen (da type == vm)
+        # nics "erzeugen" (da type == vm)
+        # 
+    sexy net-ipv4 apply all / 10.182.0.0 + 10.182.64.0
+        # dhcp / dns konfigurieren
+
+    WOREIN KOMMEN DIESE ZEILEN??????s
+
+--------------------------------------------------------------------------------
+Backends:
+    gleiche parameter wie apply + umgebungsvariablen mit info zu wo die DB ist?
+--------------------------------------------------------------------------------
+Konsens:
+    Async, da Aktionen lange dauern können (e-mail, cdist run)
+
+--------------------------------------------------------------------------------
+Andere Ideen:
+
+sexy vm2 add <fqdn> # query auf host
+
+
+sexy vm1 add <VMHOST> <fqdn>        # check for existence of vmhost
+sexy vm1 disk-add <fqdn> <size>     # size is choosen
+sexy vm1 nic-add <fqdn> <macaddr>   # nico01 00:00:00....
+sexy vm1 nic-del <fqdn> <macaddr>   # nico01 00:00:00.....
+sexy vm1 nic-list <fqdn>
+
+sexy vm1 apply <VMHOST|all>
+
+# anderes backend als host
+# sexy vm storage-pool-add ???????
+
+
+    #ip1=$(sexy net-ipv4 addr-get 10.182.0.0 $newmac1)
+    #ip2=$(sexy net-ipv4 addr-get 10.182.64.0 $newmac2)

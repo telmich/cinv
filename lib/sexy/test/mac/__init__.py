@@ -20,16 +20,21 @@
 #
 #
 
-import sexy.host
+import sexy.mac
+import shutil
+import tempfile
 import unittest
 
-class HostTest(unittest.TestCase):
+class MacTest(unittest.TestCase):
     def setUp(self):
-        self.host = sexy.host.Host("test.example.org")
+        self.mac = sexy.mac.Mac()
+        self.temp_dir = tempfile.mkdtemp()
 
-    def wrong_host_type(self):
-        self.host.host_type = "wrong type"
+        self.mac.base_dir = self.temp_dir
 
-    def test_prevent_wrong_type(self):
-        self.assertRaises(sexy.host.Error, self.wrong_host_type)
+    def tearDown(self):
+        shutil.rmtree(self.temp_dir)
 
+    def test_overflow(self):
+        self.mac.last = "00:00:00:ff:ff:ff"
+        self.assertRaises(sexy.mac.Error, self.mac.get_next)

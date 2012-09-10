@@ -44,8 +44,8 @@ class Mac(object):
         self._init_dir()
 
     _prefix  = fsproperty.FileStringProperty(lambda obj: os.path.join(obj.base_dir, "prefix"))
+    _free    = fsproperty.FileListProperty(lambda obj: os.path.join(obj.base_dir, "free"))
     last    = fsproperty.FileStringProperty(lambda obj: os.path.join(obj.base_dir, "last"))
-    free    = fsproperty.FileListProperty(lambda obj: os.path.join(obj.base_dir, "free"))
 
     def _init_dir(self):
         try:
@@ -58,6 +58,27 @@ class Mac(object):
         if not self.prefix:
             raise Error("Cannot generate address without prefix - use prefix-set")
 
+        if self.last:
+            # FIXME: raise error, if reaching the end
+
+            suffix = re.search(r'([0-9A-F]{2}[-:]){2}[0-9A-F]{2}$', self.last, re.I)
+            last_number_hex = "0x%s" % suffix.group().replace(":", "")
+            last_number = int(last_number_hex, 16)
+
+        else:
+            last_number = 0
+
+        next_number = last_number + 1
+        next_number_hex = "%0.6x" % next_number
+        next_suffix = "%s:%s:%s" % (next_number_hex[0:2], next_number_hex[2:4], next_number_hex[4:6])
+
+        next_mac = "%s:%s" % (self.prefix, next_suffix)
+
+        self.last = next_mac
+
+        return next_mac
+
+
     @property
     def prefix(self):
         return self._prefix
@@ -69,10 +90,13 @@ class Mac(object):
 
         self._prefix = prefix
 
-
-
     @classmethod
     def commandline_generate(cls, args):
+        mac = Mac()
+        print(mac.get_next())
+
+    @classmethod
+    def commandline_free_add(cls, args):
         mac = Mac()
         print(mac.get_next())
 
@@ -98,11 +122,12 @@ class Mac(object):
         parser = {}
         parser['sub'] = parent_parser.add_subparsers(title="Mac Commands")
 
+        parser['free-add'] = parser['sub'].add_parser('free', parents=parents)
+        parser['free-add'].add_argument('address', help='Address to add to free database')
+        parser['free-add'].set_defaults(func=cls.commandline_free_add)
+
         parser['generate'] = parser['sub'].add_parser('generate', parents=parents)
         parser['generate'].set_defaults(func=cls.commandline_generate)
-
-        parser['free'] = parser['sub'].add_parser('free', parents=parents)
-        parser['free'].add_argument('address', help='Address to add to free database')
 
         parser['prefix-set'] = parser['sub'].add_parser('prefix-set', parents=parents)
         parser['prefix-set'].add_argument('prefix', help="3 Byte address prefix (f.i. '00:16:3e')")

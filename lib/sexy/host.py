@@ -165,6 +165,11 @@ class Host(object):
         host._init_base_dir(args.type)
 
     @classmethod
+    def commandline_apply(cls, args):
+        """Call backend"""
+        pass
+
+    @classmethod
     def commandline_disk_add(cls, args):
 
         if not cls.exists(args.fqdn):
@@ -257,5 +262,8 @@ class Host(object):
         parser['vmhost-set'].add_argument('--vm-host', help='VM Host (only for VMs)',
             required=True)
         parser['vmhost-set'].set_defaults(func=cls.commandline_vmhost_set)
+
+        parser['apply'] = parser['sub'].add_parser('apply', parents=parents)
+        parser['apply'].set_defaults(func=cls.commandline_apply)
 
 

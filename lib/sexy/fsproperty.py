@@ -1,31 +1,31 @@
 # -*- coding: utf-8 -*-
 #
-# 2010-2011 Steven Armstrong (steven-cdist at armstrong.cc)
+# 2010-2011 Steven Armstrong (steven-sexy at armstrong.cc)
 #
-# This file is part of cdist.
+# This file is part of sexy.
 #
-# cdist is free software: you can redistribute it and/or modify
+# sexy is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation, either version 3 of the License, or
 # (at your option) any later version.
 #
-# cdist is distributed in the hope that it will be useful,
+# sexy is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
 #
 # You should have received a copy of the GNU General Public License
-# along with cdist. If not, see <http://www.gnu.org/licenses/>.
+# along with sexy. If not, see <http://www.gnu.org/licenses/>.
 #
 #
 
 import os
 import collections
 
-import cdist
+import sexy
 
 
-class AbsolutePathRequiredError(cdist.Error):
+class AbsolutePathRequiredError(sexy.Error):
     def __init__(self, path):
         self.path = path
 
@@ -70,7 +70,7 @@ class FileList(collections.MutableSequence):
                     fd.write(str(line) + '\n')
         except EnvironmentError as e:
             # should never happen
-            raise cdist.Error(str(e))
+            raise sexy.Error(str(e))
 
     def __repr__(self):
         return repr(list(self))
@@ -115,7 +115,7 @@ class DirectoryDict(collections.MutableMapping):
             if not os.path.isdir(self.path):
                 os.mkdir(self.path)
         except EnvironmentError as e:
-            raise cdist.Error(str(e))
+            raise sexy.Error(str(e))
         if initial is not None:
             self.update(initial)
         if kwargs:
@@ -140,7 +140,7 @@ class DirectoryDict(collections.MutableMapping):
                 else:
                     fd.write(str(value))
         except EnvironmentError as e:
-            raise cdist.Error(str(e))
+            raise sexy.Error(str(e))
 
     def __delitem__(self, key):
         try:
@@ -152,13 +152,13 @@ class DirectoryDict(collections.MutableMapping):
         try:
             return iter(os.listdir(self.path))
         except EnvironmentError as e:
-            raise cdist.Error(str(e))
+            raise sexy.Error(str(e))
 
     def __len__(self):
         try:
             return len(os.listdir(self.path))
         except EnvironmentError as e:
-            raise cdist.Error(str(e))
+            raise sexy.Error(str(e))
 
 
 class FileBasedProperty(object):
@@ -257,7 +257,7 @@ class FileBooleanProperty(FileBasedProperty):
             try:
                 open(path, "w").close()
             except EnvironmentError as e:
-                raise cdist.Error(str(e))
+                raise sexy.Error(str(e))
         else:
             try:
                 os.remove(path)
@@ -289,7 +289,7 @@ class FileStringProperty(FileBasedProperty):
                 with open(path, "w") as fd:
                     fd.write(str(value))
             except EnvironmentError as e:
-                raise cdist.Error(str(e))
+                raise sexy.Error(str(e))
         else:
             try:
                 os.remove(path)

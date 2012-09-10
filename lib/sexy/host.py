@@ -21,6 +21,7 @@
 #
 
 import argparse
+import logging
 import os.path
 import os
 
@@ -29,6 +30,8 @@ from sexy import fsproperty
 
 from sexy.db import DB
 
+log = logging.getLogger(__name__)
+
 HOST_TYPES = ["hw", "vm"]
 
 class Error(sexy.Error):
@@ -36,58 +39,26 @@ class Error(sexy.Error):
 
 class Host(object):
 
-    def __init__(self, fqdn, host_type=None):
+    def __init__(self, fqdn):
+        self.host_dir = os.path.join(DB.get_default_db_dir(), "host", fqdn)
         self.fqdn = fqdn
-        self.host_type = host_type
-
-        #self.host_dir = os.path.join(DB.get_default_db_dir(), "host", fqdn)
-        self.host_dir = "abc"
+        self._init_dir()
 
     host_type = fsproperty.FileStringProperty(lambda obj: os.path.join(obj.host_dir, "host_type"))
+    disks  = fsproperty.DirectoryDictProperty(lambda obj: os.path.join(obj.host_dir, 'disks'))
 
-
-    @classmethod
-    def from_disk(cls, fqdn):
-        """Read entry from disk"""
-
-        self.host_dir = os.path.join(DB.get_default_db_dir(), "host", fqdn)
-        self.db = DB(prefix="host")
-
-        if not self.db.dir_exist(fqdn):
-            raise Error("Host does not exist: %s" % fqdn)
-
-        cls(fqdn)
-
-        #self.db.oneliner_add(self.fqdn, "host_type", self.host_type)
-
-    def to_disk(self, exist_ok=True):
-        """Write entry to disk"""
-
-        self.verify()
-
-        self.db.dir_add(self.fqdn, exist_ok=exist_ok)
-        self.db.oneliner_add(self.fqdn, "host_type", self.host_type)
-
-    def verify(self):
-        self.verify_host_type()
-        self.verify_host_fqdn()
-
-    def verify_host_fqdn(self):
-        if not self.fqdn:
-            raise Error("Required FQDN not given")
-
-    def verify_host_type(self):
-        """Verify host type is correct"""
-
-        if self.host_type not in HOST_TYPES:
-            raise Error("Host type must be one of %s" % (" ".join(HOST_TYPES)))
+    def _init_dir(self):
+        try:
+            os.makedirs(self.host_dir, exist_ok=True)
+        except OSError as e:
+            raise Error(e)
 
     @staticmethod
     def convert_si_prefixed_size_values(value):
         """Convert given size of 101 G to bytes"""
 
         prefix = int(value[:-1])
-        suffix = value[-1]
+        suffix = value[-1].lower()
 
         if suffix == 'k':
             bytes = prefix * (1024**1)
@@ -99,10 +70,31 @@ class Host(object):
             bytes = prefix * (1024**4)
         elif suffix == 'p':
             bytes = prefix * (1024**5)
+        elif suffix == 'e':
+            bytes = prefix * (1024**6)
+        elif suffix == 'z':
+            bytes = prefix * (1024**7)
+        elif suffix == 'y':
+            bytes = prefix * (1024**8)
         else:
             raise Error("Unsupported suffix %s" % (suffix))
 
         return bytes
+
+    def get_next_disk_name(self):
+        """Get next generic disk name"""
+
+        base_name = "disk"
+
+        if self.disks:
+            last_name = sorted([key for key in self.disks if key.startswith(base_name)])[-1]
+            last_number = last_name.lstrip(base_name)
+            next_number = int(last_number) + 1
+        else:
+            next_number = 0
+
+        return "%s%d" % (base_name, next_number)
+
 
     @classmethod
     def commandline_list(cls, args):
@@ -111,13 +103,21 @@ class Host(object):
 
     @classmethod
     def commandline_add(cls, args):
-        host = cls(fqdn=args.fqdn, host_type = args.type)
-
-        host.to_disk(exist_ok=False)
+        host = cls(fqdn=args.fqdn)
+        host.host_type = args.type
 
     @classmethod
     def commandline_disk_add(cls, args):
         host = cls(fqdn=args.fqdn)
+        size_bytes = cls.convert_si_prefixed_size_values(args.size)
+
+        if args.name:
+            if args.name in host.disks:
+                raise Error("Disk %s already existing")
+        else:
+            name = host.get_next_disk_name()
+
+        log.info("Adding disk %s (%s Bytes)" % (name, size_bytes))
 
 
     @classmethod
@@ -134,7 +134,7 @@ class Host(object):
         parser['add'].set_defaults(func=cls.commandline_add)
 
         parser['del'] = parser['sub'].add_parser('del', parents=parents)
-        parser['add'].add_argument('fqdn', help='Host name')
+        parser['del'].add_argument('fqdn', help='Host name')
 
         parser['disk-add'] = parser['sub'].add_parser('disk-add', parents=parents)
         parser['disk-add'].add_argument('fqdn', help='Host name')

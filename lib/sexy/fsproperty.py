@@ -278,7 +278,7 @@ class FileStringProperty(FileBasedProperty):
         value = ""
         try:
             with open(path, "r") as fd:
-                value = fd.read()
+                value = fd.read().rstrip('\n')
         except EnvironmentError:
             pass
         return value

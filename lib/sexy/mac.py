@@ -1,0 +1,78 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+#
+# 2012 Nico Schottelius (nico-sexy at schottelius.org)
+#
+# This file is part of sexy.
+#
+# sexy is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# sexy is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with sexy. If not, see <http://www.gnu.org/licenses/>.
+#
+#
+
+import argparse
+import logging
+import os.path
+import os
+
+import sexy
+from sexy import fsproperty
+
+from sexy.db import DB
+
+log = logging.getLogger(__name__)
+
+class Error(sexy.Error):
+    pass
+
+class Mac(object):
+
+    def __init__(self, fqdn):
+        self.host_dir = self.get_host_dir(fqdn)
+        self.fqdn = fqdn
+        self._init_dir()
+
+    host_type = fsproperty.FileStringProperty(lambda obj: os.path.join(obj.host_dir, "host_type"))
+    disks  = fsproperty.DirectoryDictProperty(lambda obj: os.path.join(obj.host_dir, 'disks'))
+
+    def _init_dir(self):
+        try:
+            os.makedirs(self.host_dir, exist_ok=True)
+        except OSError as e:
+            raise Error(e)
+
+    @classmethod
+    def commandline_generate(cls, args):
+        print(args)
+        pass
+
+    @classmethod
+    def commandline_add(cls, args):
+        host = cls(fqdn=args.fqdn)
+        host.host_type = args.type
+
+    @classmethod
+    def commandline_args(cls, parent_parser, parents):
+        """Add us to the parent parser and add all parents to our parsers"""
+
+        parser = {}
+        parser['sub'] = parent_parser.add_subparsers(title="Mac Commands")
+
+        parser['generate'] = parser['sub'].add_parser('generate', parents=parents)
+
+        parser['free'] = parser['sub'].add_parser('free', parents=parents)
+        parser['free'].add_argument('address', help='Address to add to free database')
+
+        parser['prefix-set'] = parser['sub'].add_parser('prefix-set', parents=parents)
+        parser['prefix-set'].add_argument('prefix', help='Address prefix for generating (3 bytes)')
+        parser['prefix-set'].set_defaults(func=cls.commandline_set_prefix)

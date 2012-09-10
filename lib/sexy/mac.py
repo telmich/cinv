@@ -72,6 +72,9 @@ class Mac(object):
         return os.path.exists(cls.get_base_dir())
 
     def get_next(self):
+        if self.free:
+            return self.free.pop()
+            
         if not self.prefix:
             raise Error("Cannot generate address without prefix - use prefix-set")
 

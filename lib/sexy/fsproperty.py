@@ -288,7 +288,7 @@ class FileStringProperty(FileBasedProperty):
         if value:
             try:
                 with open(path, "w") as fd:
-                    fd.write(str(value))
+                    fd.write("%s\n" % str(value))
             except EnvironmentError as e:
                 raise sexy.Error(str(e))
         else:

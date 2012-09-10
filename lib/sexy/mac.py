@@ -86,10 +86,10 @@ class Mac(object):
             if last_number == int('0xffffff', 16):
                 raise Error("Exhausted all possible mac addresses - try to free some")
 
+            next_number = last_number + 1
         else:
-            last_number = 0
+            next_number = 0
 
-        next_number = last_number + 1
         next_number_hex = "%0.6x" % next_number
         next_suffix = "%s:%s:%s" % (next_number_hex[0:2], next_number_hex[2:4], next_number_hex[4:6])
 

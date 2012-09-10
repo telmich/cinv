@@ -1,3 +1,5 @@
+testedpub: test pub
+
 test:
 	PYTHONPATH=$$PYTHONPATH:$$(pwd -P)/lib python3 -m sexy.test
 

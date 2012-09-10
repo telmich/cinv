@@ -46,15 +46,33 @@ class DB(object):
 
         return db_dir
 
-    def entry_add(self, key, exist_ok=False):
+    def dir_add(self, key, exist_ok=True):
         """Create (new) db entry"""
 
         self.verify_prefix()
-        entry_dir = os.path.join(self.db_dir, self.prefix, key)
+        sub_dir = os.path.join(self.prefix, key)
+        entry_dir = os.path.join(self.db_dir, sub_dir)
 
         try:
             os.makedirs(entry_dir, exist_ok=exist_ok)
         except OSError as e:
+            raise Error(e)
+
+    def oneliner_add(self, sub_dir, key, value, exist_ok=True):
+        """Create (new) oneliner entry"""
+
+        self.verify_prefix()
+        entry = os.path.join(self.db_dir, self.prefix, sub_dir, key)
+
+        if not exist_ok:
+            if os.path.exists(entry):
+                raise Error("Key %s already exists for %s" % (key, os.path.join(self.prefix, sub_dir)))
+
+        try:
+            with open(entry, "w") as fd:
+                fd.write("%s\n" % value)
+
+        except IOError as e:
             raise Error(e)
 
     def verify_prefix(self):

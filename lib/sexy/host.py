@@ -42,7 +42,9 @@ class Host(object):
         """Write entry to disk"""
 
         self.verify()
-        self.db.entry_add(self.fqdn, exist_ok=exist_ok)
+
+        self.db.dir_add(self.fqdn, exist_ok=exist_ok)
+        self.db.oneliner_add(self.fqdn, "host_type", self.host_type)
 
     def verify(self):
         self.verify_host_type()

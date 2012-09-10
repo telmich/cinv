@@ -42,16 +42,32 @@ class Host(object):
     def __init__(self, fqdn):
         self.host_dir = self.get_host_dir(fqdn)
         self.fqdn = fqdn
-        self._init_dir()
 
-    host_type = fsproperty.FileStringProperty(lambda obj: os.path.join(obj.host_dir, "host_type"))
+    _host_type = fsproperty.FileStringProperty(lambda obj: os.path.join(obj.host_dir, "host_type"))
     disks  = fsproperty.DirectoryDictProperty(lambda obj: os.path.join(obj.host_dir, 'disks'))
 
-    def _init_dir(self):
+    def create(self, host_type):
+        """Create base directory of host"""
         try:
             os.makedirs(self.host_dir, exist_ok=True)
         except OSError as e:
             raise Error(e)
+
+        self.host_type = host_type
+
+    @staticmethod
+    def validate_host_type(host_type):
+        if host_type not in HOST_TYPES:
+            raise Error("Host type must be one of %s" % (" ".join(HOST_TYPES)))
+
+    @property
+    def host_type(self):
+        return self._host_type
+
+    @host_type.setter
+    def host_type(self, host_type):
+        self.validate_host_type(host_type)
+        self._host_type = host_type
 
     @staticmethod
     def get_host_dir(fqdn):
@@ -111,8 +127,12 @@ class Host(object):
 
     @classmethod
     def commandline_add(cls, args):
+        if cls.exists(args.fqdn):
+            raise Error("Host already exist: %s" % args.fqdn)
+
         host = cls(fqdn=args.fqdn)
-        host.host_type = args.type
+        host.validate_host_type(args.type)
+        host.create(args.type)
 
     @classmethod
     def commandline_disk_add(cls, args):

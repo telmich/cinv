@@ -59,11 +59,12 @@ class Mac(object):
             raise Error("Cannot generate address without prefix - use prefix-set")
 
         if self.last:
-            # FIXME: raise error, if reaching the end
-
             suffix = re.search(r'([0-9A-F]{2}[-:]){2}[0-9A-F]{2}$', self.last, re.I)
             last_number_hex = "0x%s" % suffix.group().replace(":", "")
             last_number = int(last_number_hex, 16)
+
+            if last_number == int('0xffffff', 16):
+                raise Error("Exhausted all possible mac addresses - try to free some")
 
         else:
             last_number = 0

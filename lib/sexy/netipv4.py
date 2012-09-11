@@ -151,6 +151,10 @@ class NetIPv4(object):
 
     def addr_add(self, mac_address, ipv4_address):
         """ Add an address to the network"""
+        
+        # Ensure given mac address is valid
+        import sexy.mac
+        sexy.mac.Mac.validate_mac(mac_address)
 
         if mac_address in self.address:
             raise Error("Mac address %s already using IPv4a %s" % (mac_address, self.address[mac_address]))
@@ -177,7 +181,9 @@ class NetIPv4(object):
         if next_ipv4_address == self.broadcast():
             raise Error("Next address is broadcast - cannot get new one")
 
-        log.debug(next_ipv4_address)
+        self.last = next_ipv4_address
+        log.debug("Next IPv4 address: %s" % next_ipv4_address)
+
         return next_ipv4_address
 
 

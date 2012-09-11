@@ -178,11 +178,7 @@ class Host(object):
         else:
             hosts = args.fqdn
 
-        backend_dir = os.path.join(sexy.get_base_dir("backend"), "host")
-        apply_path = os.path.join(backend_dir, "apply")
-        os.environ['__sexy_db_dir'] = os.path.join(sexy.get_base_dir("db"), "host")
-
-        log.debug("Appling with %s for: %s" % (apply_path, " ".join(hosts)))
+        sexy.backend_exec("host", "apply", *hosts)
 
     @classmethod
     def commandline_disk_add(cls, args):

@@ -24,6 +24,7 @@ import argparse
 import logging
 import os.path
 import os
+import shutil
 
 import sexy
 from sexy import fsproperty
@@ -163,6 +164,24 @@ class Host(object):
         host._init_base_dir(args.type)
 
     @classmethod
+    def commandline_del(cls, args):
+        if not cls.exists(args.fqdn):
+            if not args.missing_ignore:
+                raise Error("Host does not exist: %s" % args.fqdn)
+            else:
+                return
+
+        host = cls(fqdn=args.fqdn)
+
+        if not args.recursive:
+            if host.nics or host.disks:
+                raise Error("Cannot delete, host contains disks or nics: %s" % args.fqdn)
+
+        log.debug("Removing %s ..." % host.base_dir)
+        shutil.rmtree(host.base_dir)
+
+                
+    @classmethod
     def commandline_apply(cls, args):
         """Call backend"""
 
@@ -247,7 +266,12 @@ class Host(object):
         parser['add'].set_defaults(func=cls.commandline_add)
 
         parser['del'] = parser['sub'].add_parser('del', parents=parents)
+        parser['del'].add_argument('-r', '--recursive', help='Delete host and all parts',
+            action='store_true')
+        parser['del'].add_argument('-i', '--ignore-missing', 
+            help='Do not fail if host is missing', action='store_true')
         parser['del'].add_argument('fqdn', help='Host name')
+        parser['del'].set_defaults(func=cls.commandline_del)
 
         parser['disk-add'] = parser['sub'].add_parser('disk-add', parents=parents)
         parser['disk-add'].add_argument('fqdn', help='Host name')

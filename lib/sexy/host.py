@@ -180,10 +180,12 @@ class Host(object):
         log.debug("Removing %s ..." % host.base_dir)
         shutil.rmtree(host.base_dir)
 
+        sexy.backend_exec("host", "del", [args.fqdn])
+
                 
     @classmethod
     def commandline_apply(cls, args):
-        """Call backend"""
+        """Apply changes using the backend"""
 
         if not args.all and not args.fqdn and not args.type:
             raise Error("Required to pass either FQDNs, type or --all")
@@ -215,6 +217,8 @@ class Host(object):
             name = host.get_next_name("disk")
 
         host.disks[name] = size_bytes
+
+        sexy.backend_exec("host", "disk_add", [args.fqdn, name, str(size_bytes)])
 
         log.info("Added disk %s (%s Bytes)" % (name, size_bytes))
 

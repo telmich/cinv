@@ -60,7 +60,7 @@ def backend_exec(area, command, args, missing_ok=True):
 
     if not os.path.exists(command):
         if missing_ok:
-            log.debug("%s ignores missing command: %s" % (area, command))
+            log.debug("%s ignores missing backend command: %s" % (area, command))
             return True
         else:
             raise Error("%s misses backend command: %s" % (area, command))

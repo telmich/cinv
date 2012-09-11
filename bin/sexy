@@ -53,7 +53,7 @@ def commandline():
     # net-ipv4
     import sexy.netipv4
     parser['net-ipv4'] = {}
-    parser['host']['main'] = parser['mainsub'].add_parser('net-ipv4', 
+    parser['net-ipv4']['main'] = parser['mainsub'].add_parser('net-ipv4', 
         parents=[parser['loglevel']])
     sexy.netipv4.NetIPv4.commandline_args(parser['net-ipv4']['main'], [parser['loglevel']])
 

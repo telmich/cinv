@@ -24,7 +24,10 @@ import argparse
 import logging
 import os.path
 import os
+import re
 import shutil
+import socket
+import struct
 
 import sexy
 from sexy import fsproperty
@@ -38,110 +41,103 @@ class Error(sexy.Error):
 
 class NetIPv4(object):
 
-    def __init__(self, fqdn):
-        self.base_dir = self.get_base_dir(fqdn)
-        self.fqdn = fqdn
+    def __init__(self, subnet):
 
-    disks       = fsproperty.DirectoryDictProperty(lambda obj: os.path.join(obj.base_dir, 'disks'))
-    _host_type  = fsproperty.FileStringProperty(lambda obj: os.path.join(obj.base_dir, "host_type"))
-    _memory     = fsproperty.FileStringProperty(lambda obj: os.path.join(obj.base_dir, "memory"))
-    nics        = fsproperty.DirectoryDictProperty(lambda obj: os.path.join(obj.base_dir, 'nics'))
-    _vm_host    = fsproperty.FileStringProperty(lambda obj: os.path.join(obj.base_dir, "vm_host"))
+        if not self.validate_ipv4address(subnet):
+            raise Error("Not a valid IPv4 address: %s" % subnet)
 
-    def _init_base_dir(self, host_type):
-        """Create base directory of host"""
+        self.base_dir = self.get_base_dir(subnet)
+        self.subnet   = subnet
+
+    _mask   = fsproperty.FileStringProperty(lambda obj: os.path.join(obj.base_dir, "mask"))
+    free    = fsproperty.FileListProperty(lambda obj: os.path.join(obj.base_dir, "free"))
+    last    = fsproperty.FileStringProperty(lambda obj: os.path.join(obj.base_dir, "last"))
+    address = fsproperty.DirectoryDictProperty(lambda obj: os.path.join(obj.base_dir, 'address'))
+
+    def _init_base_dir(self, mask):
+        """Create base directory"""
+
         try:
             os.makedirs(self.base_dir, exist_ok=True)
         except OSError as e:
             raise Error(e)
 
-        self.host_type = host_type
+        self.mask = mask
 
     @staticmethod
-    def validate_host_type(host_type):
-        if host_type not in HOST_TYPES:
-            raise Error("Host type must be one of %s" % (" ".join(HOST_TYPES)))
+    def subnet_split(subnet):
+        return subnet.split('/')
 
-    @property
-    def host_type(self):
-        return self._host_type
+    def validate_mask(self, mask):
+        self.validate_mask_int_range(mask)
+        self.validate_subnetaddress(mask)
 
-    @host_type.setter
-    def host_type(self, host_type):
-        self.validate_host_type(host_type)
-        self._host_type = host_type
+    def validate_subnetaddress(self, mask):
+        """Check whether given IPv4 address is the subnet address"""
 
-    @property
-    def vm_host(self):
-        return self._vmhost
+        ip_dec = struct.unpack('>L',socket.inet_aton(self.subnet))[0]
+        mask_dec = (1<<32) - (1<<32>> int(mask))
 
-    @vm_host.setter
-    def vm_host(self, vm_host):
-        if not self.host_type == "vm":
-            raise Error("Can only configure vmhost for VMs")
+        subnet_dec = ip_dec & mask_dec
 
-        self._vm_host = vm_host
+        log.debug("%s - %s %s" % (ip_dec, subnet_dec, mask_dec))
+
+        subnet_str = socket.inet_ntoa(struct.pack('>L', subnet_dec))
+
+        if not self.subnet == subnet_str:
+            raise Error("Given address is not the subnet address (%s != %s)" % (subnet, subnet_str))
+
+        log.debug("%s/%s" % (self.subnet, subnet_str))
+
 
     @staticmethod
-    def get_base_dir(fqdn):
-        return os.path.join(sexy.get_base_dir("db"), "host", fqdn)
+    def validate_mask_int_range(mask):
+        try:
+            mask = int(mask)
+        except ValueError as e:
+            raise Error("Mask must be an integer")
+
+        if mask not in range(1, 33):
+            raise Error("Mask must be between 1 and 32 (inclusive)")
+
+        return mask
+
+    @staticmethod
+    def validate_ipv4address(ipv4address):
+        return re.match('^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])$', ipv4address)
+
+
+    @property
+    def mask(self):
+        return self._mask
+
+    @mask.setter
+    def mask(self, mask):
+        mask = self.validate_mask(mask)
+        self._mask = str(mask)
+
+    @staticmethod
+    def get_base_dir(subnet):
+        return os.path.join(sexy.get_base_dir("db"), "net-ipv4", subnet)
 
     @classmethod
-    def hosts_list(cls, host_type=None):
-        hosts = []
+    def subnet_list(cls):
+        subnets = []
 
-        if host_type:
-            if host_type not in HOST_TYPES:
-                raise Error("Host type must be one of %s" % (" ".join(HOST_TYPES)))
-
-        base_dir = os.path.join(sexy.get_base_dir("db"), "host")
+        base_dir = os.path.join(sexy.get_base_dir("db"), "net-ipv4")
 
         for entry in os.listdir(base_dir):
-            if host_type:
-                host = cls(entry)
-                if host.host_type == host_type:
-                    hosts.append(entry)
-            else:
-                hosts.append(entry)
+            subnets.append(entry)
 
-        return hosts
+        return subnets
 
     @classmethod
-    def exists(cls, fqdn):
-        return os.path.exists(cls.get_base_dir(fqdn))
+    def exists(cls, subnet):
+        return os.path.exists(cls.get_base_dir(subnet))
 
-    @staticmethod
-    def convert_si_prefixed_size_values(value):
-        """Convert given size of 101 G to bytes"""
+    def get_next_ipv4address(self):
+        """Get next address from network"""
 
-        prefix = int(value[:-1])
-        suffix = value[-1].lower()
-
-        if suffix == 'k':
-            bytes = prefix * (1024**1)
-        elif suffix == 'm':
-            bytes = prefix * (1024**2)
-        elif suffix == 'g':
-            bytes = prefix * (1024**3)
-        elif suffix == 't':
-            bytes = prefix * (1024**4)
-        elif suffix == 'p':
-            bytes = prefix * (1024**5)
-        elif suffix == 'e':
-            bytes = prefix * (1024**6)
-        elif suffix == 'z':
-            bytes = prefix * (1024**7)
-        elif suffix == 'y':
-            bytes = prefix * (1024**8)
-        else:
-            raise Error("Unsupported suffix %s" % (suffix))
-
-        return bytes
-
-    def get_next_name(self, area):
-        """Get next generic disk name"""
-
-        base_name = area
         attribute = getattr(self, "%ss" % area)
 
         if attribute:
@@ -154,14 +150,20 @@ class NetIPv4(object):
         return "%s%d" % (base_name, next_number)
 
 
+    ######################################################################
     @classmethod
     def commandline_add(cls, args):
-        if cls.exists(args.fqdn):
-            raise Error("Host already exist: %s" % args.fqdn)
+        try:
+            subnet, mask = cls.subnet_split(args.subnet)
+        except ValueError:
+            raise Error("Invalid subnet syntax (expected <IPv4addr>/<mask>): %s" % args.subnet)
 
-        host = cls(fqdn=args.fqdn)
-        host.validate_host_type(args.type)
-        host._init_base_dir(args.type)
+        if cls.exists(subnet):
+            raise Error("Network already exist: %s" % subnet)
+
+        net = cls(subnet)
+        net.validate_mask(mask)
+        net._init_base_dir(mask)
 
     @classmethod
     def commandline_del(cls, args):
@@ -228,7 +230,7 @@ class NetIPv4(object):
             print(host)
 
     @classmethod
-    def commandline_nic_add(cls, args):
+    def commandline_addr_add(cls, args):
 
         if not cls.exists(args.fqdn):
             raise Error("Host does not exist: %s" % args.fqdn)
@@ -244,17 +246,6 @@ class NetIPv4(object):
         host.nics[name] = args.address
 
         log.info("Added nic %s (%s)" % (name, args.address))
-
-    @classmethod
-    def commandline_vmhost_set(cls, args):
-
-        if not cls.exists(args.fqdn):
-            raise Error("Host does not exist: %s" % args.fqdn)
-
-        host = cls(fqdn=args.fqdn)
-        host.vm_host = args.vm_host
-
-        log.info("VMHost for %s = %s" % (args.fqdn, args.vm_host))
 
     @classmethod
     def commandline_args(cls, parent_parser, parents):
@@ -282,32 +273,15 @@ class NetIPv4(object):
         parser['addr-add'].add_argument('-n', '--name', help='Disk name')
         parser['addr-add'].set_defaults(func=cls.commandline_addr_add)
 
-        parser['nic-add'] = parser['sub'].add_parser('nic-add', parents=parents)
-        parser['nic-add'].add_argument('fqdn', help='Host name')
-        parser['nic-add'].add_argument('-a', '--address', help='Mac address',
-            required=True)
-        parser['nic-add'].add_argument('-n', '--name', help='Nic name')
-        parser['nic-add'].set_defaults(func=cls.commandline_nic_add)
-
         parser['list'] = parser['sub'].add_parser('list', parents=parents)
-        parser['list'].add_argument('-t', '--type', help='Host Type',
-            choices=["hw","vm"], required=False)
         parser['list'].set_defaults(func=cls.commandline_list)
 
-        parser['vmhost-set'] = parser['sub'].add_parser('vmhost-set', parents=parents)
-        parser['vmhost-set'].add_argument('fqdn', help='Host name')
-        parser['vmhost-set'].add_argument('--vm-host', help='VM Host (only for VMs)',
-            required=True)
-        parser['vmhost-set'].set_defaults(func=cls.commandline_vmhost_set)
-
         parser['apply'] = parser['sub'].add_parser('apply', parents=parents)
-        parser['apply'].add_argument('fqdn', help='Host name',
+        parser['apply'].add_argument('subnet', help='Subnet name and mask (a.b.c.d/m)',
             nargs='*')
         parser['apply'].add_argument('-a', '--all', 
-            help='Apply settings for all hosts', required = False,
+            help='Apply settings for all subnets', required = False,
             action='store_true')
-        parser['apply'].add_argument('-t', '--type', help='Host Type (implies --all)',
-            choices=["hw","vm"], required=False)
         parser['apply'].set_defaults(func=cls.commandline_apply)
 
 

@@ -203,6 +203,20 @@ class NetIPv4(object):
 
         sexy.backend_exec("net-ipv4", "add", [subnet, mask])
 
+    @classmethod
+    def commandline_apply(cls, args):
+        """Apply changes using the backend"""
+
+        if not args.all and not args.subnet:
+            raise Error("Required to pass either subnet(s) or --all")
+
+        if args.all:
+            subnets = cls.subnet_list()
+        else:
+            subnets = args.subnet
+
+        sexy.backend_exec("net-ipv4", "apply", subnets)
+
 #    @classmethod
 #    def commandline_del(cls, args):
 #        if not cls.exists(args.fqdn):
@@ -223,20 +237,6 @@ class NetIPv4(object):
 #        sexy.backend_exec("host", "del", [args.fqdn])
 
                 
-    @classmethod
-    def commandline_apply(cls, args):
-        """Apply changes using the backend"""
-
-        if not args.all and not args.subnet:
-            raise Error("Required to pass either subnet(s) or --all")
-
-        if args.all:
-            subnets = cls.subnet_list()
-        else:
-            hosts = args.fqdn
-
-        sexy.backend_exec("host", "apply", hosts)
-
     @classmethod
     def commandline_list(cls, args):
         for subnet in cls.subnet_list():
@@ -280,12 +280,12 @@ class NetIPv4(object):
         parser['list'] = parser['sub'].add_parser('list', parents=parents)
         parser['list'].set_defaults(func=cls.commandline_list)
 
-#        parser['apply'] = parser['sub'].add_parser('apply', parents=parents)
-#        parser['apply'].add_argument('subnet', help='Subnet name and mask (a.b.c.d/m)',
-#            nargs='*')
-#        parser['apply'].add_argument('-a', '--all', 
-#            help='Apply settings for all subnets', required = False,
-#            action='store_true')
-#        parser['apply'].set_defaults(func=cls.commandline_apply)
+        parser['apply'] = parser['sub'].add_parser('apply', parents=parents)
+        parser['apply'].add_argument('subnet', help='Subnet name and mask (a.b.c.d/m)',
+            nargs='*')
+        parser['apply'].add_argument('-a', '--all', 
+            help='Apply settings for all subnets', required = False,
+            action='store_true')
+        parser['apply'].set_defaults(func=cls.commandline_apply)
 
 

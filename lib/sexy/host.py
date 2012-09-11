@@ -167,7 +167,20 @@ class Host(object):
     @classmethod
     def commandline_apply(cls, args):
         """Call backend"""
-        pass
+
+        if not args.all and not args.fqdn and not args.type:
+            raise Error("Required to pass either FQDNs, type or --all")
+        if args.type and args.fqdn:
+            raise Error("Cannot combine FQDN list and type")
+
+        if args.type:
+            hosts = cls.hosts_list(args.type)
+        elif args.all:
+            hosts = cls.hosts_list()
+        else:
+            hosts = args.fqdn
+
+        log.debug("Apply for: %s" % (" ".join(hosts)))
 
     @classmethod
     def commandline_disk_add(cls, args):
@@ -264,6 +277,13 @@ class Host(object):
         parser['vmhost-set'].set_defaults(func=cls.commandline_vmhost_set)
 
         parser['apply'] = parser['sub'].add_parser('apply', parents=parents)
+        parser['apply'].add_argument('fqdn', help='Host name',
+            nargs='*')
+        parser['apply'].add_argument('-a', '--all', 
+            help='Apply settings for all hosts', required = False,
+            action='store_true')
+        parser['apply'].add_argument('-t', '--type', help='Host Type (implies --all)',
+            choices=["hw","vm"], required=False)
         parser['apply'].set_defaults(func=cls.commandline_apply)
 
 

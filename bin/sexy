@@ -28,6 +28,8 @@ def commandline():
 
     # Construct parser others can reuse
     parser = {}
+
+    ######################################################################
     # Options _all_ parsers have in common
     parser['loglevel'] = argparse.ArgumentParser(add_help=False)
     parser['loglevel'].add_argument('-d', '--debug',
@@ -37,6 +39,7 @@ def commandline():
         help='Set log level to info, be more verbose',
         action='store_true', default=False)
 
+    ######################################################################
     # Main subcommand parser
     parser['main'] = argparse.ArgumentParser(description='sexy ' + VERSION,
         parents=[parser['loglevel']])
@@ -46,21 +49,15 @@ def commandline():
     parser['main'].epilog = "Get sexy at http://www.nico.schottelius.org/software/sexy/"
     parser['mainsub'] = parser['main'].add_subparsers(title="Commands")
 
+    ######################################################################
     # net-ipv4
+    import sexy.netipv4
     parser['net-ipv4'] = {}
-    parser['net-ipv4']['main'] = parser['mainsub'].add_parser('net-ipv4', 
+    parser['host']['main'] = parser['mainsub'].add_parser('net-ipv4', 
         parents=[parser['loglevel']])
-    parser['net-ipv4']['sub'] = parser['net-ipv4']['main'].add_subparsers(title="net-ipv4 commands")
+    sexy.netipv4.NetIPv4.commandline_args(parser['net-ipv4']['main'], [parser['loglevel']])
 
-    parser['net-ipv4']['add'] = parser['net-ipv4']['sub'].add_parser('add', 
-        parents=[parser['loglevel']])
-    parser['net-ipv4']['add'].add_argument('subnet', help='Subnet to add')
-
-    parser['net-ipv4']['del'] = parser['net-ipv4']['sub'].add_parser('del', 
-        parents=[parser['loglevel']])
-
-    parser['net-ipv4']['del'].add_argument('subnet', help='Subnet to delete')
-
+    ######################################################################
     # host
     import sexy.host
     parser['host'] = {}
@@ -68,6 +65,7 @@ def commandline():
         parents=[parser['loglevel']])
     sexy.host.Host.commandline_args(parser['host']['main'], [parser['loglevel']])
 
+    ######################################################################
     # mac
     import sexy.mac
     parser['mac'] = {}
@@ -75,24 +73,10 @@ def commandline():
         parents=[parser['loglevel']])
     sexy.mac.Mac.commandline_args(parser['mac']['main'], [parser['loglevel']])
 
-    # vm
-    parser['vm'] = {}
-    parser['vm']['main'] = parser['mainsub'].add_parser('vm', 
-        parents=[parser['loglevel']])
-    parser['vm']['sub'] = parser['vm']['main'].add_subparsers(title="vm commands")
-
-    parser['vm']['add'] = parser['vm']['sub'].add_parser('add', 
-        parents=[parser['loglevel']])
-    parser['vm']['add'].add_argument('subnet', help='Subnet to add')
-
-    parser['vm']['del'] = parser['vm']['sub'].add_parser('del', 
-        parents=[parser['loglevel']])
-
-    parser['vm']['del'].add_argument('subnet', help='Subnet to delete')
-
     args = parser['main'].parse_args(sys.argv[1:])
 
-    # Loglevels are handled globally in here and debug wins over verbose
+    ######################################################################
+    # Loglevels - for all areas
     if args.verbose:
         logging.root.setLevel(logging.INFO)
     if args.debug:
@@ -111,37 +95,22 @@ if __name__ == "__main__":
 
     sexypythonversion = '3.2'
     if sys.version < sexypythonversion:
-        print('Sexy requires Python >= ' + sexypythonversion +
-            ' on the source host.', file=sys.stderr)
+        print('Sexy requires Python >= ' + sexypythonversion, 
+            file=sys.stderr)
         sys.exit(1)
-
-
-    exit_code = 0
 
     try:
         import logging
         import os
-        import re
 
         # Ensure our /lib/ is included into PYTHON_PATH
         sys.path.insert(0, os.path.abspath(
                 os.path.join(os.path.dirname(os.path.realpath(__file__)), '../lib')))
 
-        # And now import our stuff
-        #import sexy
-
         log = logging.getLogger("sexy")
-
         logging.basicConfig(format='%(levelname)s: %(message)s')
 
         commandline()
 
     except KeyboardInterrupt:
         pass
-
-    #except sexy.Error as e:
-    #    log.error(e)
-    #    exit_code = 1
-
-    # Determine exit code by return value of function
-    #sys.exit(exit_code)

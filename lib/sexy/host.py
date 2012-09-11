@@ -42,10 +42,10 @@ class Host(object):
         self.base_dir = self.get_base_dir(fqdn)
         self.fqdn = fqdn
 
-    disks       = fsproperty.DirectoryDictProperty(lambda obj: os.path.join(obj.base_dir, 'disks'))
+    disk       = fsproperty.DirectoryDictProperty(lambda obj: os.path.join(obj.base_dir, 'disk'))
     _host_type  = fsproperty.FileStringProperty(lambda obj: os.path.join(obj.base_dir, "host_type"))
     _memory     = fsproperty.FileStringProperty(lambda obj: os.path.join(obj.base_dir, "memory"))
-    nics        = fsproperty.DirectoryDictProperty(lambda obj: os.path.join(obj.base_dir, 'nics'))
+    nic        = fsproperty.DirectoryDictProperty(lambda obj: os.path.join(obj.base_dir, 'nic'))
     _vm_host    = fsproperty.FileStringProperty(lambda obj: os.path.join(obj.base_dir, "vm_host"))
 
     def _init_base_dir(self, host_type):
@@ -174,8 +174,8 @@ class Host(object):
         host = cls(fqdn=args.fqdn)
 
         if not args.recursive:
-            if host.nics or host.disks:
-                raise Error("Cannot delete, host contains disks or nics: %s" % args.fqdn)
+            if host.nic or host.disk:
+                raise Error("Cannot delete, host contains disk or nic: %s" % args.fqdn)
 
         log.debug("Removing %s ..." % host.base_dir)
         shutil.rmtree(host.base_dir)
@@ -211,12 +211,12 @@ class Host(object):
         size_bytes = cls.convert_si_prefixed_size_values(args.size)
 
         if args.name:
-            if args.name in host.disks:
+            if args.name in host.disk:
                 raise Error("Disk already existing: %s")
         else:
             name = host.get_next_name("disk")
 
-        host.disks[name] = size_bytes
+        host.disk[name] = size_bytes
 
         sexy.backend_exec("host", "disk_add", [args.fqdn, name, str(size_bytes)])
 
@@ -236,12 +236,12 @@ class Host(object):
         host = cls(fqdn=args.fqdn)
 
         if args.name:
-            if args.name in host.disks:
+            if args.name in host.disk:
                 raise Error("Network interface card already existing: %s")
         else:
             name = host.get_next_name("nic")
 
-        host.nics[name] = args.address
+        host.nic[name] = args.address
 
         log.info("Added nic %s (%s)" % (name, args.address))
 

@@ -85,7 +85,7 @@ class NetIPv4(object):
         subnet_str = socket.inet_ntoa(struct.pack('>L', subnet_dec))
 
         if not self.subnet == subnet_str:
-            raise Error("Given address is not the subnet address (%s != %s)" % (subnet, subnet_str))
+            raise Error("Given address is not the subnet address (%s != %s)" % (self.subnet, subnet_str))
 
         log.debug("%s/%s" % (self.subnet, subnet_str))
 
@@ -126,6 +126,7 @@ class NetIPv4(object):
 
         base_dir = os.path.join(sexy.get_base_dir("db"), "net-ipv4")
 
+        # FIXME: add mask!
         for entry in os.listdir(base_dir):
             subnets.append(entry)
 
@@ -204,30 +205,9 @@ class NetIPv4(object):
         sexy.backend_exec("host", "apply", hosts)
 
     @classmethod
-    def commandline_disk_add(cls, args):
-
-        if not cls.exists(args.fqdn):
-            raise Error("Host does not exist: %s" % args.fqdn)
-
-        host = cls(fqdn=args.fqdn)
-        size_bytes = cls.convert_si_prefixed_size_values(args.size)
-
-        if args.name:
-            if args.name in host.disks:
-                raise Error("Disk already existing: %s")
-        else:
-            name = host.get_next_name("disk")
-
-        host.disks[name] = size_bytes
-
-        sexy.backend_exec("host", "disk_add", [args.fqdn, name, str(size_bytes)])
-
-        log.info("Added disk %s (%s Bytes)" % (name, size_bytes))
-
-    @classmethod
     def commandline_list(cls, args):
-        for host in cls.hosts_list(args.type):
-            print(host)
+        for subnet in cls.subnet_list():
+            print(subnet)
 
     @classmethod
     def commandline_addr_add(cls, args):

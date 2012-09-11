@@ -77,18 +77,11 @@ class NetIPv4(object):
 
         ip_dec = struct.unpack('>L',socket.inet_aton(self.subnet))[0]
         mask_dec = (1<<32) - (1<<32>> int(mask))
-
         subnet_dec = ip_dec & mask_dec
-
-        log.debug("%s - %s %s" % (ip_dec, subnet_dec, mask_dec))
-
         subnet_str = socket.inet_ntoa(struct.pack('>L', subnet_dec))
 
         if not self.subnet == subnet_str:
             raise Error("Given address is not the subnet address (%s != %s)" % (self.subnet, subnet_str))
-
-        log.debug("%s/%s" % (self.subnet, subnet_str))
-
 
     @staticmethod
     def validate_mask_int_range(mask):

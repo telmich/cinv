@@ -25,6 +25,7 @@ VERSION="2.0"
 import logging
 import os.path
 import sexy
+import subprocess
 
 log = logging.getLogger(__name__)
 
@@ -40,7 +41,7 @@ def get_base_dir(area):
 
     return base_dir
 
-def backend_exec(area, command, *args, missing_ok=True):
+def backend_exec(area, command, args, missing_ok=True):
     command = os.path.join(get_base_dir("backend"), area, command)
     db_path = os.path.join(get_base_dir("db"), area)
 
@@ -48,14 +49,20 @@ def backend_exec(area, command, *args, missing_ok=True):
     env_name = '__sexy_db_%s' % area
     env[env_name] = db_path
 
+    subprocess_args = [ command ]
+    subprocess_args.extend(args)
+
+
     log.debug("Exec %s=%s %s %s" % (env_name, env[env_name], 
         command, " ".join(args)))
 
+    log.debug("%s" % args)
+
     if not os.path.exists(command):
         if missing_ok:
-            log.debug("Ignoring missing %s for %s" % (command, area))
+            log.debug("%s ignores missing command: %s" % (area, command))
             return True
         else:
-            raise Error("Missing backend command: %s" % command)
+            raise Error("%s misses backend command: %s" % (area, command))
 
-    return subprocess.call(command, *args, env=env)
+    return subprocess.call(subprocess_args, env=env)

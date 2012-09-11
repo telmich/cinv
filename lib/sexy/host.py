@@ -178,7 +178,7 @@ class Host(object):
         else:
             hosts = args.fqdn
 
-        sexy.backend_exec("host", "apply", *hosts)
+        sexy.backend_exec("host", "apply", hosts)
 
     @classmethod
     def commandline_disk_add(cls, args):

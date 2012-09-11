@@ -22,7 +22,16 @@
 
 VERSION="2.0"
 
-import subprocess
+import os
+import sexy
+
+def get_base_dir(area):
+    if 'HOME' in os.environ:
+        base_dir = os.path.join(os.environ['HOME'], ".sexy", area)
+    else:
+        raise Error("HOME unset - cannot find default directory")
+
+    return base_dir
 
 class Error(Exception):
     """Base class for fallback of all exceptions"""

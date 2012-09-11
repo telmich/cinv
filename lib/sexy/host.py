@@ -28,8 +28,6 @@ import os
 import sexy
 from sexy import fsproperty
 
-from sexy.db import DB
-
 log = logging.getLogger(__name__)
 
 HOST_TYPES = ["hw", "vm"]
@@ -85,7 +83,7 @@ class Host(object):
 
     @staticmethod
     def get_base_dir(fqdn):
-        return os.path.join(DB.get_default_db_dir(), "host", fqdn)
+        return os.path.join(sexy.get_base_dir("db"), "host", fqdn)
 
     @classmethod
     def hosts_list(cls, host_type=None):
@@ -95,7 +93,7 @@ class Host(object):
             if host_type not in HOST_TYPES:
                 raise Error("Host type must be one of %s" % (" ".join(HOST_TYPES)))
 
-        base_dir = os.path.join(DB.get_default_db_dir(), "host")
+        base_dir = os.path.join(sexy.get_base_dir("db"), "host")
 
         for entry in os.listdir(base_dir):
             if host_type:
@@ -180,7 +178,11 @@ class Host(object):
         else:
             hosts = args.fqdn
 
-        log.debug("Apply for: %s" % (" ".join(hosts)))
+        backend_dir = os.path.join(sexy.get_base_dir("backend"), "host")
+        apply_path = os.path.join(backend_dir, "apply")
+        os.environ['__sexy_db_dir'] = os.path.join(sexy.get_base_dir("db"), "host")
+
+        log.debug("Appling with %s for: %s" % (apply_path, " ".join(hosts)))
 
     @classmethod
     def commandline_disk_add(cls, args):

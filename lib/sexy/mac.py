@@ -29,8 +29,6 @@ import re
 import sexy
 from sexy import fsproperty
 
-from sexy.db import DB
-
 log = logging.getLogger(__name__)
 
 class Error(sexy.Error):
@@ -65,7 +63,7 @@ class Mac(object):
 
     @staticmethod
     def get_base_dir():
-        return os.path.join(DB.get_default_db_dir(), "mac")
+        return sexy.get_base_dir("mac")
 
     @classmethod
     def exists(cls):

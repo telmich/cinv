@@ -75,9 +75,8 @@ class NetIPv4(object):
     def validate_subnetaddress(self, mask):
         """Check whether given IPv4 address is the subnet address"""
 
-        ip_dec = struct.unpack('>L',socket.inet_aton(self.subnet))[0]
         mask_dec = (1<<32) - (1<<32>> int(mask))
-        subnet_dec = ip_dec & mask_dec
+        subnet_dec = self.subnet_decimal() & mask_dec
         subnet_str = socket.inet_ntoa(struct.pack('>L', subnet_dec))
 
         if not self.subnet == subnet_str:
@@ -93,8 +92,6 @@ class NetIPv4(object):
         if mask not in range(1, 33):
             raise Error("Mask must be between 1 and 32 (inclusive)")
 
-        return mask
-
     @staticmethod
     def validate_ipv4address(ipv4address):
         return re.match('^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])$', ipv4address)
@@ -106,7 +103,8 @@ class NetIPv4(object):
 
     @mask.setter
     def mask(self, mask):
-        mask = self.validate_mask(mask)
+        log.debug(mask)
+        self.validate_mask(mask)
         self._mask = str(mask)
 
     @staticmethod
@@ -129,20 +127,56 @@ class NetIPv4(object):
     def exists(cls, subnet):
         return os.path.exists(cls.get_base_dir(subnet))
 
-    def get_next_ipv4address(self):
+    @staticmethod
+    def ipv4_address_decimal(ipv4_address):
+        """ Return IPv4 address in decimal """
+        return struct.unpack('>L',socket.inet_aton(ipv4_address))[0]
+
+    @staticmethod
+    def ipv4_address_string(ipv4_address_decimal):
+        """ Return IPv4 address in decimal """
+        return socket.inet_ntoa(struct.pack('>L', ipv4_address_decimal))
+
+    def subnet_decimal(self):
+        """ Return Subnet address in decimal """
+        return self.ipv4_address_decimal(self.subnet)
+
+    def broadcast(self):
+        """ Return broadcast string """
+
+        log.debug(self.mask)
+        log.debug(self.subnet)
+        add_mask = (1<<(32 - int(self.mask)))-1
+        return socket.inet_ntoa(struct.pack(">L", self.subnet_decimal() | add_mask))
+
+    def addr_add(self, mac_address, ipv4_address):
+        """ Add an address to the network"""
+
+        if mac_address in self.address:
+            raise Error("Mac address %s already using IPv4a %s" % (mac_address, self.address[mac_address]))
+
+        self.get_next_ipv4_address()
+
+
+    def get_next_ipv4_address(self):
         """Get next address from network"""
 
         if self.free:
             return free.pop()
 
-        if attribute:
-            last_name = sorted([key for key in attribute if key.startswith(base_name)])[-1]
-            last_number = last_name.lstrip(base_name)
-            next_number = int(last_number) + 1
+        if self.last:
+            last_decimal = self.ipv4_address_decimal(self.last)
+            next_decimal = last_decimal + 1
+            next_ipv4_address = self.ipv4_address_string(next_decimal)
         else:
-            next_number = 0
+            next_decimal = self.subnet_decimal() + 1
+            next_ipv4_address = self.ipv4_address_string(next_decimal)
 
-        return "%s%d" % (base_name, next_number)
+        if next_ipv4_address == self.broadcast():
+            raise Error("Next address is broadcast - cannot get new one")
+
+        log.debug(next_ipv4_address)
+        return next_ipv4_address
 
 
     ######################################################################
@@ -208,20 +242,11 @@ class NetIPv4(object):
     @classmethod
     def commandline_addr_add(cls, args):
 
-        if not cls.exists(args.fqdn):
-            raise Error("Host does not exist: %s" % args.fqdn)
+        if not cls.exists(args.subnet):
+            raise Error("Subnet does not exist: %s" % args.subnet)
 
-        host = cls(fqdn=args.fqdn)
-
-        if args.name:
-            if args.name in host.disks:
-                raise Error("Network interface card already existing: %s")
-        else:
-            name = host.get_next_name("nic")
-
-        host.nics[name] = args.address
-
-        log.info("Added nic %s (%s)" % (name, args.address))
+        net = cls(args.subnet)
+        net.addr_add(args.mac_address, args.ipv4_address)
 
     @classmethod
     def commandline_args(cls, parent_parser, parents):

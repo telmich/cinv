@@ -77,7 +77,7 @@ class NetIPv4(object):
 
         mask_dec = (1<<32) - (1<<32>> int(mask))
         subnet_dec = self.subnet_decimal() & mask_dec
-        subnet_str = socket.inet_ntoa(struct.pack('>L', subnet_dec))
+        subnet_str = self.ipv4_address_string(subnet_dec)
 
         if not self.subnet == subnet_str:
             raise Error("Given address is not the subnet address (%s != %s)" % (self.subnet, subnet_str))
@@ -103,7 +103,6 @@ class NetIPv4(object):
 
     @mask.setter
     def mask(self, mask):
-        log.debug(mask)
         self.validate_mask(mask)
         self._mask = str(mask)
 
@@ -143,11 +142,12 @@ class NetIPv4(object):
 
     def broadcast(self):
         """ Return broadcast string """
-
-        log.debug(self.mask)
-        log.debug(self.subnet)
         add_mask = (1<<(32 - int(self.mask)))-1
-        return socket.inet_ntoa(struct.pack(">L", self.subnet_decimal() | add_mask))
+        broadcast = socket.inet_ntoa(struct.pack(">L", self.subnet_decimal() | add_mask))
+
+        log.debug("Broadcast: %s" % broadcast)
+
+        return broadcast
 
     def addr_add(self, mac_address, ipv4_address):
         """ Add an address to the network"""
@@ -155,7 +155,9 @@ class NetIPv4(object):
         if mac_address in self.address:
             raise Error("Mac address %s already using IPv4a %s" % (mac_address, self.address[mac_address]))
 
-        self.get_next_ipv4_address()
+        next_ipv4_address = self.get_next_ipv4_address()
+
+        self.address[mac_address] = next_ipv4_address
 
 
     def get_next_ipv4_address(self):

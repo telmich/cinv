@@ -46,74 +46,20 @@ class DB(object):
 
         return db_dir
 
-    def dir_add(self, key, exist_ok=True):
-        """Create (new) db entry"""
+    @staticmethod
+    def get_default_db_dir():
+        if 'HOME' in os.environ:
+            db_dir = os.path.join(os.environ['HOME'], ".sexy", "db")
+        else:
+            raise Error("HOME unset - cannot find db dir")
 
-        self.verify_prefix()
-        entry_dir = os.path.join(self.db_dir, self.prefix, key)
+        return db_dir
 
-        try:
-            os.makedirs(entry_dir, exist_ok=exist_ok)
-        except OSError as e:
-            raise Error(e)
+    @staticmethod
+    def get_default_backend_dir():
+        if 'HOME' in os.environ:
+            db_dir = os.path.join(os.environ['HOME'], ".sexy", "db")
+        else:
+            raise Error("HOME unset - cannot find db dir")
 
-    def dir_exists(self, key):
-        """Create (new) db entry"""
-
-        self.verify_prefix()
-        entry_dir = os.path.join(self.db_dir, self.prefix, key)
-
-        return os.path.exists(entry_dir)
-
-    def oneliner_add(self, sub_dir, key, value, exist_ok=True):
-        """Create (new) oneliner entry"""
-
-        self.verify_prefix()
-        entry = os.path.join(self.db_dir, self.prefix, sub_dir, key)
-
-        if not exist_ok:
-            if os.path.exists(entry):
-                raise Error("Key %s already exists for %s" % (key, os.path.join(self.prefix, sub_dir)))
-
-        try:
-            with open(entry, "w") as fd:
-                fd.write("%s\n" % value)
-
-        except IOError as e:
-            raise Error(e)
-
-    def verify_prefix(self):
-        if not self.prefix:
-            raise Error("Required prefix not given")
-
-
-#    @classmethod
-#    def commandline_list(cls, args):
-#        print(args)
-#        pass
-#
-#    @classmethod
-#    def commandline_args(cls, parent_parser, parents):
-#        """Add us to the parent parser and add all parents to our parsers"""
-#
-#        parser = {}
-#        parser['sub'] = parent_parser.add_subparsers(title="Host Commands")
-#
-#        parser['add'] = parser['sub'].add_parser('add', 
-#            parents=parents)
-#        parser['add'].add_argument('fqdn', help='Fully Qualified Domain Name')
-#        parser['add'].add_argument('-t', '--type', help='Machine Type',
-#            required=True, choices=["hw","vm"])
-#
-#        parser['del'] = parser['sub'].add_parser('del', 
-#            parents=parents)
-#
-#        parser['del'].add_argument('subnet', help='Subnet to delete')
-#
-#        parser['list'] = parser['sub'].add_parser('list', 
-#            parents=parents)
-#        parser['list'].add_argument('-t', '--type', help='Machine Type',
-#            choices=["hw","vm"])
-#        parser['list'].set_defaults(func=cls.commandline_list)
-#
-
+        return db_dir

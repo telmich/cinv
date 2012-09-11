@@ -38,6 +38,7 @@ Area consists of:
         apply is always defined, but different parameters possible
 --------------------------------------------------------------------------------
 x sexy host add <fqdn> <type>           # hw | vm
+sexy host del <fqdn>
 x sexy host disk-add <fqdn> <size>        # size is given
 x sexy host nic-add <fqdn> <macaddr>      # nico01 00:00:00....
 sexy host nic-del <fqdn> <macaddr>      # nico01 00:00:00.....

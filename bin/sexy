@@ -88,6 +88,9 @@ def commandline():
         args.func(args)
     except sexy.Error as e:
         log.error(e)
+        return 1
+
+    return 0
 
 if __name__ == "__main__":
     # Sys is needed for sys.exit()
@@ -110,7 +113,9 @@ if __name__ == "__main__":
         log = logging.getLogger("sexy")
         logging.basicConfig(format='%(levelname)s: %(message)s')
 
-        commandline()
+        exit_code = commandline()
 
     except KeyboardInterrupt:
         pass
+
+    sys.exit(exit_code)

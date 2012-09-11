@@ -40,7 +40,7 @@ class Mac(object):
         self.base_dir = self.get_base_dir()
 
     _prefix = fsproperty.FileStringProperty(lambda obj: os.path.join(obj.base_dir, "prefix"))
-    free   = fsproperty.FileListProperty(lambda obj: os.path.join(obj.base_dir, "free"))
+    free    = fsproperty.FileListProperty(lambda obj: os.path.join(obj.base_dir, "free"))
     last    = fsproperty.FileStringProperty(lambda obj: os.path.join(obj.base_dir, "last"))
 
     def _init_base_dir(self):
@@ -58,8 +58,8 @@ class Mac(object):
         if mac in self.free:
             raise Error("Mac already in free database: %s" % mac)
 
+        self._init_base_dir()
         self.free.append(mac)
-
 
     @staticmethod
     def get_base_dir():
@@ -70,6 +70,8 @@ class Mac(object):
         return os.path.exists(cls.get_base_dir())
 
     def get_next(self):
+        self._init_base_dir()
+
         if self.free:
             return self.free.pop()
             
@@ -107,6 +109,7 @@ class Mac(object):
         if not re.match(r'([0-9A-F]{2}[-:]){2}[0-9A-F]{2}$', prefix, re.I):
             raise Error("Wrong mac address format - use 00:11:22")
 
+        self._init_base_dir()
         self._prefix = prefix
 
     @classmethod

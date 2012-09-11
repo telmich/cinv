@@ -132,7 +132,8 @@ class NetIPv4(object):
     def get_next_ipv4address(self):
         """Get next address from network"""
 
-        attribute = getattr(self, "%ss" % area)
+        if self.free:
+            return free.pop()
 
         if attribute:
             last_name = sorted([key for key in attribute if key.startswith(base_name)])[-1]
@@ -159,43 +160,45 @@ class NetIPv4(object):
         net.validate_mask(mask)
         net._init_base_dir(mask)
 
-    @classmethod
-    def commandline_del(cls, args):
-        if not cls.exists(args.fqdn):
-            if not args.missing_ignore:
-                raise Error("Host does not exist: %s" % args.fqdn)
-            else:
-                return
+        sexy.backend_exec("net-ipv4", "add", [subnet, mask])
 
-        host = cls(fqdn=args.fqdn)
-
-        if not args.recursive:
-            if host.nics or host.disks:
-                raise Error("Cannot delete, host contains disks or nics: %s" % args.fqdn)
-
-        log.debug("Removing %s ..." % host.base_dir)
-        shutil.rmtree(host.base_dir)
-
-        sexy.backend_exec("host", "del", [args.fqdn])
+#    @classmethod
+#    def commandline_del(cls, args):
+#        if not cls.exists(args.fqdn):
+#            if not args.missing_ignore:
+#                raise Error("Host does not exist: %s" % args.fqdn)
+#            else:
+#                return
+#
+#        host = cls(fqdn=args.fqdn)
+#
+#        if not args.recursive:
+#            if host.nics or host.disks:
+#                raise Error("Cannot delete, host contains disks or nics: %s" % args.fqdn)
+#
+#        log.debug("Removing %s ..." % host.base_dir)
+#        shutil.rmtree(host.base_dir)
+#
+#        sexy.backend_exec("host", "del", [args.fqdn])
 
                 
-    @classmethod
-    def commandline_apply(cls, args):
-        """Apply changes using the backend"""
-
-        if not args.all and not args.fqdn and not args.type:
-            raise Error("Required to pass either FQDNs, type or --all")
-        if args.type and args.fqdn:
-            raise Error("Cannot combine FQDN list and type")
-
-        if args.type:
-            hosts = cls.hosts_list(args.type)
-        elif args.all:
-            hosts = cls.hosts_list()
-        else:
-            hosts = args.fqdn
-
-        sexy.backend_exec("host", "apply", hosts)
+#    @classmethod
+#    def commandline_apply(cls, args):
+#        """Apply changes using the backend"""
+#
+#        if not args.all and not args.fqdn and not args.type:
+#            raise Error("Required to pass either FQDNs, type or --all")
+#        if args.type and args.fqdn:
+#            raise Error("Cannot combine FQDN list and type")
+#
+#        if args.type:
+#            hosts = cls.hosts_list(args.type)
+#        elif args.all:
+#            hosts = cls.hosts_list()
+#        else:
+#            hosts = args.fqdn
+#
+#        sexy.backend_exec("host", "apply", hosts)
 
     @classmethod
     def commandline_list(cls, args):
@@ -231,30 +234,30 @@ class NetIPv4(object):
         parser['add'].add_argument('subnet', help='Subnet name and mask (a.b.c.d/m)')
         parser['add'].set_defaults(func=cls.commandline_add)
 
-        parser['del'] = parser['sub'].add_parser('del', parents=parents)
-        parser['del'].add_argument('-r', '--recursive', help='Delete subnet and all addresses',
-            action='store_true')
-        parser['del'].add_argument('-i', '--ignore-missing', 
-            help='Do not fail if subnet is missing', action='store_true')
-        parser['del'].add_argument('subnet', help='Subnet name and mask (a.b.c.d/m)')
-        parser['del'].set_defaults(func=cls.commandline_del)
+#        parser['del'] = parser['sub'].add_parser('del', parents=parents)
+#        parser['del'].add_argument('-r', '--recursive', help='Delete subnet and all addresses',
+#            action='store_true')
+#        parser['del'].add_argument('-i', '--ignore-missing', 
+#            help='Do not fail if subnet is missing', action='store_true')
+#        parser['del'].add_argument('subnet', help='Subnet name and mask (a.b.c.d/m)')
+#        parser['del'].set_defaults(func=cls.commandline_del)
 
         parser['addr-add'] = parser['sub'].add_parser('addr-add', parents=parents)
         parser['addr-add'].add_argument('subnet', help='Subnet name and mask (a.b.c.d/m)')
-        parser['addr-add'].add_argument('-s', '--size', help='Disk size',
+        parser['addr-add'].add_argument('-m', '--mac-address', help='Mac Address',
             required=True)
-        parser['addr-add'].add_argument('-n', '--name', help='Disk name')
+        parser['addr-add'].add_argument('-i', '--ipv4-address', help='Requested IPv4 Address')
         parser['addr-add'].set_defaults(func=cls.commandline_addr_add)
 
         parser['list'] = parser['sub'].add_parser('list', parents=parents)
         parser['list'].set_defaults(func=cls.commandline_list)
 
-        parser['apply'] = parser['sub'].add_parser('apply', parents=parents)
-        parser['apply'].add_argument('subnet', help='Subnet name and mask (a.b.c.d/m)',
-            nargs='*')
-        parser['apply'].add_argument('-a', '--all', 
-            help='Apply settings for all subnets', required = False,
-            action='store_true')
-        parser['apply'].set_defaults(func=cls.commandline_apply)
+#        parser['apply'] = parser['sub'].add_parser('apply', parents=parents)
+#        parser['apply'].add_argument('subnet', help='Subnet name and mask (a.b.c.d/m)',
+#            nargs='*')
+#        parser['apply'].add_argument('-a', '--all', 
+#            help='Apply settings for all subnets', required = False,
+#            action='store_true')
+#        parser['apply'].set_defaults(func=cls.commandline_apply)
 
 

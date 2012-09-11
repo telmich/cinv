@@ -142,7 +142,7 @@ class Host(object):
         """Get next generic disk name"""
 
         base_name = area
-        attribute = getattr(self, "%ss" % area)
+        attribute = getattr(self, area)
 
         if attribute:
             last_name = sorted([key for key in attribute if key.startswith(base_name)])[-1]

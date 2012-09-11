@@ -51,7 +51,7 @@ x sexy host vmhost-set <fqdn> <vmhost> # error if type != vm
 x sexy host list [--type <hw|vm>]
 sexy host apply <fqdn|all>
 --------------------------------------------------------------------------------
-sexy net-ipv4 add <subnet>/<mask>
+x sexy net-ipv4 add <subnet>/<mask>
 sexy net-ipv4 del <subnet>
 
 sexy net-ipv4 addr-add <subnet> <macaddr> [ipv4addr]
@@ -69,55 +69,8 @@ x sexy mac free <macaddr>         # write into free database
 x sexy mac prefix-set <prefix>     # prefix to use to generate mac addresses
 
 --------------------------------------------------------------------------------
-Create VM: <fqdn> => "rails"
-
-    sexy host add rails-vm-inx01.intra.local.ch --type vm
-    sexy host set-vmhost rails-vm-inx01.intra.local.ch kvm-hw-inx01
-    sexy host disk-add rails-vm-inx01.intra.local.ch 20G
-    newmac1=$(sexy mac-generate)
-    newmac2=$(sexy mac-generate)
-
-    sexy host nic-add rails-vm-inx01.intra.local.ch $newmac1
-    sexy host nic-add rails-vm-inx01.intra.local.ch $newmac2
-
-    sexy net-ipv4 addr-add 10.182.0.0 $newmac1
-    sexy net-ipv4 addr-add 10.182.64.0 $newmac2
-
-    sexy host apply --all 
-    sexy host apply rails-vm-inx01.intra.local.ch
-
-        # disk erzeugen (da type == vm)
-        # nics "erzeugen" (da type == vm)
-        # 
-    sexy net-ipv4 apply all / 10.182.0.0 + 10.182.64.0
-        # dhcp / dns konfigurieren
-
-    WOREIN KOMMEN DIESE ZEILEN??????s
-
---------------------------------------------------------------------------------
 Backends:
     gleiche parameter wie apply + umgebungsvariablen mit info zu wo die DB ist?
 --------------------------------------------------------------------------------
 Konsens:
     Async, da Aktionen lange dauern können (e-mail, cdist run)
-
---------------------------------------------------------------------------------
-Andere Ideen:
-
-sexy vm2 add <fqdn> # query auf host
-
-
-sexy vm1 add <VMHOST> <fqdn>        # check for existence of vmhost
-sexy vm1 disk-add <fqdn> <size>     # size is choosen
-sexy vm1 nic-add <fqdn> <macaddr>   # nico01 00:00:00....
-sexy vm1 nic-del <fqdn> <macaddr>   # nico01 00:00:00.....
-sexy vm1 nic-list <fqdn>
-
-sexy vm1 apply <VMHOST|all>
-
-# anderes backend als host
-# sexy vm storage-pool-add ???????
-
-
-    #ip1=$(sexy net-ipv4 addr-get 10.182.0.0 $newmac1)
-    #ip2=$(sexy net-ipv4 addr-get 10.182.64.0 $newmac2)

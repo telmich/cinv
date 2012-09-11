@@ -116,9 +116,9 @@ class NetIPv4(object):
 
         base_dir = os.path.join(sexy.get_base_dir("db"), "net-ipv4")
 
-        # FIXME: add mask!
         for entry in os.listdir(base_dir):
-            subnets.append(entry)
+            subnet = cls(entry)
+            subnets.append("%s/%s" % (entry, subnet.mask))
 
         return subnets
 
@@ -162,7 +162,6 @@ class NetIPv4(object):
         next_ipv4_address = self.get_next_ipv4_address()
 
         self.address[mac_address] = next_ipv4_address
-
 
     def get_next_ipv4_address(self):
         """Get next address from network"""
@@ -224,23 +223,19 @@ class NetIPv4(object):
 #        sexy.backend_exec("host", "del", [args.fqdn])
 
                 
-#    @classmethod
-#    def commandline_apply(cls, args):
-#        """Apply changes using the backend"""
-#
-#        if not args.all and not args.fqdn and not args.type:
-#            raise Error("Required to pass either FQDNs, type or --all")
-#        if args.type and args.fqdn:
-#            raise Error("Cannot combine FQDN list and type")
-#
-#        if args.type:
-#            hosts = cls.hosts_list(args.type)
-#        elif args.all:
-#            hosts = cls.hosts_list()
-#        else:
-#            hosts = args.fqdn
-#
-#        sexy.backend_exec("host", "apply", hosts)
+    @classmethod
+    def commandline_apply(cls, args):
+        """Apply changes using the backend"""
+
+        if not args.all and not args.subnet:
+            raise Error("Required to pass either subnet(s) or --all")
+
+        if args.all:
+            subnets = cls.subnet_list()
+        else:
+            hosts = args.fqdn
+
+        sexy.backend_exec("host", "apply", hosts)
 
     @classmethod
     def commandline_list(cls, args):

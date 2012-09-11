@@ -54,7 +54,7 @@ sexy host apply <fqdn|all>
 x sexy net-ipv4 add <subnet>/<mask>
 sexy net-ipv4 del <subnet>
 
-sexy net-ipv4 addr-add <subnet> <macaddr> [ipv4addr]
+x sexy net-ipv4 addr-add <subnet> <macaddr> [ipv4addr]
 sexy net-ipv4 addr-del <subnet> <macaddr>
 sexy net-ipv4 addr-get <subnet> <macaddr> # returns ipv4addr
 

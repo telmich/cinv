@@ -73,7 +73,7 @@ class Host(object):
 
     @property
     def vm_host(self):
-        return self._vmhost
+        return self._vm_host
 
     @vm_host.setter
     def vm_host(self, vm_host):
@@ -247,6 +247,24 @@ class Host(object):
         log.info("Added nic %s (%s)" % (name, args.mac_address))
 
     @classmethod
+    def commandline_type_get(cls, args):
+
+        if not cls.exists(args.fqdn):
+            raise Error("Host does not exist: %s" % args.fqdn)
+
+        host = cls(fqdn=args.fqdn)
+        print(host.host_type)
+
+    @classmethod
+    def commandline_vmhost_get(cls, args):
+
+        if not cls.exists(args.fqdn):
+            raise Error("Host does not exist: %s" % args.fqdn)
+
+        host = cls(fqdn=args.fqdn)
+        print(host.vm_host)
+
+    @classmethod
     def commandline_vmhost_set(cls, args):
 
         if not cls.exists(args.fqdn):
@@ -296,6 +314,14 @@ class Host(object):
         parser['list'].add_argument('-t', '--type', help='Host Type',
             choices=["hw","vm"], required=False)
         parser['list'].set_defaults(func=cls.commandline_list)
+
+        parser['type-get'] = parser['sub'].add_parser('type-get', parents=parents)
+        parser['type-get'].add_argument('fqdn', help='Host name')
+        parser['type-get'].set_defaults(func=cls.commandline_type_get)
+
+        parser['vmhost-get'] = parser['sub'].add_parser('vmhost-get', parents=parents)
+        parser['vmhost-get'].add_argument('fqdn', help='Host name')
+        parser['vmhost-get'].set_defaults(func=cls.commandline_vmhost_get)
 
         parser['vmhost-set'] = parser['sub'].add_parser('vmhost-set', parents=parents)
         parser['vmhost-set'].add_argument('fqdn', help='Host name')

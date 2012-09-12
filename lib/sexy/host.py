@@ -238,12 +238,13 @@ class Host(object):
         if args.name:
             if args.name in host.disk:
                 raise Error("Network interface card already existing: %s")
+            name = args.name
         else:
             name = host.get_next_name("nic")
 
-        host.nic[name] = args.address
+        host.nic[name] = args.mac_address
 
-        log.info("Added nic %s (%s)" % (name, args.address))
+        log.info("Added nic %s (%s)" % (name, args.mac_address))
 
     @classmethod
     def commandline_vmhost_set(cls, args):
@@ -286,7 +287,7 @@ class Host(object):
 
         parser['nic-add'] = parser['sub'].add_parser('nic-add', parents=parents)
         parser['nic-add'].add_argument('fqdn', help='Host name')
-        parser['nic-add'].add_argument('-a', '--address', help='Mac address',
+        parser['nic-add'].add_argument('-m', '--mac-address', help='Mac address',
             required=True)
         parser['nic-add'].add_argument('-n', '--name', help='Nic name')
         parser['nic-add'].set_defaults(func=cls.commandline_nic_add)

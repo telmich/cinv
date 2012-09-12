@@ -223,6 +223,22 @@ class Host(object):
         log.info("Added disk %s (%s Bytes)" % (name, size_bytes))
 
     @classmethod
+    def commandline_disk_size_get(cls, args):
+
+        if not cls.exists(args.fqdn):
+            raise Error("Host does not exist: %s" % args.fqdn)
+
+        host = cls(fqdn=args.fqdn)
+
+        try:
+            size = host.disk[args.name]
+        except KeyError:
+            raise Error("Host %s does not have disk: %s" % (args.fqdn,  args.name))
+
+        print(size)
+
+
+    @classmethod
     def commandline_list(cls, args):
         for host in cls.hosts_list(args.type):
             print(host)
@@ -245,6 +261,21 @@ class Host(object):
         host.nic[name] = args.mac_address
 
         log.info("Added nic %s (%s)" % (name, args.mac_address))
+
+    @classmethod
+    def commandline_nic_addr_get(cls, args):
+
+        if not cls.exists(args.fqdn):
+            raise Error("Host does not exist: %s" % args.fqdn)
+
+        host = cls(fqdn=args.fqdn)
+
+        try:
+            mac_address = host.nic[args.name]
+        except KeyError:
+            raise Error("Host %s does not have nic: %s" % (args.fqdn,  args.name))
+
+        print(mac_address)
 
     @classmethod
     def commandline_type_get(cls, args):
@@ -303,12 +334,23 @@ class Host(object):
         parser['disk-add'].add_argument('-n', '--name', help='Disk name')
         parser['disk-add'].set_defaults(func=cls.commandline_disk_add)
 
+        parser['disk-size-get'] = parser['sub'].add_parser('disk-size-get', parents=parents)
+        parser['disk-size-get'].add_argument('fqdn', help='Host name')
+        parser['disk-size-get'].add_argument('-n', '--name', help='Disk name', required=True)
+        parser['disk-size-get'].set_defaults(func=cls.commandline_disk_size_get)
+
         parser['nic-add'] = parser['sub'].add_parser('nic-add', parents=parents)
         parser['nic-add'].add_argument('fqdn', help='Host name')
         parser['nic-add'].add_argument('-m', '--mac-address', help='Mac address',
             required=True)
         parser['nic-add'].add_argument('-n', '--name', help='Nic name')
         parser['nic-add'].set_defaults(func=cls.commandline_nic_add)
+
+        parser['nic-addr-get'] = parser['sub'].add_parser('nic-addr-get', parents=parents)
+        parser['nic-addr-get'].add_argument('fqdn', help='Host name')
+        parser['nic-addr-get'].add_argument('-n', '--name', help='Nic name',
+            required=True)
+        parser['nic-addr-get'].set_defaults(func=cls.commandline_nic_addr_get)
 
         parser['list'] = parser['sub'].add_parser('list', parents=parents)
         parser['list'].add_argument('-t', '--type', help='Host Type',

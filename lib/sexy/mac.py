@@ -63,7 +63,7 @@ class Mac(object):
 
     @staticmethod
     def get_base_dir():
-        return sexy.get_base_dir("mac")
+        return sexy.get_base_dir("db/mac")
 
     @classmethod
     def exists(cls):
@@ -136,7 +136,7 @@ class Mac(object):
 
     @classmethod
     def commandline_prefix_get(cls, args):
-        mac = Mac()
+        mac = cls()
         print(mac.prefix)
 
     @classmethod

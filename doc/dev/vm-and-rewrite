@@ -86,3 +86,13 @@ Backends:
 --------------------------------------------------------------------------------
 Konsens:
     Async, da Aktionen lange dauern können (e-mail, cdist run)
+
+--------------------------------------------------------------------------------
+Other todos:
+
+    net-ipv4 dns-server-add
+    net-ipv4 dns-server-del
+    net-ipv4 dns-name-get
+    net-ipv4 dns-name-set
+
+    net-ipv4 router-set

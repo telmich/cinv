@@ -31,5 +31,6 @@ class HostTest(unittest.TestCase):
         self.host.host_type = "wrong type"
 
     def test_prevent_wrong_type(self):
+        """Prevent adding hosts with wrong type"""
         self.assertRaises(sexy.host.Error, self.wrong_host_type)
 

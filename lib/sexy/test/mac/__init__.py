@@ -37,5 +37,6 @@ class MacTest(unittest.TestCase):
         shutil.rmtree(self.temp_dir)
 
     def test_overflow(self):
+        """ Check that no more than all possible mac addresses with one prefix can be used"""
         self.mac.last = "00:00:00:ff:ff:ff"
         self.assertRaises(sexy.mac.Error, self.mac.get_next)

@@ -363,7 +363,7 @@ class Host(object):
 
         parser['vm-host-get'] = parser['sub'].add_parser('vmhost-get', parents=parents)
         parser['vm-host-get'].add_argument('fqdn', help='Host name')
-        parser['vm-host-get'].set_defaults(func=cls.commandline_vmhost_get)
+        parser['vm-host-get'].set_defaults(func=cls.commandline_vm_host_get)
 
         parser['vm-host-set'] = parser['sub'].add_parser('vm-host-set', parents=parents)
         parser['vm-host-set'].add_argument('fqdn', help='Host name')

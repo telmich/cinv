@@ -13,6 +13,12 @@ db:
         /net-ipv4/
             <subnet>/
                 mask
+                host/
+                    <name>/
+                        mac_address
+                        ipv4_address
+                        alias
+
                 address/
                     <ipv4addr>:<macaddr>
 
@@ -54,9 +60,15 @@ sexy host apply <fqdn|all>
 x sexy net-ipv4 add <subnet>/<mask>
 sexy net-ipv4 del <subnet>
 
-x sexy net-ipv4 addr-add <subnet> <macaddr> [ipv4addr]
+sexy net-ipv4 addr-add <subnet> <hostname> <macaddr> [ipv4addr]
+
+sexy net-ipv4 alias-add <hostname> <alias>
+
 sexy net-ipv4 addr-del <subnet> <macaddr>
 sexy net-ipv4 addr-get <subnet> <macaddr> # returns ipv4addr
+
+sexy net-ipv4 bootserver-set <subnet> <bootserver>
+sexy net-ipv4 bootfilename-set <subnet> <bootfilename>
 
 sexy net-ipv4 apply <subnet|all>
 sexy net-ipv4 check <subnet|all>

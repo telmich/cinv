@@ -46,7 +46,7 @@ def backend_exec(area, command, args, missing_ok=True):
     db_path = os.path.join(get_base_dir("db"), area)
 
     env = os.environ.copy()
-    env_name = '__sexy_db_%s' % area
+    env_name = ('__sexy_db_%s' % area).replace("-","_")
     env[env_name] = db_path
 
     subprocess_args = [ command ]

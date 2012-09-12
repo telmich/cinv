@@ -47,6 +47,7 @@ class NetIPv4(object):
             raise Error("Not a valid IPv4 address: %s" % subnet)
 
         self.base_dir = self.get_base_dir(subnet)
+        self.host_dir = os.path.join(self.base_dir, "host")
         self.subnet   = subnet
 
     _mask   = fsproperty.FileStringProperty(lambda obj: os.path.join(obj.base_dir, "mask"))
@@ -54,11 +55,15 @@ class NetIPv4(object):
     last    = fsproperty.FileStringProperty(lambda obj: os.path.join(obj.base_dir, "last"))
     address = fsproperty.DirectoryDictProperty(lambda obj: os.path.join(obj.base_dir, 'address'))
 
+    bootserver      = fsproperty.FileStringProperty(lambda obj: os.path.join(obj.base_dir, "bootserver"))
+    bootfilename    = fsproperty.FileStringProperty(lambda obj: os.path.join(obj.base_dir, "bootfilename"))
+
     def _init_base_dir(self, mask):
         """Create base directory"""
 
         try:
             os.makedirs(self.base_dir, exist_ok=True)
+            os.makedirs(self.host_dir, exist_ok=True)
         except OSError as e:
             raise Error(e)
 
@@ -117,8 +122,10 @@ class NetIPv4(object):
         base_dir = os.path.join(sexy.get_base_dir("db"), "net-ipv4")
 
         for entry in os.listdir(base_dir):
-            subnet = cls(entry)
-            subnets.append("%s/%s" % (entry, subnet.mask))
+            # With or without the mask is the question...
+            #subnet = cls(entry)
+            #subnets.append("%s/%s" % (entry, subnet.mask))
+            subnets.append("%s" % (entry))
 
         return subnets
 
@@ -149,8 +156,8 @@ class NetIPv4(object):
 
         return broadcast
 
-    def addr_add(self, mac_address, ipv4_address):
-        """ Add an address to the network"""
+    def host_add(self, fqdn, mac_address, ipv4_address):
+        """ Add a host to the network"""
         
         # Ensure given mac address is valid
         import sexy.mac
@@ -243,6 +250,22 @@ class NetIPv4(object):
             print(subnet)
 
     @classmethod
+    def commandline_bootfilename_set(cls, args):
+        if not cls.exists(args.subnet):
+            raise Error("Subnet does not exist: %s" % args.subnet)
+
+        net = cls(args.subnet)
+        net.bootfilename = args.bootfilename
+
+    @classmethod
+    def commandline_bootserver_set(cls, args):
+        if not cls.exists(args.subnet):
+            raise Error("Subnet does not exist: %s" % args.subnet)
+
+        net = cls(args.subnet)
+        net.bootserver = args.bootserver
+
+    @classmethod
     def commandline_addr_add(cls, args):
 
         if not cls.exists(args.subnet):
@@ -270,12 +293,26 @@ class NetIPv4(object):
 #        parser['del'].add_argument('subnet', help='Subnet name and mask (a.b.c.d/m)')
 #        parser['del'].set_defaults(func=cls.commandline_del)
 
-        parser['addr-add'] = parser['sub'].add_parser('addr-add', parents=parents)
-        parser['addr-add'].add_argument('subnet', help='Subnet name and mask (a.b.c.d/m)')
-        parser['addr-add'].add_argument('-m', '--mac-address', help='Mac Address',
+        parser['host-add'] = parser['sub'].add_parser('host-add', parents=parents)
+        parser['host-add'].add_argument('subnet', help='Subnet name and mask (a.b.c.d/m)')
+        parser['host-add'].add_argument('-m', '--mac-address', help='Mac Address',
             required=True)
-        parser['addr-add'].add_argument('-i', '--ipv4-address', help='Requested IPv4 Address')
-        parser['addr-add'].set_defaults(func=cls.commandline_addr_add)
+        parser['host-add'].add_argument('-f', '--fqdn', help='FQDN of host',
+            required=True)
+        parser['host-add'].add_argument('-i', '--ipv4-address', help='Requested IPv4 Address')
+        parser['host-add'].set_defaults(func=cls.commandline_host_add)
+
+        parser['bootserver-set'] = parser['sub'].add_parser('bootserver-set', parents=parents)
+        parser['bootserver-set'].add_argument('subnet', help='Subnet name and mask (a.b.c.d/m)')
+        parser['bootserver-set'].add_argument('--bootserver', help='Bootserver',
+            required=True)
+        parser['bootserver-set'].set_defaults(func=cls.commandline_bootserver_set)
+ 
+        parser['bootfilename-set'] = parser['sub'].add_parser('bootfilename-set', parents=parents)
+        parser['bootfilename-set'].add_argument('subnet', help='Subnet name and mask (a.b.c.d/m)')
+        parser['bootfilename-set'].add_argument('--bootfilename', help='Bootserver',
+            required=True)
+        parser['bootfilename-set'].set_defaults(func=cls.commandline_bootfilename_set)
 
         parser['list'] = parser['sub'].add_parser('list', parents=parents)
         parser['list'].set_defaults(func=cls.commandline_list)

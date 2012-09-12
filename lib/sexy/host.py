@@ -361,15 +361,15 @@ class Host(object):
         parser['type-get'].add_argument('fqdn', help='Host name')
         parser['type-get'].set_defaults(func=cls.commandline_type_get)
 
-        parser['vmhost-get'] = parser['sub'].add_parser('vmhost-get', parents=parents)
-        parser['vmhost-get'].add_argument('fqdn', help='Host name')
-        parser['vmhost-get'].set_defaults(func=cls.commandline_vmhost_get)
+        parser['vm-host-get'] = parser['sub'].add_parser('vmhost-get', parents=parents)
+        parser['vm-host-get'].add_argument('fqdn', help='Host name')
+        parser['vm-host-get'].set_defaults(func=cls.commandline_vmhost_get)
 
-        parser['vmhost-set'] = parser['sub'].add_parser('vmhost-set', parents=parents)
-        parser['vmhost-set'].add_argument('fqdn', help='Host name')
-        parser['vmhost-set'].add_argument('--vm-host', help='VM Host (only for VMs)',
+        parser['vm-host-set'] = parser['sub'].add_parser('vm-host-set', parents=parents)
+        parser['vm-host-set'].add_argument('fqdn', help='Host name')
+        parser['vm-host-set'].add_argument('--vm-host', help='VM Host (only for VMs)',
             required=True)
-        parser['vmhost-set'].set_defaults(func=cls.commandline_vmhost_set)
+        parser['vm-host-set'].set_defaults(func=cls.commandline_vm_host_set)
 
         parser['apply'] = parser['sub'].add_parser('apply', parents=parents)
         parser['apply'].add_argument('fqdn', help='Host name',

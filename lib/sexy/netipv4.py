@@ -41,14 +41,14 @@ class Error(sexy.Error):
 
 class NetIPv4(object):
 
-    def __init__(self, subnet):
+    def __init__(self, net):
 
-        if not self.validate_ipv4address(subnet):
-            raise Error("Not a valid IPv4 address: %s" % subnet)
+        if not self.validate_ipv4address(net):
+            raise Error("Not a valid IPv4 address: %s" % net)
 
-        self.base_dir = self.get_base_dir(subnet)
+        self.base_dir = self.get_base_dir(net)
         self.host_dir = os.path.join(self.base_dir, "host")
-        self.subnet   = subnet
+        self.net   = net
 
     _mask   = fsproperty.FileStringProperty(lambda obj: os.path.join(obj.base_dir, "mask"))
     free    = fsproperty.FileListProperty(lambda obj: os.path.join(obj.base_dir, "free"))
@@ -70,22 +70,22 @@ class NetIPv4(object):
         self.mask = mask
 
     @staticmethod
-    def subnet_split(subnet):
-        return subnet.split('/')
+    def net_split(net):
+        return net.split('/')
 
     def validate_mask(self, mask):
         self.validate_mask_int_range(mask)
-        self.validate_subnetaddress(mask)
+        self.validate_netaddress(mask)
 
-    def validate_subnetaddress(self, mask):
-        """Check whether given IPv4 address is the subnet address"""
+    def validate_netaddress(self, mask):
+        """Check whether given IPv4 address is the net address"""
 
         mask_dec = (1<<32) - (1<<32>> int(mask))
-        subnet_dec = self.subnet_decimal() & mask_dec
-        subnet_str = self.ipv4_address_string(subnet_dec)
+        net_dec = self.net_decimal() & mask_dec
+        net_str = self.ipv4_address_string(net_dec)
 
-        if not self.subnet == subnet_str:
-            raise Error("Given address is not the subnet address (%s != %s)" % (self.subnet, subnet_str))
+        if not self.net == net_str:
+            raise Error("Given address is not the net address (%s != %s)" % (self.net, net_str))
 
     @staticmethod
     def validate_mask_int_range(mask):
@@ -112,26 +112,26 @@ class NetIPv4(object):
         self._mask = str(mask)
 
     @staticmethod
-    def get_base_dir(subnet):
-        return os.path.join(sexy.get_base_dir("db"), "net-ipv4", subnet)
+    def get_base_dir(net):
+        return os.path.join(sexy.get_base_dir("db"), "net-ipv4", net)
 
     @classmethod
-    def subnet_list(cls):
-        subnets = []
+    def net_list(cls):
+        nets = []
 
         base_dir = os.path.join(sexy.get_base_dir("db"), "net-ipv4")
 
         for entry in os.listdir(base_dir):
             # With or without the mask is the question...
-            #subnet = cls(entry)
-            #subnets.append("%s/%s" % (entry, subnet.mask))
-            subnets.append("%s" % (entry))
+            #net = cls(entry)
+            #nets.append("%s/%s" % (entry, net.mask))
+            nets.append("%s" % (entry))
 
-        return subnets
+        return nets
 
     @classmethod
-    def exists(cls, subnet):
-        return os.path.exists(cls.get_base_dir(subnet))
+    def exists(cls, net):
+        return os.path.exists(cls.get_base_dir(net))
 
     @staticmethod
     def ipv4_address_decimal(ipv4_address):
@@ -143,14 +143,14 @@ class NetIPv4(object):
         """ Return IPv4 address in decimal """
         return socket.inet_ntoa(struct.pack('>L', ipv4_address_decimal))
 
-    def subnet_decimal(self):
-        """ Return Subnet address in decimal """
-        return self.ipv4_address_decimal(self.subnet)
+    def net_decimal(self):
+        """ Return Network address in decimal """
+        return self.ipv4_address_decimal(self.net)
 
     def broadcast(self):
         """ Return broadcast string """
         add_mask = (1<<(32 - int(self.mask)))-1
-        broadcast = socket.inet_ntoa(struct.pack(">L", self.subnet_decimal() | add_mask))
+        broadcast = socket.inet_ntoa(struct.pack(">L", self.net_decimal() | add_mask))
 
         log.debug("Broadcast: %s" % broadcast)
 
@@ -181,7 +181,7 @@ class NetIPv4(object):
             next_decimal = last_decimal + 1
             next_ipv4_address = self.ipv4_address_string(next_decimal)
         else:
-            next_decimal = self.subnet_decimal() + 1
+            next_decimal = self.net_decimal() + 1
             next_ipv4_address = self.ipv4_address_string(next_decimal)
 
         if next_ipv4_address == self.broadcast():
@@ -197,32 +197,32 @@ class NetIPv4(object):
     @classmethod
     def commandline_add(cls, args):
         try:
-            subnet, mask = cls.subnet_split(args.subnet)
+            net, mask = cls.net_split(args.net)
         except ValueError:
-            raise Error("Invalid subnet syntax (expected <IPv4addr>/<mask>): %s" % args.subnet)
+            raise Error("Invalid net syntax (expected <IPv4addr>/<mask>): %s" % args.net)
 
-        if cls.exists(subnet):
-            raise Error("Network already exist: %s" % subnet)
+        if cls.exists(net):
+            raise Error("Network already exist: %s" % net)
 
-        net = cls(subnet)
+        net = cls(net)
         net.validate_mask(mask)
         net._init_base_dir(mask)
 
-        sexy.backend_exec("net-ipv4", "add", [subnet, mask])
+        sexy.backend_exec("net-ipv4", "add", [net, mask])
 
     @classmethod
     def commandline_apply(cls, args):
         """Apply changes using the backend"""
 
-        if not args.all and not args.subnet:
-            raise Error("Required to pass either subnet(s) or --all")
+        if not args.all and not args.net:
+            raise Error("Required to pass either net(s) or --all")
 
         if args.all:
-            subnets = cls.subnet_list()
+            nets = cls.net_list()
         else:
-            subnets = args.subnet
+            nets = args.net
 
-        sexy.backend_exec("net-ipv4", "apply", subnets)
+        sexy.backend_exec("net-ipv4", "apply", nets)
 
 #    @classmethod
 #    def commandline_del(cls, args):
@@ -246,32 +246,32 @@ class NetIPv4(object):
                 
     @classmethod
     def commandline_list(cls, args):
-        for subnet in cls.subnet_list():
-            print(subnet)
+        for net in cls.net_list():
+            print(net)
 
     @classmethod
     def commandline_bootfilename_set(cls, args):
-        if not cls.exists(args.subnet):
-            raise Error("Subnet does not exist: %s" % args.subnet)
+        if not cls.exists(args.net):
+            raise Error("Network does not exist: %s" % args.net)
 
-        net = cls(args.subnet)
+        net = cls(args.net)
         net.bootfilename = args.bootfilename
 
     @classmethod
     def commandline_bootserver_set(cls, args):
-        if not cls.exists(args.subnet):
-            raise Error("Subnet does not exist: %s" % args.subnet)
+        if not cls.exists(args.net):
+            raise Error("Network does not exist: %s" % args.net)
 
-        net = cls(args.subnet)
+        net = cls(args.net)
         net.bootserver = args.bootserver
 
     @classmethod
-    def commandline_addr_add(cls, args):
+    def commandline_host_add(cls, args):
 
-        if not cls.exists(args.subnet):
-            raise Error("Subnet does not exist: %s" % args.subnet)
+        if not cls.exists(args.net):
+            raise Error("Network does not exist: %s" % args.net)
 
-        net = cls(args.subnet)
+        net = cls(args.net)
         net.addr_add(args.mac_address, args.ipv4_address)
 
     @classmethod
@@ -282,19 +282,19 @@ class NetIPv4(object):
         parser['sub'] = parent_parser.add_subparsers(title="Host Commands")
 
         parser['add'] = parser['sub'].add_parser('add', parents=parents)
-        parser['add'].add_argument('subnet', help='Subnet name and mask (a.b.c.d/m)')
+        parser['add'].add_argument('net', help='Network name and mask (a.b.c.d/m)')
         parser['add'].set_defaults(func=cls.commandline_add)
 
 #        parser['del'] = parser['sub'].add_parser('del', parents=parents)
-#        parser['del'].add_argument('-r', '--recursive', help='Delete subnet and all addresses',
+#        parser['del'].add_argument('-r', '--recursive', help='Delete net and all addresses',
 #            action='store_true')
 #        parser['del'].add_argument('-i', '--ignore-missing', 
-#            help='Do not fail if subnet is missing', action='store_true')
-#        parser['del'].add_argument('subnet', help='Subnet name and mask (a.b.c.d/m)')
+#            help='Do not fail if net is missing', action='store_true')
+#        parser['del'].add_argument('net', help='Network name and mask (a.b.c.d/m)')
 #        parser['del'].set_defaults(func=cls.commandline_del)
 
         parser['host-add'] = parser['sub'].add_parser('host-add', parents=parents)
-        parser['host-add'].add_argument('subnet', help='Subnet name and mask (a.b.c.d/m)')
+        parser['host-add'].add_argument('net', help='Network name and mask (a.b.c.d/m)')
         parser['host-add'].add_argument('-m', '--mac-address', help='Mac Address',
             required=True)
         parser['host-add'].add_argument('-f', '--fqdn', help='FQDN of host',
@@ -303,13 +303,13 @@ class NetIPv4(object):
         parser['host-add'].set_defaults(func=cls.commandline_host_add)
 
         parser['bootserver-set'] = parser['sub'].add_parser('bootserver-set', parents=parents)
-        parser['bootserver-set'].add_argument('subnet', help='Subnet name and mask (a.b.c.d/m)')
+        parser['bootserver-set'].add_argument('net', help='Network name and mask (a.b.c.d/m)')
         parser['bootserver-set'].add_argument('--bootserver', help='Bootserver',
             required=True)
         parser['bootserver-set'].set_defaults(func=cls.commandline_bootserver_set)
  
         parser['bootfilename-set'] = parser['sub'].add_parser('bootfilename-set', parents=parents)
-        parser['bootfilename-set'].add_argument('subnet', help='Subnet name and mask (a.b.c.d/m)')
+        parser['bootfilename-set'].add_argument('net', help='Network name and mask (a.b.c.d/m)')
         parser['bootfilename-set'].add_argument('--bootfilename', help='Bootserver',
             required=True)
         parser['bootfilename-set'].set_defaults(func=cls.commandline_bootfilename_set)
@@ -318,10 +318,10 @@ class NetIPv4(object):
         parser['list'].set_defaults(func=cls.commandline_list)
 
         parser['apply'] = parser['sub'].add_parser('apply', parents=parents)
-        parser['apply'].add_argument('subnet', help='Subnet name and mask (a.b.c.d/m)',
+        parser['apply'].add_argument('net', help='Network name and mask (a.b.c.d/m)',
             nargs='*')
         parser['apply'].add_argument('-a', '--all', 
-            help='Apply settings for all subnets', required = False,
+            help='Apply settings for all nets', required = False,
             action='store_true')
         parser['apply'].set_defaults(func=cls.commandline_apply)
 

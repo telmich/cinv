@@ -287,7 +287,7 @@ class Host(object):
         print(host.host_type)
 
     @classmethod
-    def commandline_vmhost_get(cls, args):
+    def commandline_vm_host_get(cls, args):
 
         if not cls.exists(args.fqdn):
             raise Error("Host does not exist: %s" % args.fqdn)
@@ -296,7 +296,7 @@ class Host(object):
         print(host.vm_host)
 
     @classmethod
-    def commandline_vmhost_set(cls, args):
+    def commandline_vm_host_set(cls, args):
 
         if not cls.exists(args.fqdn):
             raise Error("Host does not exist: %s" % args.fqdn)

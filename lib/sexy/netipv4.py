@@ -49,10 +49,10 @@ class NetIPv4(object):
         self.base_dir = self.get_base_dir(network)
         self.network   = network
 
-    _mask   = fsproperty.FileStringProperty(lambda obj: os.path.join(obj.base_dir, "mask"))
-    free    = fsproperty.FileListProperty(lambda obj: os.path.join(obj.base_dir, "free"))
-    last    = fsproperty.FileStringProperty(lambda obj: os.path.join(obj.base_dir, "last"))
-    address = fsproperty.DirectoryDictProperty(lambda obj: os.path.join(obj.base_dir, 'address'))
+    _mask           = fsproperty.FileStringProperty(lambda obj: os.path.join(obj.base_dir, "mask"))
+    address_free    = fsproperty.FileListProperty(lambda obj: os.path.join(obj.base_dir, "address_free"))
+    last            = fsproperty.FileStringProperty(lambda obj: os.path.join(obj.base_dir, "last"))
+    address         = fsproperty.DirectoryDictProperty(lambda obj: os.path.join(obj.base_dir, 'address'))
 
     bootserver      = fsproperty.FileStringProperty(lambda obj: os.path.join(obj.base_dir, "bootserver"))
     bootfilename    = fsproperty.FileStringProperty(lambda obj: os.path.join(obj.base_dir, "bootfilename"))
@@ -63,14 +63,14 @@ class NetIPv4(object):
 
         try:
             os.makedirs(self.base_dir, exist_ok=True)
-            os.makedirs(self.host_dir, exist_ok=True)
+            os.makedirs(self.base_host_dir, exist_ok=True)
         except OSError as e:
             raise Error(e)
 
         self.mask = mask
 
     @property 
-    def host_dir(self):
+    def base_host_dir(self):
         return os.path.join(self.base_dir, "host")
 
     @staticmethod
@@ -211,6 +211,18 @@ class NetIPv4(object):
         self.host_mac_address_set(fqdn, mac_address)
         self.host_ipv4_address_set(fqdn, ipv4_address)
 
+    def host_del(self, fqdn):
+        """ Remove a host from the network"""
+
+        if not self.host_exists(fqdn):
+            raise Error("Host %s does not exist in network %s" % (fqdn, self.network))
+
+        ipv4_address = host_ipv4_address_get(fqdn)
+        log.debug("Removing host %s with ipv4 address %s" % (fqdn, ipv4_address))
+
+        self.address_free.push(ipv4_address)
+        shutil.rmtree(self.host_dir(fqdn))
+
     def host_exists(self, fqdn):
         host_path = os.path.join(self.host_dir, fqdn)
 
@@ -219,39 +231,40 @@ class NetIPv4(object):
 
     def host_list(self):
         hosts = []
-        for host in os.listdir(self.host_dir):
+        for host in os.listdir(self.base_host_dir):
             hosts.append(host)
 
         return hosts
 
-    def host_create(self, host):
-        host_dir = os.path.join(self.host_dir, host)
+    def host_dir(self, host):
+        return os.path.join(self.base_host_dir, host)
 
+    def host_create(self, host):
         try:
-            os.makedirs(host_dir)
+            os.makedirs(self.host_dir(host))
         except OSError as e:
             raise Error(e)
 
     def host_mac_address_get(self, host):
-        mac_address_file = os.path.join(self.host_dir, host, "mac_address")
+        mac_address_file = os.path.join(self.base_host_dir, host, "mac_address")
 
         with open(mac_address_file, "r") as fd:
             return fd.read().rstrip('\n')
 
     def host_mac_address_set(self, host, mac_address):
-        mac_address_file = os.path.join(self.host_dir, host, "mac_address")
+        mac_address_file = os.path.join(self.base_host_dir, host, "mac_address")
 
         with open(mac_address_file, "w") as fd:
             fd.write("%s\n" % mac_address)
 
     def host_ipv4_address_get(self, host):
-        ipv4_address_file = os.path.join(self.host_dir, host, "ipv4_address")
+        ipv4_address_file = os.path.join(self.base_host_dir, host, "ipv4_address")
 
         with open(ipv4_address_file, "r") as fd:
             return fd.read().rstrip('\n')
 
     def host_ipv4_address_set(self, host, ipv4_address):
-        ipv4_address_file = os.path.join(self.host_dir, host, "ipv4_address")
+        ipv4_address_file = os.path.join(self.base_host_dir, host, "ipv4_address")
 
         with open(ipv4_address_file, "w") as fd:
             fd.write("%s\n" % ipv4_address)
@@ -405,6 +418,14 @@ class NetIPv4(object):
         network.host_add(args.fqdn, args.mac_address, args.ipv4_address)
 
     @classmethod
+    def commandline_host_del(cls, args):
+        if not cls.exists(args.network):
+            raise Error("Network does not exist: %s" % args.network)
+
+        network = cls(args.network)
+        network.host_del(args.fqdn)
+
+    @classmethod
     def commandline_host_list(cls, args):
         if not cls.exists(args.network):
             raise Error("Network does not exist: %s" % args.network)
@@ -530,6 +551,12 @@ class NetIPv4(object):
             required=True)
         parser['host-add'].add_argument('-i', '--ipv4-address', help='Requested IPv4 Address')
         parser['host-add'].set_defaults(func=cls.commandline_host_add)
+
+        parser['host-del'] = parser['sub'].add_parser('host-del', parents=parents)
+        parser['host-del'].add_argument('network', help='Network name')
+        parser['host-del'].add_argument('-f', '--fqdn', help='FQDN of host',
+            required=True)
+        parser['host-del'].set_defaults(func=cls.commandline_host_del)
 
         parser['host-list'] = parser['sub'].add_parser('host-list', parents=parents)
         parser['host-list'].add_argument('network', help='Network name')

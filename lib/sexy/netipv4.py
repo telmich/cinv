@@ -217,14 +217,14 @@ class NetIPv4(object):
         if not self.host_exists(fqdn):
             raise Error("Host %s does not exist in network %s" % (fqdn, self.network))
 
-        ipv4_address = host_ipv4_address_get(fqdn)
+        ipv4_address = self.host_ipv4_address_get(fqdn)
         log.debug("Removing host %s with ipv4 address %s" % (fqdn, ipv4_address))
 
-        self.address_free.push(ipv4_address)
+        self.address_free.append(ipv4_address)
         shutil.rmtree(self.host_dir(fqdn))
 
     def host_exists(self, fqdn):
-        host_path = os.path.join(self.host_dir, fqdn)
+        host_path = self.host_dir(fqdn)
 
         log.debug("Checking for host %s at %s" % (fqdn, host_path))
         return os.path.exists(host_path)
@@ -290,8 +290,8 @@ class NetIPv4(object):
     def get_next_ipv4_address(self):
         """Get next address from network"""
 
-        if self.free:
-            return free.pop()
+        if self.address_free:
+            return address_free.pop()
 
         if self.last:
             last_decimal = self.ipv4_address_decimal(self.last)

@@ -42,10 +42,11 @@ class Host(object):
         self.base_dir = self.get_base_dir(fqdn)
         self.fqdn = fqdn
 
-    disk       = fsproperty.DirectoryDictProperty(lambda obj: os.path.join(obj.base_dir, 'disk'))
+    _cores      = fsproperty.FileStringProperty(lambda obj: os.path.join(obj.base_dir, "cores"))
+    disk        = fsproperty.DirectoryDictProperty(lambda obj: os.path.join(obj.base_dir, 'disk'))
     _host_type  = fsproperty.FileStringProperty(lambda obj: os.path.join(obj.base_dir, "host_type"))
     _memory     = fsproperty.FileStringProperty(lambda obj: os.path.join(obj.base_dir, "memory"))
-    nic        = fsproperty.DirectoryDictProperty(lambda obj: os.path.join(obj.base_dir, 'nic'))
+    nic         = fsproperty.DirectoryDictProperty(lambda obj: os.path.join(obj.base_dir, 'nic'))
     _vm_host    = fsproperty.FileStringProperty(lambda obj: os.path.join(obj.base_dir, "vm_host"))
 
     def _init_base_dir(self, host_type):
@@ -81,6 +82,19 @@ class Host(object):
             raise Error("Can only configure vmhost for VMs")
 
         self._vm_host = vm_host
+
+    @property
+    def cores(self):
+        return self._cores
+
+    @cores.setter
+    def cores(self, cores):
+        try:
+            cores_int = int(cores)
+        except ValueError:
+            raise Error("Cores need to be specified as an integer")
+
+        self._cores = cores
 
     @staticmethod
     def get_base_dir(fqdn):
@@ -202,6 +216,27 @@ class Host(object):
         sexy.backend_exec("host", "apply", hosts)
 
     @classmethod
+    def commandline_cores_get(cls, args):
+
+        if not cls.exists(args.fqdn):
+            raise Error("Host does not exist: %s" % args.fqdn)
+
+        host = cls(fqdn=args.fqdn)
+        print(host.cores)
+
+    @classmethod
+    def commandline_cores_set(cls, args):
+
+        if not cls.exists(args.fqdn):
+            raise Error("Host does not exist: %s" % args.fqdn)
+
+        host = cls(fqdn=args.fqdn)
+        host.cores = args.cores
+
+        log.info("Cores for %s = %s" % (args.fqdn, args.cores))
+
+
+    @classmethod
     def commandline_disk_add(cls, args):
 
         if not cls.exists(args.fqdn):
@@ -318,6 +353,16 @@ class Host(object):
         parser['add'].add_argument('-t', '--type', help='Machine Type',
             required=True, choices=["hw","vm"])
         parser['add'].set_defaults(func=cls.commandline_add)
+
+        parser['cores-get'] = parser['sub'].add_parser('cores-get', parents=parents)
+        parser['cores-get'].add_argument('fqdn', help='Host name')
+        parser['cores-get'].set_defaults(func=cls.commandline_cores_get)
+
+        parser['cores-set'] = parser['sub'].add_parser('cores-set', parents=parents)
+        parser['cores-set'].add_argument('fqdn', help='Host name')
+        parser['cores-set'].add_argument('-c', '--cores', help='Number of Cores',
+            required=True)
+        parser['cores-set'].set_defaults(func=cls.commandline_cores_set)
 
         parser['del'] = parser['sub'].add_parser('del', parents=parents)
         parser['del'].add_argument('-r', '--recursive', help='Delete host and all parts',

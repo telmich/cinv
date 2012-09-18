@@ -38,16 +38,13 @@ class Error(sexy.Error):
 
 class Host(object):
 
+    ######################################################################
+    # Initialisation
+    #
+
     def __init__(self, fqdn):
         self.base_dir = self.get_base_dir(fqdn)
         self.fqdn = fqdn
-
-    _cores      = fsproperty.FileStringProperty(lambda obj: os.path.join(obj.base_dir, "cores"))
-    disk        = fsproperty.DirectoryDictProperty(lambda obj: os.path.join(obj.base_dir, 'disk'))
-    _host_type  = fsproperty.FileStringProperty(lambda obj: os.path.join(obj.base_dir, "host_type"))
-    _memory     = fsproperty.FileStringProperty(lambda obj: os.path.join(obj.base_dir, "memory"))
-    nic         = fsproperty.DirectoryDictProperty(lambda obj: os.path.join(obj.base_dir, 'nic'))
-    _vm_host    = fsproperty.FileStringProperty(lambda obj: os.path.join(obj.base_dir, "vm_host"))
 
     def _init_base_dir(self, host_type):
         """Create base directory of host"""
@@ -58,30 +55,16 @@ class Host(object):
 
         self.host_type = host_type
 
-    @staticmethod
-    def validate_host_type(host_type):
-        if host_type not in HOST_TYPES:
-            raise Error("Host type must be one of %s" % (" ".join(HOST_TYPES)))
+    ######################################################################
+    # Properties
+    #
 
-    @property
-    def host_type(self):
-        return self._host_type
-
-    @host_type.setter
-    def host_type(self, host_type):
-        self.validate_host_type(host_type)
-        self._host_type = host_type
-
-    @property
-    def vm_host(self):
-        return self._vm_host
-
-    @vm_host.setter
-    def vm_host(self, vm_host):
-        if not self.host_type == "vm":
-            raise Error("Can only configure vmhost for VMs")
-
-        self._vm_host = vm_host
+    _cores      = fsproperty.FileStringProperty(lambda obj: os.path.join(obj.base_dir, "cores"))
+    disk        = fsproperty.DirectoryDictProperty(lambda obj: os.path.join(obj.base_dir, 'disk'))
+    _host_type  = fsproperty.FileStringProperty(lambda obj: os.path.join(obj.base_dir, "host_type"))
+    _memory     = fsproperty.FileStringProperty(lambda obj: os.path.join(obj.base_dir, "memory"))
+    nic         = fsproperty.DirectoryDictProperty(lambda obj: os.path.join(obj.base_dir, 'nic'))
+    _vm_host    = fsproperty.FileStringProperty(lambda obj: os.path.join(obj.base_dir, "vm_host"))
 
     @property
     def cores(self):
@@ -95,6 +78,39 @@ class Host(object):
             raise Error("Cores need to be specified as an integer")
 
         self._cores = cores
+
+    @property
+    def host_type(self):
+        return self._host_type
+
+    @host_type.setter
+    def host_type(self, host_type):
+        self.validate_host_type(host_type)
+        self._host_type = host_type
+
+    @property
+    def memory(self):
+        return self._memory
+
+    @memory.setter
+    def memory(self, memory):
+        try:
+            memory_int = int(memory)
+        except ValueError:
+            raise Error("Cores need to be specified as an integer of Bytes")
+
+        self._memory = memory
+
+    @property
+    def vm_host(self):
+        return self._vm_host
+
+    @vm_host.setter
+    def vm_host(self, vm_host):
+        if not self.host_type == "vm":
+            raise Error("Can only configure vmhost for VMs")
+
+        self._vm_host = vm_host
 
     @staticmethod
     def get_base_dir(fqdn):
@@ -126,7 +142,7 @@ class Host(object):
 
     @staticmethod
     def convert_si_prefixed_size_values(value):
-        """Convert given size of 101 G to bytes"""
+        """Convert given size to bytes"""
 
         prefix = int(value[:-1])
         suffix = value[-1].lower()
@@ -167,6 +183,15 @@ class Host(object):
 
         return "%s%d" % (base_name, next_number)
 
+    @staticmethod
+    def validate_host_type(host_type):
+        if host_type not in HOST_TYPES:
+            raise Error("Host type must be one of %s" % (" ".join(HOST_TYPES)))
+
+
+    ######################################################################
+    # Commandline
+    #
 
     @classmethod
     def commandline_add(cls, args):
@@ -176,25 +201,6 @@ class Host(object):
         host = cls(fqdn=args.fqdn)
         host.validate_host_type(args.type)
         host._init_base_dir(args.type)
-
-    @classmethod
-    def commandline_del(cls, args):
-        if not cls.exists(args.fqdn):
-            if not args.missing_ignore:
-                raise Error("Host does not exist: %s" % args.fqdn)
-            else:
-                return
-
-        host = cls(fqdn=args.fqdn)
-
-        if not args.recursive:
-            if host.nic or host.disk:
-                raise Error("Cannot delete, host contains disk or nic: %s" % args.fqdn)
-
-        log.debug("Removing %s ..." % host.base_dir)
-        shutil.rmtree(host.base_dir)
-
-        sexy.backend_exec("host", "del", [args.fqdn])
 
                 
     @classmethod
@@ -234,6 +240,25 @@ class Host(object):
         host.cores = args.cores
 
         log.info("Cores for %s = %s" % (args.fqdn, args.cores))
+
+    @classmethod
+    def commandline_del(cls, args):
+        if not cls.exists(args.fqdn):
+            if not args.missing_ignore:
+                raise Error("Host does not exist: %s" % args.fqdn)
+            else:
+                return
+
+        host = cls(fqdn=args.fqdn)
+
+        if not args.recursive:
+            if host.nic or host.disk:
+                raise Error("Cannot delete, host contains disk or nic: %s" % args.fqdn)
+
+        log.debug("Removing %s ..." % host.base_dir)
+        shutil.rmtree(host.base_dir)
+
+        sexy.backend_exec("host", "del", [args.fqdn])
 
 
     @classmethod
@@ -277,6 +302,28 @@ class Host(object):
     def commandline_list(cls, args):
         for host in cls.hosts_list(args.type):
             print(host)
+
+    @classmethod
+    def commandline_memory_get(cls, args):
+
+        if not cls.exists(args.fqdn):
+            raise Error("Host does not exist: %s" % args.fqdn)
+
+        host = cls(fqdn=args.fqdn)
+        print(host.memory)
+
+    @classmethod
+    def commandline_memory_set(cls, args):
+
+        if not cls.exists(args.fqdn):
+            raise Error("Host does not exist: %s" % args.fqdn)
+
+        host = cls(fqdn=args.fqdn)
+        size_bytes = cls.convert_si_prefixed_size_values(args.memory)
+        host.memory = size_bytes
+
+        log.info("Memory for %s = %s" % (args.fqdn, args.memory))
+
 
     @classmethod
     def commandline_nic_add(cls, args):
@@ -341,6 +388,10 @@ class Host(object):
 
         log.info("VMHost for %s = %s" % (args.fqdn, args.vm_host))
 
+    ######################################################################
+    # Argument parser
+    #
+
     @classmethod
     def commandline_args(cls, parent_parser, parents):
         """Add us to the parent parser and add all parents to our parsers"""
@@ -384,6 +435,17 @@ class Host(object):
         parser['disk-size-get'].add_argument('-n', '--name', help='Disk name', required=True)
         parser['disk-size-get'].set_defaults(func=cls.commandline_disk_size_get)
 
+        parser['memory-get'] = parser['sub'].add_parser('memory-get', parents=parents)
+        parser['memory-get'].add_argument('fqdn', help='Host name')
+        parser['memory-get'].set_defaults(func=cls.commandline_memory_get)
+
+        parser['memory-set'] = parser['sub'].add_parser('memory-set', parents=parents)
+        parser['memory-set'].add_argument('fqdn', help='Host name')
+        parser['memory-set'].add_argument('-m', '--memory', help='Main memory',
+            required=True)
+        parser['memory-set'].set_defaults(func=cls.commandline_memory_set)
+
+
         parser['nic-add'] = parser['sub'].add_parser('nic-add', parents=parents)
         parser['nic-add'].add_argument('fqdn', help='Host name')
         parser['nic-add'].add_argument('-m', '--mac-address', help='Mac address',
@@ -425,5 +487,3 @@ class Host(object):
         parser['apply'].add_argument('-t', '--type', help='Host Type (implies --all)',
             choices=["hw","vm"], required=False)
         parser['apply'].set_defaults(func=cls.commandline_apply)
-
-

@@ -34,3 +34,19 @@ class HostTest(unittest.TestCase):
         """Prevent adding hosts with wrong type"""
         self.assertRaises(sexy.host.Error, self.wrong_host_type)
 
+
+    def wrong_memory(self):
+        self.host.memory = "13A"
+
+    def test_prevent_wrong_memory(self):
+        """Prevent adding wrong memory values"""
+        self.assertRaises(sexy.host.Error, self.wrong_memory)
+
+
+    def wrong_cores(self):
+        self.host.cores = "13A"
+
+    def test_prevent_wrong_cores(self):
+        """Prevent adding wrong core values"""
+        self.assertRaises(sexy.host.Error, self.wrong_cores)
+

@@ -291,7 +291,7 @@ class NetIPv4(object):
         """Get next address from network"""
 
         if self.address_free:
-            return address_free.pop()
+            return self.address_free.pop()
 
         if self.last:
             last_decimal = self.ipv4_address_decimal(self.last)

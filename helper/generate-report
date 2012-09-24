@@ -1,0 +1,46 @@
+#!/bin/sh
+# -*- coding: utf-8 -*-
+#
+# 2012 Nico Schottelius (nico-sexy at schottelius.org)
+#
+# This file is part of sexy.
+#
+# sexy is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# sexy is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with sexy. If not, see <http://www.gnu.org/licenses/>.
+#
+#
+
+cat << eof
+<html>
+<head>
+<title>Sexy Inventory</title>
+</head>
+<body>
+eof
+
+for network in $(sexy net-ipv4 list); do
+    echo "<h2>$network</h2>"
+    echo "<table>"
+    echo "<tr><th>FQDN</th><th>Mac Address</th><th>IPv4 address</th></tr>"
+    for host in $(sexy net-ipv4 host-list $network); do
+        ipv4a=$(sexy net-ipv4 host-ipv4-address-get -f $host $network)
+        mac=$(sexy net-ipv4 host-mac-address-get -f $host $network)
+        echo "<tr><td>$host</td><td>$mac</td><td>$ipv4a</td></tr>"
+    done;
+    echo "</table>"
+done
+
+cat << eof
+</body>
+</html>
+eof

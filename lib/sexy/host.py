@@ -108,7 +108,7 @@ class Host(object):
     @vm_host.setter
     def vm_host(self, vm_host):
         if not self.host_type == "vm":
-            raise Error("Can only configure vmhost for VMs")
+            raise Error("Can only configure vm-host for VMs")
 
         self._vm_host = vm_host
 
@@ -378,6 +378,25 @@ class Host(object):
         print(host.vm_host)
 
     @classmethod
+    def commandline_vm_host_list(cls, args):
+        vm_hosts = {}
+        for fqdn in cls.hosts_list():
+            host = cls(fqdn)
+            if host.vm_host:
+                # Create new array, if not already existing
+                if host.vm_host not in vm_hosts:
+                    vm_hosts[host.vm_host] = []
+
+                vm_hosts[host.vm_host].append(fqdn)
+        
+        for vm_host in vm_hosts:
+            print("%s:" % vm_host)
+
+            for fqdn in vm_hosts[vm_host]:
+                print("\t%s" % fqdn)
+
+
+    @classmethod
     def commandline_vm_host_set(cls, args):
 
         if not cls.exists(args.fqdn):
@@ -471,6 +490,9 @@ class Host(object):
         parser['vm-host-get'] = parser['sub'].add_parser('vm-host-get', parents=parents)
         parser['vm-host-get'].add_argument('fqdn', help='Host name')
         parser['vm-host-get'].set_defaults(func=cls.commandline_vm_host_get)
+
+        parser['vm-host-list'] = parser['sub'].add_parser('vm-host-list', parents=parents)
+        parser['vm-host-list'].set_defaults(func=cls.commandline_vm_host_list)
 
         parser['vm-host-set'] = parser['sub'].add_parser('vm-host-set', parents=parents)
         parser['vm-host-set'].add_argument('fqdn', help='Host name')

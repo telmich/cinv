@@ -140,6 +140,11 @@ class Host(object):
     def exists(cls, fqdn):
         return os.path.exists(cls.get_base_dir(fqdn))
 
+    @classmethod
+    def exists_or_raise_error(cls, fqdn):
+        if not cls.exists(args.fqdn):
+            raise Error("Host does not exist: %s" % args.fqdn)
+
     @staticmethod
     def convert_si_prefixed_size_values(value):
         """Convert given size to bytes"""
@@ -224,8 +229,7 @@ class Host(object):
     @classmethod
     def commandline_cores_get(cls, args):
 
-        if not cls.exists(args.fqdn):
-            raise Error("Host does not exist: %s" % args.fqdn)
+        cls.exists_or_raise_error(args.fqdn)
 
         host = cls(fqdn=args.fqdn)
         print(host.cores)
@@ -233,8 +237,7 @@ class Host(object):
     @classmethod
     def commandline_cores_set(cls, args):
 
-        if not cls.exists(args.fqdn):
-            raise Error("Host does not exist: %s" % args.fqdn)
+        cls.exists_or_raise_error(args.fqdn)
 
         host = cls(fqdn=args.fqdn)
         host.cores = args.cores
@@ -264,9 +267,7 @@ class Host(object):
     @classmethod
     def commandline_disk_add(cls, args):
 
-        if not cls.exists(args.fqdn):
-            raise Error("Host does not exist: %s" % args.fqdn)
-
+        cls.exists_or_raise_error(args.fqdn)
         host = cls(fqdn=args.fqdn)
         size_bytes = cls.convert_si_prefixed_size_values(args.size)
 
@@ -285,8 +286,7 @@ class Host(object):
     @classmethod
     def commandline_disk_size_get(cls, args):
 
-        if not cls.exists(args.fqdn):
-            raise Error("Host does not exist: %s" % args.fqdn)
+        cls.exists_or_raise_error(args.fqdn)
 
         host = cls(fqdn=args.fqdn)
 
@@ -306,8 +306,7 @@ class Host(object):
     @classmethod
     def commandline_memory_get(cls, args):
 
-        if not cls.exists(args.fqdn):
-            raise Error("Host does not exist: %s" % args.fqdn)
+        cls.exists_or_raise_error(args.fqdn)
 
         host = cls(fqdn=args.fqdn)
         print(host.memory)
@@ -315,8 +314,7 @@ class Host(object):
     @classmethod
     def commandline_memory_set(cls, args):
 
-        if not cls.exists(args.fqdn):
-            raise Error("Host does not exist: %s" % args.fqdn)
+        cls.exists_or_raise_error(args.fqdn)
 
         host = cls(fqdn=args.fqdn)
         size_bytes = cls.convert_si_prefixed_size_values(args.memory)
@@ -328,8 +326,7 @@ class Host(object):
     @classmethod
     def commandline_nic_add(cls, args):
 
-        if not cls.exists(args.fqdn):
-            raise Error("Host does not exist: %s" % args.fqdn)
+        cls.exists_or_raise_error(args.fqdn)
 
         host = cls(fqdn=args.fqdn)
 
@@ -347,8 +344,21 @@ class Host(object):
     @classmethod
     def commandline_nic_addr_get(cls, args):
 
-        if not cls.exists(args.fqdn):
-            raise Error("Host does not exist: %s" % args.fqdn)
+        cls.exists_or_raise_error(args.fqdn)
+
+        host = cls(fqdn=args.fqdn)
+
+        try:
+            mac_address = host.nic[args.name]
+        except KeyError:
+            raise Error("Host %s does not have nic: %s" % (args.fqdn,  args.name))
+
+        print(mac_address)
+
+    @classmethod
+    def commandline_nic_list(cls, args):
+
+        cls.exists_or_raise_error(args.fqdn)
 
         host = cls(fqdn=args.fqdn)
 
@@ -362,8 +372,7 @@ class Host(object):
     @classmethod
     def commandline_type_get(cls, args):
 
-        if not cls.exists(args.fqdn):
-            raise Error("Host does not exist: %s" % args.fqdn)
+        cls.exists_or_raise_error(args.fqdn)
 
         host = cls(fqdn=args.fqdn)
         print(host.host_type)
@@ -371,8 +380,7 @@ class Host(object):
     @classmethod
     def commandline_vm_host_get(cls, args):
 
-        if not cls.exists(args.fqdn):
-            raise Error("Host does not exist: %s" % args.fqdn)
+        cls.exists_or_raise_error(args.fqdn)
 
         host = cls(fqdn=args.fqdn)
         print(host.vm_host)
@@ -399,8 +407,7 @@ class Host(object):
     @classmethod
     def commandline_vm_host_set(cls, args):
 
-        if not cls.exists(args.fqdn):
-            raise Error("Host does not exist: %s" % args.fqdn)
+        cls.exists_or_raise_error(args.fqdn)
 
         host = cls(fqdn=args.fqdn)
         host.vm_host = args.vm_host
@@ -477,6 +484,11 @@ class Host(object):
         parser['nic-addr-get'].add_argument('-n', '--name', help='Nic name',
             required=True)
         parser['nic-addr-get'].set_defaults(func=cls.commandline_nic_addr_get)
+
+        parser['nic-list'] = parser['sub'].add_parser('nic-list', parents=parents)
+        parser['nic-list'].add_argument('fqdn', help='Host name')
+        parser['nic-list'].set_defaults(func=cls.commandline_nic_list)
+
 
         parser['list'] = parser['sub'].add_parser('list', parents=parents)
         parser['list'].add_argument('-t', '--type', help='Host Type',

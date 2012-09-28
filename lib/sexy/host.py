@@ -247,7 +247,7 @@ class Host(object):
     @classmethod
     def commandline_del(cls, args):
         if not cls.exists(args.fqdn):
-            if not args.missing_ignore:
+            if not args.ignore_missing:
                 raise Error("Host does not exist: %s" % args.fqdn)
             else:
                 return

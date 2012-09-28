@@ -1,1 +1,2 @@
-database/tmp
+.*.swp
+__pycache__/

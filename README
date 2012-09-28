@@ -1,120 +1,52 @@
-Sexy - the make-the-sysadmin-happy-tool (host management)
-=========================================================
-sexy - make sysadmins think about nethack strategies
+Sexy - the sysadmin swiss army knife
+====================================
+sexy - the sysadmin swiss army knife
 
 You define a state - sexy takes care of what needs to be done.
 
 Preamble
 --------
-To be able to use the sexy suite, you have to agree to the following
-principle:
+Sexy assumes that you've processes that you would like to automate.
+Sexy gives you a framework to drop your processes into and makes
+you forget about HOW something is solved.
 
+The basic idea is that you draw some sketch on your whiteboard,
+beginning with "what I want to do" (for instance: create virtual machines).
+Now draw a graph containing all dependencies needed for the process,
+like this:
 
-- I do not care how something is done (realised with 'backends').
-- One aim is to minimise the time spend doing a job (realised with 'frontends').
+--------------------------------------------------------------------------------
+I want a virtual machine with 512M RAM (other stuff I don't care).
+|- requires: virtual machine host with >= 512M RAM
+  |- requires: virtual machine hypervisor
+   |- requires: operating system
+    |- requires: real machine (hardware)
+--------------------------------------------------------------------------------
 
-If you care about how things are done, sexy is suitable for you.
+When you're done, you create a sexy-plugin for each dependency and
+the task you would like to solve, like this:
 
-You can change the job and continue to use sexy.
-Your job can change the backends needed, you can continue to use
-sexy. Sexy, isn't it?
+- vm
+- vm-host
+- os
+- hardware
 
-What sexy can do so far
-~~~~~~~~~~~~~~~~~~~~~~~
+Now your plugin "vm" can contain methods like "create", "delete" etc.
+which use the vm-host plugin to check whether a suitable
+vm-host is available and if not, it can check whether there's an os
+available for a vm-host and if not it can check for relevant hardware.
+IF no suitable hardware is found, it can call the method "aquire"
+of the hardware plugin, to generate a mail to buy and install hardware,
+etc.
 
-Sexy can manage dns/dhcp.
-Sexy should be able to do general services.
-Some stateful, some one shot (?)
+The key to get this working is to find out about the dependencies and
+automate each step in a sexy-plugin.
 
-   - order printer xyz
-   - add host abc to network foobar
+And yes, the authors of sexy use this approach to manage their
+real world clusters.
 
 
 How to use sexy
 ---------------
-
-Initialise sexy
-~~~~~~~~~~~~~~~~
-
-Type into the shell:
-
---------------------------------------------------------------------------------
-sexypath=/path/to/sexy
-export PATH=$PATH:$sexypath/bin
-ln -s $sexypath/database ~/.sexy
---------------------------------------------------------------------------------
-
-That's it, have fun.
-
-
-
-Utilisation (= What I want to do)
----------------------------------
-I want to add a new host ($name $mac $network $location $remarks)
-and after some time everything is working. I do not want to spend
-any time on waiting, but want to be notified, when everything is
-working or if after a time out stuff is *not* working.
-
-
-How to realise the stored configuration?
------------------------------------------
-Via backends, which are independent of the frontend.
-
-General
-~~~~~~~
-The frontend defines the target state, while the backend
-analyses the target state, compares it to the
-present situation and applies the needed changes to get
-to the target state.
-
-
-Backend triggering
-~~~~~~~~~~~~~~~~~~
-
-- frontend generated data -> backend-process transfer
-- backend triggered by
-   - change: check after changes occured
-      - data collector: retrieve present situation for changed ressources
-   - time: check that configuration is still valid
-      - data collector: retrieve present situation for all ressources (contiously)
-
-Backend realisation
-~~~~~~~~~~~~~~~~~~~
-$backend <if ressources-> only ressources>
-   no args = all ressources (-> cron)
-
-
-DHCP
-~~~~
-
-Communication
--------------
-
-Via temp files, see api.
-
-Programming language
-~~~~~~~~~~~~~~~~~~~~
-Independent of the used language. Use the right tool for the right job!
-API available for shell scripts. See sexy-config-load.
-
-Sexy commands (proposals)
--------------------------
-
-host -<c|d> -h <hostname> -t <tag> -m <mac-address> -4 <ipv4-address>
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
--c: create or change host (creates it, if non existing)
--d: delete host
-
-network -<c|d> -n <network> -t <tag> -m <mac-address> -4 <ipv4-address>
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-
-
-Missing / unimplemented commands
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-- host rename
-- host alias add
-- host change mac addr
-- host change ip addr
+% export PATH=$PATH:${pwd -P)/bin
+% sexy

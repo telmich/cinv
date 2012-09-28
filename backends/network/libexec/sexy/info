@@ -1,0 +1,26 @@
+#!/bin/sh
+#
+# Write information about the requested network to stdout.
+#
+#
+
+error() {
+   echo "[ERROR] $@" >&2
+}
+
+die() {
+   error "$@"
+   exit 1
+}
+
+id="$1"; shift
+
+pushd "$id" > /dev/null
+
+for f in $(ls .); do
+   #echo "$f:" $(cat $f)
+   sexy network get $id "--$f"
+done
+
+popd > /dev/null
+

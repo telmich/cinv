@@ -1,0 +1,519 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+#
+# 2012 Nico Schottelius (nico-sexy at schottelius.org)
+#
+# This file is part of sexy.
+#
+# sexy is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# sexy is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with sexy. If not, see <http://www.gnu.org/licenses/>.
+#
+#
+
+import argparse
+import logging
+import os.path
+import os
+import shutil
+
+import sexy
+from sexy import fsproperty
+
+log = logging.getLogger(__name__)
+
+HOST_TYPES = ["hw", "vm"]
+
+class Error(sexy.Error):
+    pass
+
+class Host(object):
+
+    ######################################################################
+    # Initialisation
+    #
+
+    def __init__(self, fqdn):
+        self.base_dir = self.get_base_dir(fqdn)
+        self.fqdn = fqdn
+
+    def _init_base_dir(self, host_type):
+        """Create base directory of host"""
+        try:
+            os.makedirs(self.base_dir, exist_ok=True)
+        except OSError as e:
+            raise Error(e)
+
+        self.host_type = host_type
+
+    ######################################################################
+    # Properties
+    #
+
+    _cores      = fsproperty.FileStringProperty(lambda obj: os.path.join(obj.base_dir, "cores"))
+    disk        = fsproperty.DirectoryDictProperty(lambda obj: os.path.join(obj.base_dir, 'disk'))
+    _host_type  = fsproperty.FileStringProperty(lambda obj: os.path.join(obj.base_dir, "host_type"))
+    _memory     = fsproperty.FileStringProperty(lambda obj: os.path.join(obj.base_dir, "memory"))
+    nic         = fsproperty.DirectoryDictProperty(lambda obj: os.path.join(obj.base_dir, 'nic'))
+    _vm_host    = fsproperty.FileStringProperty(lambda obj: os.path.join(obj.base_dir, "vm_host"))
+
+    @property
+    def cores(self):
+        return self._cores
+
+    @cores.setter
+    def cores(self, cores):
+        try:
+            cores_int = int(cores)
+        except ValueError:
+            raise Error("Cores need to be specified as an integer")
+
+        self._cores = cores
+
+    @property
+    def host_type(self):
+        return self._host_type
+
+    @host_type.setter
+    def host_type(self, host_type):
+        self.validate_host_type(host_type)
+        self._host_type = host_type
+
+    @property
+    def memory(self):
+        return self._memory
+
+    @memory.setter
+    def memory(self, memory):
+        try:
+            memory_int = int(memory)
+        except ValueError:
+            raise Error("Cores need to be specified as an integer of Bytes")
+
+        self._memory = memory
+
+    @property
+    def vm_host(self):
+        return self._vm_host
+
+    @vm_host.setter
+    def vm_host(self, vm_host):
+        if not self.host_type == "vm":
+            raise Error("Can only configure vm-host for VMs")
+
+        self._vm_host = vm_host
+
+    @staticmethod
+    def get_base_dir(fqdn):
+        return os.path.join(sexy.get_base_dir("db"), "host", fqdn)
+
+    @classmethod
+    def hosts_list(cls, host_type=None):
+        hosts = []
+
+        if host_type:
+            if host_type not in HOST_TYPES:
+                raise Error("Host type must be one of %s" % (" ".join(HOST_TYPES)))
+
+        base_dir = os.path.join(sexy.get_base_dir("db"), "host")
+
+        for entry in os.listdir(base_dir):
+            if host_type:
+                host = cls(entry)
+                if host.host_type == host_type:
+                    hosts.append(entry)
+            else:
+                hosts.append(entry)
+
+        return hosts
+
+    @classmethod
+    def exists(cls, fqdn):
+        return os.path.exists(cls.get_base_dir(fqdn))
+
+    @classmethod
+    def exists_or_raise_error(cls, fqdn):
+        if not cls.exists(fqdn):
+            raise Error("Host does not exist: %s" % fqdn)
+
+    @staticmethod
+    def convert_si_prefixed_size_values(value):
+        """Convert given size to bytes"""
+
+        prefix = int(value[:-1])
+        suffix = value[-1].lower()
+
+        if suffix == 'k':
+            bytes = prefix * (1024**1)
+        elif suffix == 'm':
+            bytes = prefix * (1024**2)
+        elif suffix == 'g':
+            bytes = prefix * (1024**3)
+        elif suffix == 't':
+            bytes = prefix * (1024**4)
+        elif suffix == 'p':
+            bytes = prefix * (1024**5)
+        elif suffix == 'e':
+            bytes = prefix * (1024**6)
+        elif suffix == 'z':
+            bytes = prefix * (1024**7)
+        elif suffix == 'y':
+            bytes = prefix * (1024**8)
+        else:
+            raise Error("Unsupported suffix %s" % (suffix))
+
+        return bytes
+
+    def get_next_name(self, area):
+        """Get next generic disk name"""
+
+        base_name = area
+        attribute = getattr(self, area)
+
+        if attribute:
+            last_name = sorted([key for key in attribute if key.startswith(base_name)])[-1]
+            last_number = last_name.lstrip(base_name)
+            next_number = int(last_number) + 1
+        else:
+            next_number = 0
+
+        return "%s%d" % (base_name, next_number)
+
+    @staticmethod
+    def validate_host_type(host_type):
+        if host_type not in HOST_TYPES:
+            raise Error("Host type must be one of %s" % (" ".join(HOST_TYPES)))
+
+
+    ######################################################################
+    # Commandline
+    #
+
+    @classmethod
+    def commandline_add(cls, args):
+        if cls.exists(args.fqdn):
+            raise Error("Host already exist: %s" % args.fqdn)
+
+        host = cls(fqdn=args.fqdn)
+        host.validate_host_type(args.type)
+        host._init_base_dir(args.type)
+
+                
+    @classmethod
+    def commandline_apply(cls, args):
+        """Apply changes using the backend"""
+
+        if not args.all and not args.fqdn and not args.type:
+            raise Error("Required to pass either FQDNs, type or --all")
+        if args.type and args.fqdn:
+            raise Error("Cannot combine FQDN list and type")
+
+        if args.type:
+            hosts = cls.hosts_list(args.type)
+        elif args.all:
+            hosts = cls.hosts_list()
+        else:
+            hosts = args.fqdn
+
+        sexy.backend_exec("host", "apply", hosts)
+
+    @classmethod
+    def commandline_cores_get(cls, args):
+
+        cls.exists_or_raise_error(args.fqdn)
+
+        host = cls(fqdn=args.fqdn)
+        print(host.cores)
+
+    @classmethod
+    def commandline_cores_set(cls, args):
+
+        cls.exists_or_raise_error(args.fqdn)
+
+        host = cls(fqdn=args.fqdn)
+        host.cores = args.cores
+
+        log.info("Cores for %s = %s" % (args.fqdn, args.cores))
+
+    @classmethod
+    def commandline_del(cls, args):
+        if not cls.exists(args.fqdn):
+            if not args.missing_ignore:
+                raise Error("Host does not exist: %s" % args.fqdn)
+            else:
+                return
+
+        host = cls(fqdn=args.fqdn)
+
+        if not args.recursive:
+            if host.nic or host.disk:
+                raise Error("Cannot delete, host contains disk or nic: %s" % args.fqdn)
+
+        log.debug("Removing %s ..." % host.base_dir)
+        shutil.rmtree(host.base_dir)
+
+        sexy.backend_exec("host", "del", [args.fqdn])
+
+
+    @classmethod
+    def commandline_disk_add(cls, args):
+
+        cls.exists_or_raise_error(args.fqdn)
+        host = cls(fqdn=args.fqdn)
+        size_bytes = cls.convert_si_prefixed_size_values(args.size)
+
+        if args.name:
+            if args.name in host.disk:
+                raise Error("Disk already existing: %s")
+        else:
+            name = host.get_next_name("disk")
+
+        host.disk[name] = size_bytes
+
+        sexy.backend_exec("host", "disk_add", [args.fqdn, name, str(size_bytes)])
+
+        log.info("Added disk %s (%s Bytes)" % (name, size_bytes))
+
+    @classmethod
+    def commandline_disk_size_get(cls, args):
+
+        cls.exists_or_raise_error(args.fqdn)
+
+        host = cls(fqdn=args.fqdn)
+
+        try:
+            size = host.disk[args.name]
+        except KeyError:
+            raise Error("Host %s does not have disk: %s" % (args.fqdn,  args.name))
+
+        print(size)
+
+
+    @classmethod
+    def commandline_list(cls, args):
+        for host in cls.hosts_list(args.type):
+            print(host)
+
+    @classmethod
+    def commandline_memory_get(cls, args):
+
+        cls.exists_or_raise_error(args.fqdn)
+
+        host = cls(fqdn=args.fqdn)
+        print(host.memory)
+
+    @classmethod
+    def commandline_memory_set(cls, args):
+
+        cls.exists_or_raise_error(args.fqdn)
+
+        host = cls(fqdn=args.fqdn)
+        size_bytes = cls.convert_si_prefixed_size_values(args.memory)
+        host.memory = size_bytes
+
+        log.info("Memory for %s = %s" % (args.fqdn, args.memory))
+
+
+    @classmethod
+    def commandline_nic_add(cls, args):
+
+        cls.exists_or_raise_error(args.fqdn)
+
+        host = cls(fqdn=args.fqdn)
+
+        if args.name:
+            if args.name in host.disk:
+                raise Error("Network interface card already existing: %s")
+            name = args.name
+        else:
+            name = host.get_next_name("nic")
+
+        host.nic[name] = args.mac_address
+
+        log.info("Added nic %s (%s)" % (name, args.mac_address))
+
+    @classmethod
+    def commandline_nic_addr_get(cls, args):
+
+        cls.exists_or_raise_error(args.fqdn)
+
+        host = cls(fqdn=args.fqdn)
+
+        try:
+            mac_address = host.nic[args.name]
+        except KeyError:
+            raise Error("Host %s does not have nic: %s" % (args.fqdn,  args.name))
+
+        print(mac_address)
+
+    @classmethod
+    def commandline_nic_list(cls, args):
+
+        cls.exists_or_raise_error(args.fqdn)
+
+        host = cls(fqdn=args.fqdn)
+
+        for nic in host.nic.keys():
+            print(nic)
+
+    @classmethod
+    def commandline_type_get(cls, args):
+
+        cls.exists_or_raise_error(args.fqdn)
+
+        host = cls(fqdn=args.fqdn)
+        print(host.host_type)
+
+    @classmethod
+    def commandline_vm_host_get(cls, args):
+
+        cls.exists_or_raise_error(args.fqdn)
+
+        host = cls(fqdn=args.fqdn)
+        print(host.vm_host)
+
+    @classmethod
+    def commandline_vm_host_list(cls, args):
+        vm_hosts = {}
+        for fqdn in cls.hosts_list():
+            host = cls(fqdn)
+            if host.vm_host:
+                # Create new array, if not already existing
+                if host.vm_host not in vm_hosts:
+                    vm_hosts[host.vm_host] = []
+
+                vm_hosts[host.vm_host].append(fqdn)
+        
+        for vm_host in vm_hosts:
+            print("%s:" % vm_host)
+
+            for fqdn in vm_hosts[vm_host]:
+                print("\t%s" % fqdn)
+
+
+    @classmethod
+    def commandline_vm_host_set(cls, args):
+
+        cls.exists_or_raise_error(args.fqdn)
+
+        host = cls(fqdn=args.fqdn)
+        host.vm_host = args.vm_host
+
+        log.info("VMHost for %s = %s" % (args.fqdn, args.vm_host))
+
+    ######################################################################
+    # Argument parser
+    #
+
+    @classmethod
+    def commandline_args(cls, parent_parser, parents):
+        """Add us to the parent parser and add all parents to our parsers"""
+
+        parser = {}
+        parser['sub'] = parent_parser.add_subparsers(title="Host Commands")
+
+        parser['add'] = parser['sub'].add_parser('add', parents=parents)
+        parser['add'].add_argument('fqdn', help='Host name')
+        parser['add'].add_argument('-t', '--type', help='Machine Type',
+            required=True, choices=["hw","vm"])
+        parser['add'].set_defaults(func=cls.commandline_add)
+
+        parser['cores-get'] = parser['sub'].add_parser('cores-get', parents=parents)
+        parser['cores-get'].add_argument('fqdn', help='Host name')
+        parser['cores-get'].set_defaults(func=cls.commandline_cores_get)
+
+        parser['cores-set'] = parser['sub'].add_parser('cores-set', parents=parents)
+        parser['cores-set'].add_argument('fqdn', help='Host name')
+        parser['cores-set'].add_argument('-c', '--cores', help='Number of Cores',
+            required=True)
+        parser['cores-set'].set_defaults(func=cls.commandline_cores_set)
+
+        parser['del'] = parser['sub'].add_parser('del', parents=parents)
+        parser['del'].add_argument('-r', '--recursive', help='Delete host and all parts',
+            action='store_true')
+        parser['del'].add_argument('-i', '--ignore-missing', 
+            help='Do not fail if host is missing', action='store_true')
+        parser['del'].add_argument('fqdn', help='Host name')
+        parser['del'].set_defaults(func=cls.commandline_del)
+
+        parser['disk-add'] = parser['sub'].add_parser('disk-add', parents=parents)
+        parser['disk-add'].add_argument('fqdn', help='Host name')
+        parser['disk-add'].add_argument('-s', '--size', help='Disk size',
+            required=True)
+        parser['disk-add'].add_argument('-n', '--name', help='Disk name')
+        parser['disk-add'].set_defaults(func=cls.commandline_disk_add)
+
+        parser['disk-size-get'] = parser['sub'].add_parser('disk-size-get', parents=parents)
+        parser['disk-size-get'].add_argument('fqdn', help='Host name')
+        parser['disk-size-get'].add_argument('-n', '--name', help='Disk name', required=True)
+        parser['disk-size-get'].set_defaults(func=cls.commandline_disk_size_get)
+
+        parser['memory-get'] = parser['sub'].add_parser('memory-get', parents=parents)
+        parser['memory-get'].add_argument('fqdn', help='Host name')
+        parser['memory-get'].set_defaults(func=cls.commandline_memory_get)
+
+        parser['memory-set'] = parser['sub'].add_parser('memory-set', parents=parents)
+        parser['memory-set'].add_argument('fqdn', help='Host name')
+        parser['memory-set'].add_argument('-m', '--memory', help='Main memory',
+            required=True)
+        parser['memory-set'].set_defaults(func=cls.commandline_memory_set)
+
+
+        parser['nic-add'] = parser['sub'].add_parser('nic-add', parents=parents)
+        parser['nic-add'].add_argument('fqdn', help='Host name')
+        parser['nic-add'].add_argument('-m', '--mac-address', help='Mac address',
+            required=True)
+        parser['nic-add'].add_argument('-n', '--name', help='Nic name')
+        parser['nic-add'].set_defaults(func=cls.commandline_nic_add)
+
+        parser['nic-addr-get'] = parser['sub'].add_parser('nic-addr-get', parents=parents)
+        parser['nic-addr-get'].add_argument('fqdn', help='Host name')
+        parser['nic-addr-get'].add_argument('-n', '--name', help='Nic name',
+            required=True)
+        parser['nic-addr-get'].set_defaults(func=cls.commandline_nic_addr_get)
+
+        parser['nic-list'] = parser['sub'].add_parser('nic-list', parents=parents)
+        parser['nic-list'].add_argument('fqdn', help='Host name')
+        parser['nic-list'].set_defaults(func=cls.commandline_nic_list)
+
+
+        parser['list'] = parser['sub'].add_parser('list', parents=parents)
+        parser['list'].add_argument('-t', '--type', help='Host Type',
+            choices=["hw","vm"], required=False)
+        parser['list'].set_defaults(func=cls.commandline_list)
+
+        parser['type-get'] = parser['sub'].add_parser('type-get', parents=parents)
+        parser['type-get'].add_argument('fqdn', help='Host name')
+        parser['type-get'].set_defaults(func=cls.commandline_type_get)
+
+        parser['vm-host-get'] = parser['sub'].add_parser('vm-host-get', parents=parents)
+        parser['vm-host-get'].add_argument('fqdn', help='Host name')
+        parser['vm-host-get'].set_defaults(func=cls.commandline_vm_host_get)
+
+        parser['vm-host-list'] = parser['sub'].add_parser('vm-host-list', parents=parents)
+        parser['vm-host-list'].set_defaults(func=cls.commandline_vm_host_list)
+
+        parser['vm-host-set'] = parser['sub'].add_parser('vm-host-set', parents=parents)
+        parser['vm-host-set'].add_argument('fqdn', help='Host name')
+        parser['vm-host-set'].add_argument('--vm-host', help='VM Host (only for VMs)',
+            required=True)
+        parser['vm-host-set'].set_defaults(func=cls.commandline_vm_host_set)
+
+        parser['apply'] = parser['sub'].add_parser('apply', parents=parents)
+        parser['apply'].add_argument('fqdn', help='Host name',
+            nargs='*')
+        parser['apply'].add_argument('-a', '--all', 
+            help='Apply settings for all hosts', required = False,
+            action='store_true')
+        parser['apply'].add_argument('-t', '--type', help='Host Type (implies --all)',
+            choices=["hw","vm"], required=False)
+        parser['apply'].set_defaults(func=cls.commandline_apply)

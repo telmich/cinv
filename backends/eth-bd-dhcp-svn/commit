@@ -1,0 +1,47 @@
+#!/bin/sh
+# 
+# 2009      Nico Schottelius (nico-sexy at schottelius.org)
+# 
+# This file is part of sexy.
+#
+# sexy is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+# 
+# sexy is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+# 
+# You should have received a copy of the GNU General Public License
+# along with sexy. If not, see <http://www.gnu.org/licenses/>.
+#
+#
+# Commit subnet.conf
+#
+
+. "$(which sexy-config-load)"
+
+sexy_args network -- "$@" 
+
+#sexy_type_attribute backends ipa-default
+#echo ${sexy_my_config}
+
+tmp="$(sexy_shared_temp "${network}")"
+dst="$(sexy_file_read "${sexy_my_config}/path")/${network}/"
+filename="subnet.conf"
+dstfile="${dst}/${filename}"
+
+set -e
+cp "${tmp}" "${dstfile}"
+cd "${dst}"
+
+# FIXME: make sure git-commit does the right thing and
+# use git diff-index --cached to check whether to run git commit
+#git add "${filename}" 
+set +e
+git commit -m "Sexy update for $network" -o -- "${filename}"
+set -e
+git svn rebase
+git svn dcommit

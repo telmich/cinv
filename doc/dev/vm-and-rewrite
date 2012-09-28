@@ -1,0 +1,98 @@
+db:
+
+~/.sexy
+    /db/
+        /host/
+            <fqdn>/
+                disk/
+                    <name>/
+                        size # in Bytes
+                nic/
+                    <macaddr>
+                type    # hw or vm
+        /net-ipv4/
+            <subnet>/
+                mask
+                host/
+                    <name>/
+                        mac_address
+                        ipv4_address
+                        alias
+
+                address/
+                    <ipv4addr>:<macaddr>
+
+        /mac/
+            prefix      # to be used for mac address generation
+            last        # last assigned mac address
+            free        # list of freed mac addresses
+            
+    /backend/
+        /host/
+            add
+            disk-add
+            apply
+        /net-ipv4/
+        /mac/
+            set-prefix
+
+--------------------------------------------------------------------------------
+Area consists of:
+    Arguments
+    DB Entry definition
+    Backend definition + "Hooks"
+        apply is always defined, but different parameters possible
+--------------------------------------------------------------------------------
+x sexy host add <fqdn> <type>           # hw | vm
+sexy host del <fqdn>
+x sexy host disk-add <fqdn> <size>        # size is given
+x sexy host nic-add <fqdn> <macaddr>      # nico01 00:00:00....
+sexy host nic-del <fqdn> <macaddr>      # nico01 00:00:00.....
+sexy host nic-list <fqdn>
+
+x sexy host memory-set <amount>           # allow k,m,g,t, suffices
+x sexy host cpu-set <amount >             # amount of cpus / cores
+x sexy host vmhost-set <fqdn> <vmhost> # error if type != vm
+
+x sexy host list [--type <hw|vm>]
+x sexy host apply <fqdn|all>
+--------------------------------------------------------------------------------
+x sexy net-ipv4 add <subnet>/<mask>
+sexy net-ipv4 del <subnet>
+
+sexy net-ipv4 addr-add <subnet> <hostname> <macaddr> [ipv4addr]
+
+sexy net-ipv4 alias-add <hostname> <alias>
+
+sexy net-ipv4 addr-del <subnet> <macaddr>
+sexy net-ipv4 addr-get <subnet> <macaddr> # returns ipv4addr
+
+sexy net-ipv4 bootserver-set <subnet> <bootserver>
+sexy net-ipv4 bootfilename-set <subnet> <bootfilename>
+
+sexy net-ipv4 apply <subnet|all>
+sexy net-ipv4 check <subnet|all>
+sexy net-ipv4 list
+
+--------------------------------------------------------------------------------
+
+x sexy mac generate               # stdout = next
+x sexy mac free <macaddr>         # write into free database
+x sexy mac prefix-set <prefix>     # prefix to use to generate mac addresses
+
+--------------------------------------------------------------------------------
+Backends:
+    gleiche parameter wie apply + umgebungsvariablen mit info zu wo die DB ist?
+--------------------------------------------------------------------------------
+Konsens:
+    Async, da Aktionen lange dauern können (e-mail, cdist run)
+
+--------------------------------------------------------------------------------
+Other todos:
+
+    net-ipv4 dns-server-add
+    net-ipv4 dns-server-del
+    net-ipv4 dns-name-get
+    net-ipv4 dns-name-set
+
+    net-ipv4 router-set

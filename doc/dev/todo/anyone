@@ -1,0 +1,5 @@
+- add plugin: "plugin" which knows methods "list", "list-methods", "show-help"
+   - a plugin that helps the life with plugins ;-)
+- add plugin: use macdb as bases and create "leases" => usable for mac, ipv4, ipv6, ...
+   - methods like first, last, get-next, free/unuse (or book|bring-back)
+   - also: increment? or only via get-next?

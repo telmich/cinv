@@ -142,8 +142,8 @@ class Host(object):
 
     @classmethod
     def exists_or_raise_error(cls, fqdn):
-        if not cls.exists(args.fqdn):
-            raise Error("Host does not exist: %s" % args.fqdn)
+        if not cls.exists(fqdn):
+            raise Error("Host does not exist: %s" % fqdn)
 
     @staticmethod
     def convert_si_prefixed_size_values(value):
@@ -362,12 +362,8 @@ class Host(object):
 
         host = cls(fqdn=args.fqdn)
 
-        try:
-            mac_address = host.nic[args.name]
-        except KeyError:
-            raise Error("Host %s does not have nic: %s" % (args.fqdn,  args.name))
-
-        print(mac_address)
+        for nic in host.nic.keys():
+            print(nic)
 
     @classmethod
     def commandline_type_get(cls, args):

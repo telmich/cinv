@@ -126,6 +126,9 @@ class Host(object):
 
         base_dir = os.path.join(sexy.get_base_dir("db"), "host")
 
+        if not os.path.isdir(base_dir):
+            return []
+
         for entry in os.listdir(base_dir):
             if host_type:
                 host = cls(entry)

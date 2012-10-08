@@ -1,0 +1,61 @@
+#!/bin/sh
+
+cd ~/.sexy/hosts
+
+for host in *; do
+    host_type="hw"
+
+    # Do filerzone in 2nd step - they are the 2nd interface of
+    # the host
+    echo $host | grep -q fs.intra.local.ch && continue
+
+    echo $host | grep -q vm && host_type="vm"
+    sexy host add -t $host_type $host
+
+    mac=$(cat $host/mac)
+
+    sexy host nic-add -m $mac -n pz $host
+done
+
+# Add nic to host
+for host in *.fs.intra.local.ch; do
+    mac=$(cat $host/mac)
+
+    # Original host is without fs
+    host=$(echo $host | sed 's/fs\.//')
+
+    sexy host nic-add -m $mac -n fz $host
+done
+
+
+cd ~/.sexy/networks
+
+for network in *; do
+    (
+        cd $network
+        for host in *; do
+            ipv4a=$(cat $host/ipv4a)
+            mac=$(cat $host/mac)
+
+            echo Migrating $host in $network with address $ipv4a
+
+            sexy net-ipv4 host-add -m $mac -f $host -i $ipv4a $network
+        done
+    )
+
+    last=$(cat $network/.config/address_last_used)
+    echo Using $last as last used IP address in $network
+    echo $last > ~/.sexy/db/net-ipv4/$network/last
+
+    if [ -f $network/.config/bootfilename ]; then
+        bootfilename=$(cat $network/.config/bootfilename)
+        echo Setting bootfilename $bootfilename ...
+        sexy net-ipv4 bootfilename-set --bootfilename $bootfilename $network
+    fi
+
+    if [ -f $network/.config/next-server ]; then
+        bootserver=$(cat $network/.config/next-server)
+        echo Setting bootserver $bootserver ...
+        sexy net-ipv4 bootserver-set --bootfilename $bootfilename $network
+    fi
+done

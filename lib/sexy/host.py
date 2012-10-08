@@ -276,7 +276,8 @@ class Host(object):
 
         if args.name:
             if args.name in host.disk:
-                raise Error("Disk already existing: %s")
+                raise Error("Disk already exists: %s" % args.name)
+            name = args.name
         else:
             name = host.get_next_name("disk")
 

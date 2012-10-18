@@ -288,6 +288,17 @@ class Host(object):
         log.info("Added disk %s (%s Bytes)" % (name, size_bytes))
 
     @classmethod
+    def commandline_disk_list(cls, args):
+
+        cls.exists_or_raise_error(args.fqdn)
+
+        host = cls(fqdn=args.fqdn)
+
+        for disk in host.disk.keys():
+            print(disk)
+
+
+    @classmethod
     def commandline_disk_size_get(cls, args):
 
         cls.exists_or_raise_error(args.fqdn)
@@ -462,6 +473,10 @@ class Host(object):
         parser['disk-size-get'].add_argument('fqdn', help='Host name')
         parser['disk-size-get'].add_argument('-n', '--name', help='Disk name', required=True)
         parser['disk-size-get'].set_defaults(func=cls.commandline_disk_size_get)
+
+        parser['disk-list'] = parser['sub'].add_parser('disk-list', parents=parents)
+        parser['disk-list'].add_argument('fqdn', help='Host name')
+        parser['disk-list'].set_defaults(func=cls.commandline_disk_list)
 
         parser['memory-get'] = parser['sub'].add_parser('memory-get', parents=parents)
         parser['memory-get'].add_argument('fqdn', help='Host name')

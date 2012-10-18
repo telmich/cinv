@@ -397,7 +397,9 @@ class Host(object):
 
                 vm_hosts[host.vm_host].append(fqdn)
         
-        for vm_host in vm_hosts:
+        sorted_vm_host_names = sorted(vm_hosts.keys())
+
+        for vm_host in sorted_vm_host_names:
             print("%s:" % vm_host)
 
             for fqdn in vm_hosts[vm_host]:

@@ -20,13 +20,22 @@
 #
 #
 
-VERSION="2.0"
+import os
+import subprocess
+
+try:
+    with open(os.devnull, 'w') as devnull:
+        here = os.path.dirname(os.path.realpath(__file__))
+        VERSION = subprocess.check_output(
+                    'cd "%s" && git describe' % here,
+                    stderr=devnull, shell=True).decode('utf-8')
+except:
+    VERSION     = "2.0.0 (very soon)"
 
 def commandline():
     """Parse command line"""
     import argparse
 
-    # Construct parser others can reuse
     parser = {}
 
     ######################################################################
@@ -91,6 +100,10 @@ def commandline():
         return 1
 
     return 0
+
+def commandline_main(args):
+    pass
+
 
 if __name__ == "__main__":
     # Sys is needed for sys.exit()

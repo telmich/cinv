@@ -346,7 +346,7 @@ class Host(object):
         host = cls(fqdn=args.fqdn)
 
         if args.name:
-            if args.name in host.disk:
+            if args.name in host.nic:
                 raise Error("Network interface card already existing: %s")
             name = args.name
         else:

@@ -371,6 +371,22 @@ class Host(object):
         print(mac_address)
 
     @classmethod
+    def commandline_nic_del(cls, args):
+
+        cls.exists_or_raise_error(args.fqdn)
+
+        host = cls(fqdn=args.fqdn)
+        name = args.name
+
+        if not name in host.nic:
+            raise Error("Cannot delete non existing nic: %s" % name)
+
+        del host.nic[name]
+
+        log.info("Deleted nic %s" % name)
+
+
+    @classmethod
     def commandline_nic_list(cls, args):
 
         cls.exists_or_raise_error(args.fqdn)
@@ -495,6 +511,11 @@ class Host(object):
             required=True)
         parser['nic-add'].add_argument('-n', '--name', help='Nic name')
         parser['nic-add'].set_defaults(func=cls.commandline_nic_add)
+
+        parser['nic-del'] = parser['sub'].add_parser('nic-del', parents=parents)
+        parser['nic-del'].add_argument('fqdn', help='Host name')
+        parser['nic-del'].add_argument('-n', '--name', help='Nic name', required=True)
+        parser['nic-del'].set_defaults(func=cls.commandline_nic_del)
 
         parser['nic-addr-get'] = parser['sub'].add_parser('nic-addr-get', parents=parents)
         parser['nic-addr-get'].add_argument('fqdn', help='Host name')

@@ -94,6 +94,12 @@ def commandline():
     log.debug(args)
 
     try:
+        a = getattr(args, "func")
+    except AttributeError:
+        parser['main'].print_help()
+        sys.exit(0)
+
+    try:
         args.func(args)
     except sexy.Error as e:
         log.error(e)

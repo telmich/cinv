@@ -1,0 +1,52 @@
+Sexy - the sysadmin swiss army knife
+====================================
+sexy - the sysadmin swiss army knife
+
+You define a state - sexy takes care of what needs to be done.
+
+Preamble
+--------
+Sexy assumes that you've processes that you would like to automate.
+Sexy gives you a framework to drop your processes into and makes
+you forget about HOW something is solved.
+
+The basic idea is that you draw some sketch on your whiteboard,
+beginning with "what I want to do" (for instance: create virtual machines).
+Now draw a graph containing all dependencies needed for the process,
+like this:
+
+--------------------------------------------------------------------------------
+I want a virtual machine with 512M RAM (other stuff I don't care).
+|- requires: virtual machine host with >= 512M RAM
+  |- requires: virtual machine hypervisor
+   |- requires: operating system
+    |- requires: real machine (hardware)
+--------------------------------------------------------------------------------
+
+When you're done, you create a sexy-plugin for each dependency and
+the task you would like to solve, like this:
+
+- vm
+- vm-host
+- os
+- hardware
+
+Now your plugin "vm" can contain methods like "create", "delete" etc.
+which use the vm-host plugin to check whether a suitable
+vm-host is available and if not, it can check whether there's an os
+available for a vm-host and if not it can check for relevant hardware.
+IF no suitable hardware is found, it can call the method "aquire"
+of the hardware plugin, to generate a mail to buy and install hardware,
+etc.
+
+The key to get this working is to find out about the dependencies and
+automate each step in a sexy-plugin.
+
+And yes, the authors of sexy use this approach to manage their
+real world clusters.
+
+
+How to use sexy
+---------------
+% export PATH=$PATH:${pwd -P)/bin
+% sexy

@@ -457,7 +457,7 @@ class Host(object):
         parser['add'] = parser['sub'].add_parser('add', parents=parents)
         parser['add'].add_argument('fqdn', help='Host name')
         parser['add'].add_argument('-t', '--type', help='Machine Type',
-            required=True, choices=["hw","vm"])
+            required=True, choices=HOST_TYPES)
         parser['add'].set_defaults(func=cls.commandline_add)
 
         parser['cores-get'] = parser['sub'].add_parser('cores-get', parents=parents)
@@ -530,7 +530,7 @@ class Host(object):
 
         parser['list'] = parser['sub'].add_parser('list', parents=parents)
         parser['list'].add_argument('-t', '--type', help='Host Type',
-            choices=["hw","vm"], required=False)
+            choices=HOST_TYPES, required=False)
         parser['list'].set_defaults(func=cls.commandline_list)
 
         parser['type-get'] = parser['sub'].add_parser('type-get', parents=parents)
@@ -557,5 +557,5 @@ class Host(object):
             help='Apply settings for all hosts', required = False,
             action='store_true')
         parser['apply'].add_argument('-t', '--type', help='Host Type (implies --all)',
-            choices=["hw","vm"], required=False)
+            choices=HOST_TYPES, required=False)
         parser['apply'].set_defaults(func=cls.commandline_apply)

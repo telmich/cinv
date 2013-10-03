@@ -138,17 +138,9 @@ class Host(object):
             else:
                 hosts.append(entry)
 
-        # Filter for tags
-        for tag in tags:
-            print("%s" % tag)
-            for entry in hosts:
-                host = cls(entry)
-                if not tag in host.tag:
-                    log.info("Deleted non-matching host %s" % entry)
-                    hosts.remove(entry)
-                else:
-                    log.info("matching host %s" % entry)
-
+        tagset = set(tags)
+        host_objects = [cls(h) for h in hosts]
+        hosts = [h.fqdn for h in host_objects if h.tag.keys() == tagset]
 
         return hosts
 

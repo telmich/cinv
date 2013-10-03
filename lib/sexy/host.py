@@ -64,6 +64,7 @@ class Host(object):
     _host_type  = fsproperty.FileStringProperty(lambda obj: os.path.join(obj.base_dir, "host_type"))
     _memory     = fsproperty.FileStringProperty(lambda obj: os.path.join(obj.base_dir, "memory"))
     nic         = fsproperty.DirectoryDictProperty(lambda obj: os.path.join(obj.base_dir, 'nic'))
+    tag         = fsproperty.DirectoryDictProperty(lambda obj: os.path.join(obj.base_dir, 'tag'))
     _vm_host    = fsproperty.FileStringProperty(lambda obj: os.path.join(obj.base_dir, "vm_host"))
 
     @property
@@ -117,7 +118,7 @@ class Host(object):
         return os.path.join(sexy.get_base_dir("db"), "host", fqdn)
 
     @classmethod
-    def hosts_list(cls, host_type=None):
+    def host_list(cls, host_type=None, tags=[]):
         hosts = []
 
         if host_type:
@@ -136,6 +137,18 @@ class Host(object):
                     hosts.append(entry)
             else:
                 hosts.append(entry)
+
+        # Filter for tags
+        for tag in tags:
+            print("%s" % tag)
+            for entry in hosts:
+                host = cls(entry)
+                if not tag in host.tag:
+                    log.info("Deleted non-matching host %s" % entry)
+                    hosts.remove(entry)
+                else:
+                    log.info("matching host %s" % entry)
+
 
         return hosts
 
@@ -221,9 +234,9 @@ class Host(object):
             raise Error("Cannot combine FQDN list and type")
 
         if args.type:
-            hosts = cls.hosts_list(args.type)
+            hosts = cls.host_list(args.type)
         elif args.all:
-            hosts = cls.hosts_list()
+            hosts = cls.host_list()
         else:
             hosts = args.fqdn
 
@@ -315,7 +328,7 @@ class Host(object):
 
     @classmethod
     def commandline_list(cls, args):
-        for host in cls.hosts_list(args.type):
+        for host in cls.host_list(args.type, args.tags):
             print(host)
 
     @classmethod
@@ -395,6 +408,53 @@ class Host(object):
 
         for nic in host.nic.keys():
             print(nic)
+
+    @classmethod
+    def commandline_tag_add(cls, args):
+
+        cls.exists_or_raise_error(args.fqdn)
+
+        host = cls(fqdn=args.fqdn)
+
+        name = args.name
+
+        if args.value:
+            value = args.value
+        else:
+            value = ""
+
+        if args.name in host.tag and not args.force:
+            raise Error("tag already existing: %s" % args.name)
+
+        host.tag[name] = value
+
+        log.info("Added tag %s = \"%s\"" % (name, value))
+
+    @classmethod
+    def commandline_tag_del(cls, args):
+
+        cls.exists_or_raise_error(args.fqdn)
+
+        host = cls(fqdn=args.fqdn)
+
+        if args.name in host.tag:
+            del host.tag[name]
+        else:
+            if not args.force:
+                raise Error("tag does not exist: %s" % name)
+
+        log.info("Deleted tag %s" % (name))
+
+    @classmethod
+    def commandline_tag_list(cls, args):
+
+        cls.exists_or_raise_error(args.fqdn)
+
+        host = cls(fqdn=args.fqdn)
+
+        for name in host.tag.keys():
+            print(name)
+
 
     @classmethod
     def commandline_type_get(cls, args):
@@ -494,6 +554,14 @@ class Host(object):
         parser['disk-list'].add_argument('fqdn', help='Host name')
         parser['disk-list'].set_defaults(func=cls.commandline_disk_list)
 
+        parser['list'] = parser['sub'].add_parser('list', parents=parents)
+        parser['list'].add_argument('-t', '--type', help='Host Type',
+            choices=HOST_TYPES, required=False)
+        parser['list'].add_argument('-T', '--tags', help='Host containing tag', action='append',
+            default=[], required=False)
+        parser['list'].set_defaults(func=cls.commandline_list)
+
+
         parser['memory-get'] = parser['sub'].add_parser('memory-get', parents=parents)
         parser['memory-get'].add_argument('fqdn', help='Host name')
         parser['memory-get'].set_defaults(func=cls.commandline_memory_get)
@@ -519,19 +587,30 @@ class Host(object):
 
         parser['nic-addr-get'] = parser['sub'].add_parser('nic-addr-get', parents=parents)
         parser['nic-addr-get'].add_argument('fqdn', help='Host name')
-        parser['nic-addr-get'].add_argument('-n', '--name', help='Nic name',
-            required=True)
+        parser['nic-addr-get'].add_argument('-n', '--name', help='Name', required=True)
         parser['nic-addr-get'].set_defaults(func=cls.commandline_nic_addr_get)
 
         parser['nic-list'] = parser['sub'].add_parser('nic-list', parents=parents)
         parser['nic-list'].add_argument('fqdn', help='Host name')
         parser['nic-list'].set_defaults(func=cls.commandline_nic_list)
 
+        parser['tag-add'] = parser['sub'].add_parser('tag-add', parents=parents)
+        parser['tag-add'].add_argument('fqdn', help='Host name')
+        parser['tag-add'].add_argument('-f', '--force', help='Also add if already existent')
+        parser['tag-add'].add_argument('-n', '--name', help='Name', required=True)
+        parser['tag-add'].add_argument('-V', '--value', help='Value')
+        parser['tag-add'].set_defaults(func=cls.commandline_tag_add)
 
-        parser['list'] = parser['sub'].add_parser('list', parents=parents)
-        parser['list'].add_argument('-t', '--type', help='Host Type',
-            choices=HOST_TYPES, required=False)
-        parser['list'].set_defaults(func=cls.commandline_list)
+        parser['tag-del'] = parser['sub'].add_parser('tag-del', parents=parents)
+        parser['tag-del'].add_argument('fqdn', help='Host name')
+        parser['tag-del'].add_argument('-f', '--force', help='Do not fail if tag is gone already')
+        parser['tag-del'].add_argument('-n', '--name', help='Name', required=True)
+        parser['tag-del'].add_argument('-V', '--value', help='Value')
+        parser['tag-del'].set_defaults(func=cls.commandline_tag_del)
+
+        parser['tag-list'] = parser['sub'].add_parser('tag-list', parents=parents)
+        parser['tag-list'].add_argument('fqdn', help='Host name')
+        parser['tag-list'].set_defaults(func=cls.commandline_tag_list)
 
         parser['type-get'] = parser['sub'].add_parser('type-get', parents=parents)
         parser['type-get'].add_argument('fqdn', help='Host name')

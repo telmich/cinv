@@ -138,9 +138,11 @@ class Host(object):
             else:
                 hosts.append(entry)
 
-        tagset = set(tags)
-        host_objects = [cls(h) for h in hosts]
-        hosts = [h.fqdn for h in host_objects if h.tag.keys() == tagset]
+        # Only show hosts matching all tags
+        if len(tags) > 0:
+            tagset = set(tags)
+            host_objects = [cls(h) for h in hosts]
+            hosts = [h.fqdn for h in host_objects if h.tag.keys() == tagset]
 
         return hosts
 
@@ -467,7 +469,7 @@ class Host(object):
     @classmethod
     def commandline_vm_host_list(cls, args):
         vm_hosts = {}
-        for fqdn in cls.hosts_list():
+        for fqdn in cls.host_list():
             host = cls(fqdn)
             if host.vm_host:
                 # Create new array, if not already existing

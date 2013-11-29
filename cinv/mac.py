@@ -1,22 +1,22 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 #
-# 2012 Nico Schottelius (nico-sexy at schottelius.org)
+# 2012 Nico Schottelius (nico-cinv at schottelius.org)
 #
-# This file is part of sexy.
+# This file is part of cinv.
 #
-# sexy is free software: you can redistribute it and/or modify
+# cinv is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation, either version 3 of the License, or
 # (at your option) any later version.
 #
-# sexy is distributed in the hope that it will be useful,
+# cinv is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
 #
 # You should have received a copy of the GNU General Public License
-# along with sexy. If not, see <http://www.gnu.org/licenses/>.
+# along with cinv. If not, see <http://www.gnu.org/licenses/>.
 #
 #
 
@@ -26,12 +26,12 @@ import os.path
 import os
 import re
 
-import sexy
-from sexy import fsproperty
+import cinv
+from cinv import fsproperty
 
 log = logging.getLogger(__name__)
 
-class Error(sexy.Error):
+class Error(cinv.Error):
     pass
 
 class Mac(object):
@@ -63,7 +63,7 @@ class Mac(object):
 
     @staticmethod
     def get_base_dir():
-        return sexy.get_base_dir("db/mac")
+        return cinv.get_base_dir("db/mac")
 
     @classmethod
     def exists(cls):

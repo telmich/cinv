@@ -1,22 +1,22 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 #
-# 2012 Nico Schottelius (nico-sexy at schottelius.org)
+# 2012 Nico Schottelius (nico-cinv at schottelius.org)
 #
-# This file is part of sexy.
+# This file is part of cinv.
 #
-# sexy is free software: you can redistribute it and/or modify
+# cinv is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation, either version 3 of the License, or
 # (at your option) any later version.
 #
-# sexy is distributed in the hope that it will be useful,
+# cinv is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
 #
 # You should have received a copy of the GNU General Public License
-# along with sexy. If not, see <http://www.gnu.org/licenses/>.
+# along with cinv. If not, see <http://www.gnu.org/licenses/>.
 #
 #
 
@@ -29,14 +29,14 @@ import shutil
 import socket
 import struct
 
-import sexy
-from sexy import fsproperty
+import cinv
+from cinv import fsproperty
 
 log = logging.getLogger(__name__)
 
 HOST_TYPES = ["hw", "vm"]
 
-class Error(sexy.Error):
+class Error(cinv.Error):
     pass
 
 class NetIPv4(object):
@@ -125,13 +125,13 @@ class NetIPv4(object):
 
     @staticmethod
     def get_base_dir(network):
-        return os.path.join(sexy.get_base_dir("db"), "net-ipv4", network)
+        return os.path.join(cinv.get_base_dir("db"), "net-ipv4", network)
 
     @classmethod
     def network_list(cls):
         networks = []
 
-        base_dir = os.path.join(sexy.get_base_dir("db"), "net-ipv4")
+        base_dir = os.path.join(cinv.get_base_dir("db"), "net-ipv4")
 
         for entry in os.listdir(base_dir):
             # With or without the mask is the question...
@@ -185,8 +185,8 @@ class NetIPv4(object):
         """ Add a host to the network"""
         
         # Ensure given mac address is valid
-        import sexy.mac
-        sexy.mac.Mac.validate_mac(mac_address)
+        import cinv.mac
+        cinv.mac.Mac.validate_mac(mac_address)
 
         if self.host_exists(fqdn):
             raise Error("Host %s already in network %s" % (fqdn, self.network))
@@ -320,7 +320,7 @@ class NetIPv4(object):
         network.validate_mask(args.mask)
         network._init_base_dir(args.mask)
 
-        sexy.backend_exec("net-ipv4", "add", [args.network, args.mask])
+        cinv.backend_exec("net-ipv4", "add", [args.network, args.mask])
 
     @classmethod
     def commandline_apply(cls, args):
@@ -334,7 +334,7 @@ class NetIPv4(object):
         else:
             networks = args.network
 
-        sexy.backend_exec("net-ipv4", "apply", networks)
+        cinv.backend_exec("net-ipv4", "apply", networks)
 
 #    @classmethod
 #    def commandline_del(cls, args):
@@ -353,7 +353,7 @@ class NetIPv4(object):
 #        log.debug("Removing %s ..." % host.base_dir)
 #        shutil.rmtree(host.base_dir)
 #
-#        sexy.backend_exec("host", "del", [args.fqdn])
+#        cinv.backend_exec("host", "del", [args.fqdn])
 
                 
     @classmethod

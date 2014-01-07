@@ -33,11 +33,14 @@ class Error(Exception):
     """Base class for fallback of all exceptions"""
     pass
 
-def get_base_dir(area):
-    if 'HOME' in os.environ:
-        base_dir = os.path.join(os.environ['HOME'], ".cinv", area)
-    else:
+def get_home_dir():
+    if not 'HOME' in os.environ:
         raise Error("HOME unset - cannot find default directory")
+
+    return  os.path.join(os.environ['HOME'], ".cinv")
+
+def get_base_dir(area):
+    return os.path.join(get_home_dir(), area)
 
     return base_dir
 

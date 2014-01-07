@@ -222,6 +222,8 @@ class Host(object):
     def commandline_apply(cls, args):
         """Apply changes using the backend"""
 
+        # FIXME: maybe support only --all - everything else could cause inconsistencies
+
         if not args.all and not args.fqdn and not args.type:
             raise Error("Required to pass either FQDNs, type or --all")
         if args.type and args.fqdn:

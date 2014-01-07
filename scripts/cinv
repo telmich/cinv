@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 #
-# 2012 Nico Schottelius (nico-cinv at schottelius.org)
+# 2012-2014 Nico Schottelius (nico-cinv at schottelius.org)
 #
 # This file is part of cinv.
 #
@@ -81,6 +81,15 @@ def commandline():
     parser['mac']['main'] = parser['mainsub'].add_parser('mac', 
         parents=[parser['loglevel']])
     cinv.mac.Mac.commandline_args(parser['mac']['main'], [parser['loglevel']])
+
+
+    ######################################################################
+    # process
+    import cinv.process
+    parser['process'] = {}
+    parser['process']['main'] = parser['mainsub'].add_parser('process', 
+        parents=[parser['loglevel']])
+    cinv.process.Process.commandline_args(parser['process']['main'], [parser['loglevel']])
 
     args = parser['main'].parse_args(sys.argv[1:])
 

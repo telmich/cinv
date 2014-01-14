@@ -34,8 +34,6 @@ from cinv import fsproperty
 
 log = logging.getLogger(__name__)
 
-HOST_TYPES = ["hw", "vm"]
-
 class Error(cinv.Error):
     pass
 

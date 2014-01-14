@@ -168,29 +168,36 @@ class Host(object):
         if type(value) == int:
             return value
 
+        # Skip if it is a string that is just an int
+        try:
+            value = int(value)
+            return value
+        except ValueError:
+            pass
+
         prefix = int(value[:-1])
         suffix = value[-1].lower()
 
         if suffix == 'k':
-            bytes = prefix * (1024**1)
+            value = prefix * (1024**1)
         elif suffix == 'm':
-            bytes = prefix * (1024**2)
+            value = prefix * (1024**2)
         elif suffix == 'g':
-            bytes = prefix * (1024**3)
+            value = prefix * (1024**3)
         elif suffix == 't':
-            bytes = prefix * (1024**4)
+            value = prefix * (1024**4)
         elif suffix == 'p':
-            bytes = prefix * (1024**5)
+            value = prefix * (1024**5)
         elif suffix == 'e':
-            bytes = prefix * (1024**6)
+            value = prefix * (1024**6)
         elif suffix == 'z':
-            bytes = prefix * (1024**7)
+            value = prefix * (1024**7)
         elif suffix == 'y':
-            bytes = prefix * (1024**8)
+            value = prefix * (1024**8)
         else:
             raise Error("Unsupported suffix %s" % (suffix))
 
-        return bytes
+        return value
 
     def get_next_name(self, area):
         """Get next generic disk name"""
@@ -404,6 +411,14 @@ class Host(object):
         for nic in host.nic.keys():
             print(nic)
 
+    def tag_add(self, name, value="", force=False):
+
+        if name in self.tag and not force:
+            raise Error("tag already existing: %s" % name)
+
+        self.tag[name] = value
+
+
     @classmethod
     def commandline_tag_add(cls, args):
 
@@ -411,19 +426,16 @@ class Host(object):
 
         host = cls(fqdn=args.fqdn)
 
-        name = args.name
-
-        if args.value:
-            value = args.value
-        else:
-            value = ""
-
-        if args.name in host.tag and not args.force:
-            raise Error("tag already existing: %s" % args.name)
-
-        host.tag[name] = value
+        host.tag_add(args.name, args.value, args.force)
 
         log.info("Added tag %s = \"%s\"" % (name, value))
+
+    def tag_del(self, name, force=False):
+        if name in self.tag:
+            del self.tag[name]
+        else:
+            if not force:
+                raise Error("tag does not exist: %s" % name)
 
     @classmethod
     def commandline_tag_del(cls, args):
@@ -432,11 +444,7 @@ class Host(object):
 
         host = cls(fqdn=args.fqdn)
 
-        if args.name in host.tag:
-            del host.tag[name]
-        else:
-            if not args.force:
-                raise Error("tag does not exist: %s" % name)
+        host.tag_del(args.name, args.force)
 
         log.info("Deleted tag %s" % (name))
 

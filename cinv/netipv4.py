@@ -179,7 +179,7 @@ class NetIPv4(object):
     def ipv4_address_used_in_network(self, ipv4_address):
         return self.network == self.map_ipv4_address_to_network_address(ipv4_address)
 
-    def host_add(self, fqdn, mac_address, ipv4_address):
+    def host_add(self, fqdn, mac_address, ipv4_address=None):
         """ Add a host to the network"""
         
         # Ensure given mac address is valid
@@ -187,7 +187,7 @@ class NetIPv4(object):
         cinv.mac.Mac.validate_mac(mac_address)
 
         if self.host_exists(fqdn):
-            raise Error("Host %s already in network %s" % (fqdn, self.network))
+            raise Error("Host %s exists already in network %s" % (fqdn, self.network))
 
         mac_address_used = self.mac_address_used(mac_address)
         if mac_address_used:
@@ -208,6 +208,8 @@ class NetIPv4(object):
         self.host_create(fqdn)
         self.host_mac_address_set(fqdn, mac_address)
         self.host_ipv4_address_set(fqdn, ipv4_address)
+
+        return ipv4_address
 
     def host_del(self, fqdn):
         """ Remove a host from the network"""

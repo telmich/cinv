@@ -1,0 +1,9 @@
+Changelog
+---------
+
+	* Changes are always commented with their author in (braces)
+	* Exception: No braces means author == Nico Schottelius
+
+2.0.0:
+	* First release after rebranding sexy to cinv
+	* Expose more of the python functions to be usable from outside

@@ -48,15 +48,15 @@ class Process(object):
     def commandline_args(cls, parent_parser, parents):
         """Add us to the parent parser and add all parents to our parsers"""
 
-        parser = {}
-        parser['sub'] = parent_parser.add_subparsers(title="Process Commands")
-
         if cls.check_for_processes():
             log.debug("importing processes")
 
             sys.path.insert(0, cinv.get_home_dir())
             import process as cinvprocess
-            cinvprocess.register_parser(parser)
+            cinvprocess.register_parser(parent_parser, parents)
 
         else:
+            parser = {}
+            parser['sub'] = parent_parser.add_subparsers(title="Process Commands")
+
             log.debug("no processes defined")

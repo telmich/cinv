@@ -73,12 +73,21 @@ class Host(object):
 
     @cores.setter
     def cores(self, cores):
-        try:
-            cores_int = int(cores)
-        except ValueError:
-            raise Error("Cores need to be specified as an integer")
-
+        cores = self.convert_si_prefixed_size_values(cores)
         self._cores = cores
+
+    def disk_add(self, size, name=False):
+        size = self.convert_si_prefixed_size_values(size)
+
+        if name:
+            if name in self.disk:
+                raise Error("Disk already exists: %s" % name)
+        else:
+            name = self.get_next_name("disk")
+
+        self.disk[name] = size
+
+        cinv.backend_exec("host", "disk_add", [self.fqdn, name, str(size)])
 
     @property
     def host_type(self):
@@ -95,11 +104,7 @@ class Host(object):
 
     @memory.setter
     def memory(self, memory):
-        try:
-            memory_int = int(memory)
-        except ValueError:
-            raise Error("Cores need to be specified as an integer of Bytes")
-
+        memory = self.convert_si_prefixed_size_values(memory)
         self._memory = memory
 
     @property
@@ -158,6 +163,10 @@ class Host(object):
     @staticmethod
     def convert_si_prefixed_size_values(value):
         """Convert given size to bytes"""
+
+        # Skip if there is nothing to calculate
+        if type(value) == int:
+            return value
 
         prefix = int(value[:-1])
         suffix = value[-1].lower()
@@ -276,23 +285,13 @@ class Host(object):
         cinv.backend_exec("host", "del", [args.fqdn])
 
 
+
     @classmethod
     def commandline_disk_add(cls, args):
 
         cls.exists_or_raise_error(args.fqdn)
         host = cls(fqdn=args.fqdn)
-        size_bytes = cls.convert_si_prefixed_size_values(args.size)
-
-        if args.name:
-            if args.name in host.disk:
-                raise Error("Disk already exists: %s" % args.name)
-            name = args.name
-        else:
-            name = host.get_next_name("disk")
-
-        host.disk[name] = size_bytes
-
-        cinv.backend_exec("host", "disk_add", [args.fqdn, name, str(size_bytes)])
+        host.disk_add(size=args.size, name=args.name)
 
         log.info("Added disk %s (%s Bytes)" % (name, size_bytes))
 

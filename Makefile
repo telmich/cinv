@@ -9,7 +9,4 @@ githubpub:
 selfpub:
 	git push --mirror
 
-sanspub: selfpub githubpub
-	git push --mirror sans
-
-pub: selfpub githubpub sanspub
+pub: selfpub githubpub

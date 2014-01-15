@@ -27,6 +27,9 @@ import os.path
 import cinv
 import subprocess
 
+#from cinv.netipv4 import NetIPv4
+#from cinv.host import Host
+
 log = logging.getLogger(__name__)
 
 class Error(Exception):

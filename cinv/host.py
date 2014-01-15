@@ -42,6 +42,9 @@ class Host(object):
     # Initialisation
     #
 
+    def __str__(self):
+        return self.fqdn
+
     def __init__(self, fqdn):
         self.base_dir = self.get_base_dir(fqdn)
         self.fqdn = fqdn
@@ -88,6 +91,10 @@ class Host(object):
         self.disk[name] = size
 
         cinv.backend_exec("host", "disk_add", [self.fqdn, name, str(size)])
+
+    @property
+    def hostname(self):
+        return self.fqdn.split(".")[0]
 
     @property
     def host_type(self):
@@ -428,7 +435,7 @@ class Host(object):
 
         host.tag_add(args.name, args.value, args.force)
 
-        log.info("Added tag %s = \"%s\"" % (name, value))
+        log.info("Added tag %s = \"%s\"" % (args.name, args.value))
 
     def tag_del(self, name, force=False):
         if name in self.tag:
@@ -476,9 +483,9 @@ class Host(object):
         print(host.vm_host)
 
     @classmethod
-    def commandline_vm_host_list(cls, args):
+    def vmhosts_vms_list(cls, tags=[]):
         vm_hosts = {}
-        for fqdn in cls.host_list():
+        for fqdn in cls.host_list(tags=tags):
             host = cls(fqdn)
             if host.vm_host:
                 # Create new array, if not already existing
@@ -487,6 +494,11 @@ class Host(object):
 
                 vm_hosts[host.vm_host].append(fqdn)
         
+        return vm_hosts
+
+    @classmethod
+    def commandline_vm_host_list(cls, args):
+        vm_hosts = cls.vmhosts_vms_list()
         sorted_vm_host_names = sorted(vm_hosts.keys())
 
         for vm_host in sorted_vm_host_names:

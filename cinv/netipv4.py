@@ -30,6 +30,7 @@ import socket
 import struct
 
 import cinv
+import cinv.mac
 from cinv import fsproperty
 
 log = logging.getLogger(__name__)
@@ -183,7 +184,6 @@ class NetIPv4(object):
         """ Add a host to the network"""
         
         # Ensure given mac address is valid
-        import cinv.mac
         cinv.mac.Mac.validate_mac(mac_address)
 
         if self.host_exists(fqdn):
@@ -302,7 +302,7 @@ class NetIPv4(object):
             next_ipv4_address = self.ipv4_address_dotted_quad(next_decimal)
 
         if next_ipv4_address == self.broadcast:
-            raise Error("Next address is broadcast - cannot get new one")
+            raise Error("Next address is broadcast address - no free address left")
 
         self.last = next_ipv4_address
         log.debug("Next IPv4 address: %s" % next_ipv4_address)

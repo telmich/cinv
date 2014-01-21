@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 #
-# 2012 Nico Schottelius (nico-cinv at schottelius.org)
+# 2012-2014 Nico Schottelius (nico-cinv at schottelius.org)
 #
 # This file is part of cinv.
 #
@@ -46,6 +46,10 @@ class Host(object):
         return self.fqdn
 
     def __init__(self, fqdn):
+
+        if fqdn == None or fqdn == "":
+            raise cdist.Error("Cannot create host with empty fqdn")
+
         self.base_dir = self.get_base_dir(fqdn)
         self.fqdn = fqdn
 

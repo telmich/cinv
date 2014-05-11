@@ -154,11 +154,21 @@ class Host(object):
             else:
                 hosts.append(entry)
 
-        # Only show hosts matching all tags
+        # Only show hosts matching all tags (but can contain other tags)
         if len(tags) > 0:
-            tagset = set(tags)
-            host_objects = [cls(h) for h in hosts]
-            hosts = [h.fqdn for h in host_objects if h.tag.keys() == tagset]
+            hosts_with_tags = []
+
+            for host in hosts:
+                host_object = cls(host)
+                has_tags = True
+                for tag in tags:
+                    if not tag in host_object.tag.keys():
+                        has_tags = False
+                        break
+                if has_tags:
+                    hosts_with_tags.append(host)
+
+            hosts = hosts_with_tags
 
         return hosts
 

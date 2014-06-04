@@ -467,7 +467,7 @@ class Host(object):
 
         host.tag_del(args.name, args.force)
 
-        log.info("Deleted tag %s" % (name))
+        log.info("Deleted tag %s" % (args.name))
 
     @classmethod
     def commandline_tag_list(cls, args):

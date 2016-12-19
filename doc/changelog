@@ -4,6 +4,11 @@ Changelog
 	* Changes are always commented with their author in (braces)
 	* Exception: No braces means author == Nico Schottelius
 
+next:
+	* Do not use address_free list nor last used address because
+	  of issue with manually db manipulation. Scan for next free
+	  address. (Darko Poljak)
+
 2.0.0:
 	* First release after rebranding sexy to cinv
 	* Expose more of the python functions to be usable from outside

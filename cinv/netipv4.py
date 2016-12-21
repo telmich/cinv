@@ -28,7 +28,6 @@ import re
 import shutil
 import socket
 import struct
-from collections import defaultdict
 
 import cinv
 import cinv.mac
@@ -321,19 +320,18 @@ class NetIPv4(object):
 
     def get_next_ipv4_address(self):
         """Get next address from network"""
-        used_addrs = defaultdict(int)
+        used_addrs = set()
 
         # Scan used addresses and also check for integrity:
         # each address is used at most once.
         for host in self.host_list():
             host_ipv4_address = self.host_ipv4_address_get(host)
             addr_decimal = self.ipv4_address_decimal(host_ipv4_address)
-            addr_cnt = used_addrs[addr_decimal]
-            if addr_cnt == 0:
-                used_addrs[addr_decimal] += 1
-            else:
+            if addr_decimal in used_addrs:
                 raise Error(("Integrity error: address {0} used more than once"
                              "".format(host_ipv4_address)))
+            else:
+                used_addrs.add(addr_decimal)
 
         addr = self.network_decimal() + 1
         broadcast = self._broadcast_decimal

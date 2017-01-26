@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 #
 # 2012 Nico Schottelius (nico-cinv at schottelius.org)
+# 2016 Darko Poljak (darko.poljak at gmail.com)
 #
 # This file is part of cinv.
 #
@@ -20,7 +21,6 @@
 #
 #
 
-import argparse
 import logging
 import os.path
 import os
@@ -35,8 +35,10 @@ from cinv import fsproperty
 
 log = logging.getLogger(__name__)
 
+
 class Error(cinv.Error):
     pass
+
 
 class NetIPv4(object):
 
@@ -46,16 +48,19 @@ class NetIPv4(object):
             raise Error("Not a valid IPv4 address: %s" % network)
 
         self.base_dir = self.get_base_dir(network)
-        self.network   = network
+        self.network = network
 
-    _mask           = fsproperty.FileStringProperty(lambda obj: os.path.join(obj.base_dir, "mask"))
-    address_free    = fsproperty.FileListProperty(lambda obj: os.path.join(obj.base_dir, "address_free"))
-    last            = fsproperty.FileStringProperty(lambda obj: os.path.join(obj.base_dir, "last"))
-    address         = fsproperty.DirectoryDictProperty(lambda obj: os.path.join(obj.base_dir, 'address'))
+    _mask = fsproperty.FileStringProperty(
+        lambda obj: os.path.join(obj.base_dir, "mask"))
+    address = fsproperty.DirectoryDictProperty(
+        lambda obj: os.path.join(obj.base_dir, 'address'))
 
-    bootserver      = fsproperty.FileStringProperty(lambda obj: os.path.join(obj.base_dir, "bootserver"))
-    bootfilename    = fsproperty.FileStringProperty(lambda obj: os.path.join(obj.base_dir, "bootfilename"))
-    router          = fsproperty.FileStringProperty(lambda obj: os.path.join(obj.base_dir, "router"))
+    bootserver = fsproperty.FileStringProperty(
+        lambda obj: os.path.join(obj.base_dir, "bootserver"))
+    bootfilename = fsproperty.FileStringProperty(
+        lambda obj: os.path.join(obj.base_dir, "bootfilename"))
+    router = fsproperty.FileStringProperty(
+        lambda obj: os.path.join(obj.base_dir, "router"))
 
     def _init_base_dir(self, mask):
         """Create base directory"""
@@ -68,7 +73,7 @@ class NetIPv4(object):
 
         self.mask = mask
 
-    @property 
+    @property
     def base_host_dir(self):
         return os.path.join(self.base_dir, "host")
 
@@ -84,25 +89,29 @@ class NetIPv4(object):
         if not mask:
             mask = self.mask
 
-        mask_dec = (1<<32) - (1<<32>> int(mask))
-        mapped_ipv4_address_dec = self.ipv4_address_decimal(ipv4_address) & mask_dec
-        mapped_ipv4_address_str = self.ipv4_address_dotted_quad(mapped_ipv4_address_dec)
+        mask_dec = (1 << 32) - (1 << 32 >> int(mask))
+        mapped_ipv4_address_dec = (self.ipv4_address_decimal(ipv4_address) &
+                                   mask_dec)
+        mapped_ipv4_address_str = self.ipv4_address_dotted_quad(
+            mapped_ipv4_address_dec)
 
         return mapped_ipv4_address_str
 
     def validate_network_address(self, mask):
         """Check whether given IPv4 address is the net address"""
 
-        network_str = self.map_ipv4_address_to_network_address(self.network, mask=mask)
+        network_str = self.map_ipv4_address_to_network_address(self.network,
+                                                               mask=mask)
 
         if not self.network == network_str:
-            raise Error("Given address is not the net address (%s != %s)" % (self.network, network_str))
+            raise Error("Given address is not the net address (%s != %s)" % (
+                self.network, network_str))
 
     @staticmethod
     def validate_mask_int_range(mask):
         try:
             mask = int(mask)
-        except ValueError as e:
+        except ValueError:
             raise Error("Mask must be an integer")
 
         if mask not in range(1, 33):
@@ -110,8 +119,10 @@ class NetIPv4(object):
 
     @staticmethod
     def validate_ipv4address(ipv4address):
-        return re.match('^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])$', ipv4address)
-
+        return re.match(('^(([0-9]|[1-9][0-9]|1[0-9]{2}'
+                         '|2[0-4][0-9]|25[0-5])\.){3}'
+                         '([0-9]|[1-9][0-9]|1[0-9]{2}'
+                         '|2[0-4][0-9]|25[0-5])$'), ipv4address)
 
     @property
     def mask(self):
@@ -134,8 +145,8 @@ class NetIPv4(object):
 
         for entry in os.listdir(base_dir):
             # With or without the mask is the question...
-            #network = cls(entry)
-            #networks.append("%s/%s" % (entry, network.mask))
+            # network = cls(entry)
+            # networks.append("%s/%s" % (entry, network.mask))
             networks.append("%s" % (entry))
 
         return networks
@@ -147,7 +158,7 @@ class NetIPv4(object):
     @staticmethod
     def ipv4_address_decimal(ipv4_address):
         """ Return IPv4 address in decimal """
-        return struct.unpack('>L',socket.inet_aton(ipv4_address))[0]
+        return struct.unpack('>L', socket.inet_aton(ipv4_address))[0]
 
     @staticmethod
     def ipv4_address_dotted_quad(ipv4_address_decimal):
@@ -161,46 +172,63 @@ class NetIPv4(object):
     @property
     def broadcast(self):
         """ Return broadcast string """
-        add_mask = (1<<(32 - int(self.mask)))-1
-        broadcast = socket.inet_ntoa(struct.pack(">L", self.network_decimal() | add_mask))
+        add_mask = (1 << (32 - int(self.mask))) - 1
+        broadcast = socket.inet_ntoa(
+            struct.pack(">L", self.network_decimal() | add_mask))
 
         log.debug("Broadcast: %s" % broadcast)
 
         return broadcast
 
     @property
+    def _broadcast_decimal(self):
+        """ Return broadcast decimal """
+        add_mask = (1 << (32 - int(self.mask))) - 1
+        broadcast = self.network_decimal() | add_mask
+
+        log.debug("Broadcast decimal: %s" % broadcast)
+
+        return broadcast
+
+    @property
     def mask_dotted_quad(self):
         """ Return mask_decimal string """
-        return socket.inet_ntoa(struct.pack('>L', (1<<32)-(1<<(32-int(self.mask)))))
-
+        return socket.inet_ntoa(
+            struct.pack('>L', (1 << 32) - (1 << (32 - int(self.mask)))))
 
     def ipv4_address_belongs_to_network(self, ipv4_address):
-        return self.network == self.map_ipv4_address_to_network_address(ipv4_address)
+        return self.network == self.map_ipv4_address_to_network_address(
+            ipv4_address)
 
     def ipv4_address_used_in_network(self, ipv4_address):
-        return self.network == self.map_ipv4_address_to_network_address(ipv4_address)
+        return self.network == self.map_ipv4_address_to_network_address(
+            ipv4_address)
 
     def host_add(self, fqdn, mac_address, ipv4_address=None):
         """ Add a host to the network"""
-        
+
         # Ensure given mac address is valid
         cinv.mac.Mac.validate_mac(mac_address)
 
         if self.host_exists(fqdn):
-            raise Error("Host %s exists already in network %s" % (fqdn, self.network))
+            raise Error("Host %s exists already in network %s" % (
+                fqdn, self.network))
 
         mac_address_used = self.mac_address_used(mac_address)
         if mac_address_used:
-            raise Error("Mac %s already used in network %s by %s" % (mac_address, self.network, mac_address_used))
+            raise Error("Mac %s already used in network %s by %s" % (
+                mac_address, self.network, mac_address_used))
 
         # Adresse given from outside
         if ipv4_address:
             if not self.ipv4_address_belongs_to_network(ipv4_address):
-                raise Error("Requested IPv4 address not in network: %s/%s" % (self.network, ipv4_address))
+                raise Error("Requested IPv4 address not in network: %s/%s" % (
+                    self.network, ipv4_address))
 
             ipv4_address_used = self.ipv4_address_used(ipv4_address)
             if ipv4_address_used:
-                raise Error("IPv4 address %s already used in network %s by %s" % (ipv4_address, self.network, ipv4_address_used))
+                raise Error("IPv4 address %s already used in network %s by %s"
+                            % (ipv4_address, self.network, ipv4_address_used))
 
         else:
             ipv4_address = self.get_next_ipv4_address()
@@ -215,12 +243,13 @@ class NetIPv4(object):
         """ Remove a host from the network"""
 
         if not self.host_exists(fqdn):
-            raise Error("Host %s does not exist in network %s" % (fqdn, self.network))
+            raise Error("Host %s does not exist in network %s" % (
+                fqdn, self.network))
 
         ipv4_address = self.host_ipv4_address_get(fqdn)
-        log.debug("Removing host %s with ipv4 address %s" % (fqdn, ipv4_address))
+        log.debug("Removing host %s with ipv4 address %s" % (
+            fqdn, ipv4_address))
 
-        self.address_free.append(ipv4_address)
         shutil.rmtree(self.host_dir(fqdn))
 
     def host_exists(self, fqdn):
@@ -258,13 +287,15 @@ class NetIPv4(object):
             fd.write("%s\n" % mac_address)
 
     def host_ipv4_address_get(self, host):
-        ipv4_address_file = os.path.join(self.base_host_dir, host, "ipv4_address")
+        ipv4_address_file = os.path.join(self.base_host_dir, host,
+                                         "ipv4_address")
 
         with open(ipv4_address_file, "r") as fd:
             return fd.read().rstrip('\n')
 
     def host_ipv4_address_set(self, host, ipv4_address):
-        ipv4_address_file = os.path.join(self.base_host_dir, host, "ipv4_address")
+        ipv4_address_file = os.path.join(self.base_host_dir,
+                                         host, "ipv4_address")
 
         with open(ipv4_address_file, "w") as fd:
             fd.write("%s\n" % ipv4_address)
@@ -289,26 +320,33 @@ class NetIPv4(object):
 
     def get_next_ipv4_address(self):
         """Get next address from network"""
+        used_addrs = set()
 
-        if self.address_free:
-            return self.address_free.pop()
+        # Scan used addresses and also check for integrity:
+        # each address is used at most once.
+        for host in self.host_list():
+            host_ipv4_address = self.host_ipv4_address_get(host)
+            addr_decimal = self.ipv4_address_decimal(host_ipv4_address)
+            if addr_decimal in used_addrs:
+                raise Error(("Integrity error: address {0} used more than once"
+                             "".format(host_ipv4_address)))
+            else:
+                used_addrs.add(addr_decimal)
 
-        if self.last:
-            last_decimal = self.ipv4_address_decimal(self.last)
-            next_decimal = last_decimal + 1
-            next_ipv4_address = self.ipv4_address_dotted_quad(next_decimal)
-        else:
-            next_decimal = self.network_decimal() + 1
-            next_ipv4_address = self.ipv4_address_dotted_quad(next_decimal)
-
+        addr = self.network_decimal() + 1
+        broadcast = self._broadcast_decimal
+        while addr < broadcast:
+            if addr not in used_addrs:
+                break
+            addr += 1
+        next_ipv4_address = self.ipv4_address_dotted_quad(addr)
         if next_ipv4_address == self.broadcast:
-            raise Error("Next address is broadcast address - no free address left")
+            raise Error(("Next address is broadcast address - no free "
+                         "address left"))
 
-        self.last = next_ipv4_address
         log.debug("Next IPv4 address: %s" % next_ipv4_address)
 
         return next_ipv4_address
-
 
     ######################################################################
     @classmethod
@@ -348,14 +386,14 @@ class NetIPv4(object):
 #
 #        if not args.recursive:
 #            if host.nics or host.disks:
-#                raise Error("Cannot delete, host contains disks or nics: %s" % args.fqdn)
+#                raise Error("Cannot delete, host contains disks or nics: %s"
+#                              % args.fqdn)
 #
 #        log.debug("Removing %s ..." % host.base_dir)
 #        shutil.rmtree(host.base_dir)
 #
 #        cinv.backend_exec("host", "del", [args.fqdn])
 
-                
     @classmethod
     def commandline_list(cls, args):
         for network in cls.network_list():
@@ -489,98 +527,125 @@ class NetIPv4(object):
 
         parser['add'] = parser['sub'].add_parser('add', parents=parents)
         parser['add'].add_argument('network', help='Network name')
-        parser['add'].add_argument('-m', '--mask', help='Network mask (in Bits, f.i. "24")',
-            required=True)
+        parser['add'].add_argument('-m', '--mask',
+                                   help='Network mask (in Bits, f.i. "24")',
+                                   required=True)
         parser['add'].set_defaults(func=cls.commandline_add)
 
-        parser['bootfilename-get'] = parser['sub'].add_parser('bootfilename-get', parents=parents)
+        parser['bootfilename-get'] = parser['sub'].add_parser(
+            'bootfilename-get', parents=parents)
         parser['bootfilename-get'].add_argument('network', help='Network name')
-        parser['bootfilename-get'].set_defaults(func=cls.commandline_bootfilename_get)
- 
-        parser['bootfilename-set'] = parser['sub'].add_parser('bootfilename-set', parents=parents)
-        parser['bootfilename-set'].add_argument('network', help='Network name')
-        parser['bootfilename-set'].add_argument('--bootfilename', help='Bootserver',
-            required=True)
-        parser['bootfilename-set'].set_defaults(func=cls.commandline_bootfilename_set)
+        parser['bootfilename-get'].set_defaults(
+            func=cls.commandline_bootfilename_get)
 
-        parser['bootserver-get'] = parser['sub'].add_parser('bootserver-get', parents=parents)
+        parser['bootfilename-set'] = parser['sub'].add_parser(
+            'bootfilename-set', parents=parents)
+        parser['bootfilename-set'].add_argument('network', help='Network name')
+        parser['bootfilename-set'].add_argument(
+            '--bootfilename', help='Bootserver', required=True)
+        parser['bootfilename-set'].set_defaults(
+            func=cls.commandline_bootfilename_set)
+
+        parser['bootserver-get'] = parser['sub'].add_parser(
+            'bootserver-get', parents=parents)
         parser['bootserver-get'].add_argument('network', help='Network name')
-        parser['bootserver-get'].set_defaults(func=cls.commandline_bootserver_get)
- 
-        parser['bootserver-set'] = parser['sub'].add_parser('bootserver-set', parents=parents)
+        parser['bootserver-get'].set_defaults(
+            func=cls.commandline_bootserver_get)
+
+        parser['bootserver-set'] = parser['sub'].add_parser(
+            'bootserver-set', parents=parents)
         parser['bootserver-set'].add_argument('network', help='Network name')
         parser['bootserver-set'].add_argument('--bootserver', help='Bootserver',
-            required=True)
-        parser['bootserver-set'].set_defaults(func=cls.commandline_bootserver_set)
- 
-        parser['broadcast-get'] = parser['sub'].add_parser('broadcast-get', parents=parents)
+                                              required=True)
+        parser['bootserver-set'].set_defaults(
+            func=cls.commandline_bootserver_set)
+
+        parser['broadcast-get'] = parser['sub'].add_parser(
+            'broadcast-get', parents=parents)
         parser['broadcast-get'].add_argument('network', help='Network name')
         parser['broadcast-get'].set_defaults(func=cls.commandline_broadcast_get)
- 
-        parser['mask-get'] = parser['sub'].add_parser('mask-get', parents=parents)
+
+        parser['mask-get'] = parser['sub'].add_parser(
+            'mask-get', parents=parents)
         parser['mask-get'].add_argument('network', help='Network name')
         parser['mask-get'].set_defaults(func=cls.commandline_mask_get)
 
-        parser['mask-dotted-quad-get'] = parser['sub'].add_parser('mask-dotted-quad-get', parents=parents)
-        parser['mask-dotted-quad-get'].add_argument('network', help='Network name')
-        parser['mask-dotted-quad-get'].set_defaults(func=cls.commandline_mask_dotted_quad_get)
-  
-        parser['router-get'] = parser['sub'].add_parser('router-get', parents=parents)
+        parser['mask-dotted-quad-get'] = parser['sub'].add_parser(
+            'mask-dotted-quad-get', parents=parents)
+        parser['mask-dotted-quad-get'].add_argument(
+            'network', help='Network name')
+        parser['mask-dotted-quad-get'].set_defaults(
+            func=cls.commandline_mask_dotted_quad_get)
+
+        parser['router-get'] = parser['sub'].add_parser(
+            'router-get', parents=parents)
         parser['router-get'].add_argument('network', help='Network name')
         parser['router-get'].set_defaults(func=cls.commandline_router_get)
- 
-        parser['router-set'] = parser['sub'].add_parser('router-set', parents=parents)
+
+        parser['router-set'] = parser['sub'].add_parser(
+            'router-set', parents=parents)
         parser['router-set'].add_argument('network', help='Network name')
         parser['router-set'].add_argument('-r', '--router', help='Router',
-            required=True)
+                                          required=True)
         parser['router-set'].set_defaults(func=cls.commandline_router_set)
 
 #        parser['del'] = parser['sub'].add_parser('del', parents=parents)
-#        parser['del'].add_argument('-r', '--recursive', help='Delete net and all addresses',
-#            action='store_true')
-#        parser['del'].add_argument('-i', '--ignore-missing', 
+#        parser['del'].add_argument('-r', '--recursive',
+#                                   help='Delete net and all addresses',
+#                                   action='store_true')
+#        parser['del'].add_argument('-i', '--ignore-missing',
 #            help='Do not fail if net is missing', action='store_true')
 #        parser['del'].add_argument('net', help='Network name')
 #        parser['del'].set_defaults(func=cls.commandline_del)
 
-        parser['host-add'] = parser['sub'].add_parser('host-add', parents=parents)
+        parser['host-add'] = parser['sub'].add_parser(
+            'host-add', parents=parents)
         parser['host-add'].add_argument('network', help='Network name')
-        parser['host-add'].add_argument('-m', '--mac-address', help='Mac Address',
-            required=True)
+        parser['host-add'].add_argument('-m', '--mac-address',
+                                        help='Mac Address', required=True)
         parser['host-add'].add_argument('-f', '--fqdn', help='FQDN of host',
-            required=True)
-        parser['host-add'].add_argument('-i', '--ipv4-address', help='Requested IPv4 Address')
+                                        required=True)
+        parser['host-add'].add_argument('-i', '--ipv4-address',
+                                        help='Requested IPv4 Address')
         parser['host-add'].set_defaults(func=cls.commandline_host_add)
 
-        parser['host-del'] = parser['sub'].add_parser('host-del', parents=parents)
+        parser['host-del'] = parser['sub'].add_parser('host-del',
+                                                      parents=parents)
         parser['host-del'].add_argument('network', help='Network name')
         parser['host-del'].add_argument('-f', '--fqdn', help='FQDN of host',
-            required=True)
+                                        required=True)
         parser['host-del'].set_defaults(func=cls.commandline_host_del)
 
-        parser['host-list'] = parser['sub'].add_parser('host-list', parents=parents)
+        parser['host-list'] = parser['sub'].add_parser(
+            'host-list', parents=parents)
         parser['host-list'].add_argument('network', help='Network name')
         parser['host-list'].set_defaults(func=cls.commandline_host_list)
 
-        parser['host-ipv4-address-get'] = parser['sub'].add_parser('host-ipv4-address-get', parents=parents)
-        parser['host-ipv4-address-get'].add_argument('network', help='Network name')
-        parser['host-ipv4-address-get'].add_argument('-f', '--fqdn', help='FQDN of host',
-            required=True)
-        parser['host-ipv4-address-get'].set_defaults(func=cls.commandline_host_ipv4_address_get)
+        parser['host-ipv4-address-get'] = parser['sub'].add_parser(
+            'host-ipv4-address-get', parents=parents)
+        parser['host-ipv4-address-get'].add_argument(
+            'network', help='Network name')
+        parser['host-ipv4-address-get'].add_argument(
+            '-f', '--fqdn', help='FQDN of host', required=True)
+        parser['host-ipv4-address-get'].set_defaults(
+            func=cls.commandline_host_ipv4_address_get)
 
-        parser['host-mac-address-get'] = parser['sub'].add_parser('host-mac-address-get', parents=parents)
-        parser['host-mac-address-get'].add_argument('network', help='Network name')
-        parser['host-mac-address-get'].add_argument('-f', '--fqdn', help='FQDN of host',
-            required=True)
-        parser['host-mac-address-get'].set_defaults(func=cls.commandline_host_mac_address_get)
+        parser['host-mac-address-get'] = parser['sub'].add_parser(
+            'host-mac-address-get', parents=parents)
+        parser['host-mac-address-get'].add_argument(
+            'network', help='Network name')
+        parser['host-mac-address-get'].add_argument(
+            '-f', '--fqdn', help='FQDN of host', required=True)
+        parser['host-mac-address-get'].set_defaults(
+            func=cls.commandline_host_mac_address_get)
 
         parser['list'] = parser['sub'].add_parser('list', parents=parents)
         parser['list'].set_defaults(func=cls.commandline_list)
 
         parser['apply'] = parser['sub'].add_parser('apply', parents=parents)
-        parser['apply'].add_argument('network', help='Network name',
-            nargs='*')
-        parser['apply'].add_argument('-a', '--all', 
-            help='Apply settings for all networks', required = False,
-            action='store_true')
+        parser['apply'].add_argument(
+            'network', help='Network name', nargs='*')
+        parser['apply'].add_argument('-a', '--all',
+                                     help='Apply settings for all networks',
+                                     required=False, action='store_true')
         parser['apply'].set_defaults(func=cls.commandline_apply)
